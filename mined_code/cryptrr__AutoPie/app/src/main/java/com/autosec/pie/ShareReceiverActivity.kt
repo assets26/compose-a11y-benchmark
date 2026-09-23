@@ -1,0 +1,533 @@
+package com.autopi
+
+
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.UnfoldMore
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ModalBottomSheetDefaults
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
+import com.autopi.autopieapp.data.CommandModel
+import com.autopi.autopieapp.data.ExtraFlags
+import com.autopi.autopieapp.data.ShareInputs
+import com.autopi.autopieapp.data.firstStepOrSelf
+import com.autopi.autopieapp.data.hasFlag
+import com.autopi.autopieapp.data.hasUnsetRequiredExtras
+import com.autopi.autopieapp.domain.ViewModelEvent
+import com.autopi.autopieapp.presentation.elements.AutoPieLogo
+import com.autopi.autopieapp.presentation.elements.SearchBar
+import com.autopi.autopieapp.presentation.screens.CloudCommandCard
+import com.autopi.autopieapp.presentation.screens.CloudCommandDetails
+import com.autopi.autopieapp.presentation.screens.CommandExtrasBottomSheet
+import com.autopi.ui.theme.AutoPieTheme
+import com.autopi.utils.Utils.Companion.getPathsFromClipData
+import com.autopi.autopieapp.presentation.viewModels.ShareReceiverViewModel
+import com.autopi.autopieapp.presentation.viewModels.CloudCommandsViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import org.koin.java.KoinJavaComponent.inject
+import timber.log.Timber
+import com.autopi.utils.getActivity
+import com.autopi.utils.getCommandExec
+import org.koin.androidx.compose.koinViewModel
+import kotlin.time.Duration.Companion.milliseconds
+
+
+private data class ShareRequest(val intent: Intent?, val version: Int)
+
+class ShareReceiverActivity : ComponentActivity() {
+
+    private var shareRequest by mutableStateOf(ShareRequest(null, 0))
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+
+        super.onCreate(savedInstanceState)
+        shareRequest = ShareRequest(intent, 0)
+
+        setContent {
+            val currentRequest = shareRequest
+            val currentIntent = currentRequest.intent
+            val inputText = currentIntent?.getStringExtra(Intent.EXTRA_TEXT)
+            val inputFiles = remember(currentIntent) {
+                extractInputFiles(currentIntent, inputText)
+            }
+            val requestVersion = currentRequest.version
+            val shareReceiverViewModel: ShareReceiverViewModel = koinViewModel()
+
+            LaunchedEffect(requestVersion) {
+                if (requestVersion > 0) {
+                    shareReceiverViewModel.abandonCurrentInvocation()
+                }
+            }
+
+            AutoPieTheme {
+                key(requestVersion) {
+                    ShareContextMenuBottomSheet(inputText = inputText, inputFiles = inputFiles)
+                }
+            }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        shareRequest = ShareRequest(intent, shareRequest.version + 1)
+    }
+
+    private fun extractInputFiles(intent: Intent?, inputText: String?): List<String> {
+        Timber.d(intent.toString())
+        Timber.d(intent?.extras.toString())
+        Timber.d("View data: ${intent?.data}")
+
+        if (intent == null) return emptyList()
+        val inputFiles = mutableListOf<String>()
+
+        when (intent.action) {
+            Intent.ACTION_SEND_MULTIPLE -> {
+                val sharedPaths = intent.getParcelableArrayListExtra<Uri>("extra_file_uris")
+                Timber.d("ACTION_SEND_MULTIPLE PATH: $sharedPaths")
+                sharedPaths?.forEach { sharedPath ->
+                    sharedPath.path?.let { path ->
+                        inputFiles.add(sharedPath.fragment?.let { "$path#$it" } ?: path)
+                    }
+                }
+                if (sharedPaths == null && inputText == null) {
+                    inputFiles.addAll(getPathsFromClipData(applicationContext, intent))
+                }
+            }
+
+            Intent.ACTION_SEND, Intent.ACTION_VIEW -> {
+                val sharedPath = intent.getParcelableExtra<Uri>("extra_file_uris")
+                Timber.d("${intent.action} PATH: $sharedPath")
+                sharedPath?.path?.let { path ->
+                    inputFiles.add(sharedPath.fragment?.let { "$path#$it" } ?: path)
+                }
+                if (sharedPath == null && inputText == null) {
+                    inputFiles.addAll(getPathsFromClipData(applicationContext, intent))
+                }
+            }
+        }
+
+        Timber.d("Intent EXTRA_TEXT: $inputText")
+        Timber.d("Intent FILES: $inputFiles")
+        return inputFiles
+    }
+
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ShareContextMenuBottomSheet(
+    inputText: String?,
+    inputFiles: List<String>,
+    onHide: () -> Unit = {},
+    onExpand: () -> Unit = {}
+) {
+    val shareReceiverViewModel: ShareReceiverViewModel = koinViewModel()
+    val cloudCommandsViewModel: CloudCommandsViewModel = koinViewModel()
+
+    val shareItemsResult = shareReceiverViewModel.shareItemsResult.collectAsState()
+    val filteredShareItemsResult = shareReceiverViewModel.filteredShareItemsResult.collectAsState()
+    val repositorySearchResults = shareReceiverViewModel.repositorySearchResults.collectAsState()
+    val repositoryInstalledCommandVersions =
+        shareReceiverViewModel.repositoryInstalledCommandVersions.collectAsState()
+    val mostUsedPackages = shareReceiverViewModel.mostUsedPackages.collectAsState()
+
+
+    val activity = LocalContext.current.getActivity()
+
+
+    LaunchedEffect(key1 = inputText, inputFiles) {
+        shareReceiverViewModel.main.eventFlow.collect {
+            when (it) {
+                is ViewModelEvent.CloseShareReceiverSheet -> activity?.finish()
+                else -> {}
+            }
+        }
+    }
+
+    SideEffect {
+        if(shareItemsResult.value.isEmpty()){
+            shareReceiverViewModel.getShareCommands()
+        }
+    }
+
+    val state = rememberModalBottomSheetState(skipPartiallyExpanded = true, confirmValueChange = {
+        it != SheetValue.Hidden
+    })
+
+    val scope = rememberCoroutineScope()
+
+
+    val extrasBottomSheetState = rememberModalBottomSheetState(true,confirmValueChange = {
+        it != SheetValue.Hidden
+    })
+    val extrasBottomSheetStateOpen = remember {
+        mutableStateOf(false)
+    }
+    val cloudCommandDetailsState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val cloudCommandDetailsOpen = remember { mutableStateOf(false) }
+
+    LaunchedEffect(shareReceiverViewModel.currentExtrasDetails.value) {
+        extrasBottomSheetStateOpen.value = shareReceiverViewModel.currentExtrasDetails.value != null
+    }
+
+
+    @Composable
+    fun bottomSheetContent() {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                //.height(700.dp)
+                .fillMaxHeight(0.75F),
+            contentAlignment = Alignment.TopStart
+
+        )
+        {
+
+            Column(
+                Modifier
+                    .fillMaxSize()
+            ) {
+
+                LazyColumn(
+                    Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(15.dp),
+                    contentPadding = PaddingValues(10.dp)
+                ) {
+                    item {
+
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            AutoPieLogo()
+                            Spacer(modifier = Modifier.height(15.dp))
+                            Button(
+                                modifier = Modifier,
+                                contentPadding = PaddingValues(10.dp),
+                                shape = RoundedCornerShape(15.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                                onClick = {
+                                val intent = Intent(activity, MainActivity::class.java)
+                                activity?.startActivity(intent)
+                            }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Settings,
+                                    contentDescription = "Open the main app.",
+                                    tint = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.size(28.dp)
+                                )
+                            }
+                        }
+
+                    }
+                    item {
+                        SearchBar(searchQuery = shareReceiverViewModel.main.shareReceiverSearchQuery, "Search your commands") {
+                            shareReceiverViewModel.search(shareReceiverViewModel.main.shareReceiverSearchQuery.value)
+                        }
+                    }
+                    item{
+                        FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)){
+                            mostUsedPackages.value.map{
+                                AssistChip(onClick = {shareReceiverViewModel.main.shareReceiverSearchQuery.value = it;shareReceiverViewModel.search(it)}, label = { Text(it) }, colors = AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(10.dp)), border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2F)))
+                            }
+                        }
+                    }
+                    items(
+                        filteredShareItemsResult.value,
+                        key = { it.name ?: it }) { item ->
+                        ShareCard(card = item, inputText, inputFiles, state)
+                    }
+                    if (shareReceiverViewModel.isRepositorySearchLoading.value) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 30.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(strokeWidth = 2.dp)
+                            }
+                        }
+                    }
+                    if (repositorySearchResults.value.isNotEmpty()) {
+                        item {
+                            Text(
+                                text = "Available from the command catalog",
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.75F)
+                            )
+                        }
+                        items(
+                            repositorySearchResults.value,
+                            key = { "repository:${it.id}" }
+                        ) { command ->
+                            val installedVersion =
+                                repositoryInstalledCommandVersions.value[command.id]
+                            CloudCommandCard(
+                                card = command,
+                                installedVersion = installedVersion,
+                                onClick = {
+                                    cloudCommandsViewModel.selectCommand(command, installedVersion)
+                                    cloudCommandDetailsOpen.value = true
+                                }
+                            )
+                        }
+                    }
+                }
+
+            }
+        }
+
+        if (extrasBottomSheetStateOpen.value) {
+            CommandExtrasBottomSheet(
+                state = extrasBottomSheetState,
+                open = extrasBottomSheetStateOpen,
+                state,
+                isAsync = true
+            )
+        }
+
+    }
+
+
+    ModalBottomSheet(
+
+        sheetState = state,
+
+        content = { bottomSheetContent() },
+        shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp),
+        //containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp),
+        properties = ModalBottomSheetDefaults.properties(),
+        onDismissRequest = {
+            scope.launch {
+                state.hide()
+                activity?.finish()
+            }
+        }
+    )
+
+    if (cloudCommandDetailsOpen.value) {
+        CloudCommandDetails(
+            state = cloudCommandDetailsState,
+            open = cloudCommandDetailsOpen
+        )
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@Composable
+fun ShareCard(
+    card: CommandModel,
+    inputText: String?,
+    inputFiles: List<String>,
+    sheetState: SheetState,
+) {
+
+
+    val activity = LocalContext.current.getActivity()
+    var isLoading by remember {
+        mutableStateOf(false)
+    }
+
+    val shareReceiverViewModel: ShareReceiverViewModel = koinViewModel()
+    val activeCard = card.firstStepOrSelf()
+    val hasUserFacingExtras = activeCard.extras?.any {
+        !it.flags.hasFlag(ExtraFlags.INTERNAL_CONFIG)
+    } == true
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(120.dp)
+            .combinedClickable(
+                onClick = {
+                    Timber.d("CLICK DETECTED")
+
+                    if(isLoading){
+                        return@combinedClickable
+                    }
+
+                    val runnableCard = shareReceiverViewModel.prepareCommand(card)?.firstStepOrSelf()
+                        ?: return@combinedClickable
+
+                    if (runnableCard.hasUnsetRequiredExtras()) {
+                        shareReceiverViewModel.openCommandExtras(
+                            runnableCard,
+                            ShareInputs(inputText, inputFiles)
+                        )
+                    } else {
+                        isLoading = true
+                        shareReceiverViewModel.onCommandClick(runnableCard, inputFiles, inputText) {
+                            shareReceiverViewModel.viewModelScope.launch {
+                                delay(900.milliseconds)
+                                Timber.d("CLOSING THE AUTOPIE COMMANDS SHEET.")
+                                activity?.finish()
+                            }
+                        }
+                    }
+                },
+                onLongClick = {
+                    Timber.d("LONG PRESS DETECTED")
+
+                    if (activeCard.multiStage == true || hasUserFacingExtras) {
+                        shareReceiverViewModel.openCommandExtras(
+                            activeCard,
+                            ShareInputs(inputText, inputFiles)
+                        )
+                    }
+                }
+            ),
+        shape = RoundedCornerShape(15.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
+        ),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.1F))
+    ) {
+
+        Column(
+            Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(strokeWidth = 2.dp)
+            } else {
+                CommandCard(card = card) {
+                    shareReceiverViewModel.openCommandExtras(
+                        activeCard,
+                        ShareInputs(inputText, inputFiles)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CommandCard(card: CommandModel, onExpandButtonClick: () -> Unit) {
+
+    val activeCard = card.firstStepOrSelf()
+    val hasUserFacingExtras = activeCard.extras?.any {
+        !it.flags.hasFlag(ExtraFlags.INTERNAL_CONFIG)
+    } == true || activeCard.multiStage == true
+
+
+    Box(
+        Modifier
+            .fillMaxSize()
+            .padding(15.dp),
+        //verticalArrangement = Arrangement.Center
+        contentAlignment = Alignment.Center
+    ) {
+        if (hasUserFacingExtras) {
+            Box(
+                Modifier
+                    .align(Alignment.TopEnd)
+                    .clip(RoundedCornerShape(15.dp))
+                    //.background(MaterialTheme.colorScheme.surfaceColorAtElevation(10.dp))
+                    .clickable {
+                        onExpandButtonClick()
+                    }
+                    .padding(10.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.UnfoldMore,
+                    tint = MaterialTheme.colorScheme.primary,
+                    contentDescription = "Show more options",
+                    modifier = Modifier.size(22.dp)
+                )
+            }
+        }
+        Column {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(
+                    text = card.name ?: "",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.fillMaxWidth(if (hasUserFacingExtras) 0.9F else 1F)
+                )
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = activeCard.command
+                    .lines()
+                    .filter { it.isNotBlank() }
+                    .joinToString("\n").ifBlank { card.steps.map{it.commandId}.joinToString("\n") },
+                maxLines = 2,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(0.7F),
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+        }
+    }
+}

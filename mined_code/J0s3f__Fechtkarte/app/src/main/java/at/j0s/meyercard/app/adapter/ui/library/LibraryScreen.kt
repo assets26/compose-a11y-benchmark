@@ -1,0 +1,290 @@
+package at.j0s.meyercard.app.adapter.ui.library
+
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.LastPage
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.FastForward
+import androidx.compose.material.icons.filled.FastRewind
+import androidx.compose.material.icons.filled.FirstPage
+import androidx.compose.material.icons.filled.Shuffle
+import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PrimaryTabRow
+import androidx.compose.material3.Tab
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.annotation.StringRes
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import at.j0s.meyercard.app.R
+import at.j0s.meyercard.app.adapter.ui.CardArea
+import at.j0s.meyercard.app.adapter.ui.MeyerSquareCard
+import at.j0s.meyercard.app.adapter.ui.displayName
+import at.j0s.meyercard.app.domain.CardLineStyle
+import at.j0s.meyercard.app.domain.Hand
+import at.j0s.meyercard.app.domain.HistoricalDrill
+import at.j0s.meyercard.app.domain.Instruction
+import at.j0s.meyercard.app.domain.MeyerCard
+
+private enum class LibraryTab(@StringRes val label: Int) {
+    DRILLS(R.string.library_tab_drills),
+    TECHNIQUES(R.string.library_tab_techniques),
+}
+
+/**
+ * The Library screen: the 44 historical drills with a hand
+ * toggle, and the 21 technique cards, each in their own tab with independent
+ * filtering and first/previous/next/last/±10/random navigation.
+ *
+ * [DrillsTab]/[TechniquesTab]'s own filter/position state is hoisted up here rather than
+ * `remember`ed inside either tab composable: the `when(tab)` below only ever composes one of
+ * them at a time, so a tab's own `remember` gets disposed the moment the other tab is selected
+ * — switching back silently reset the filter and browse position to their defaults (found via
+ * real-device QA testing, M-02). Hoisting to this composable, which stays in composition across
+ * the tab switch, is the same fix this project already used for Train's card surviving a
+ * Library/Learn round trip (`FechtkarteApp.kt`'s own `trainCard`/`trainLineStyle`).
+ */
+@Composable
+fun LibraryScreen(
+    drills: List<HistoricalDrill>,
+    techniqueCards: List<MeyerCard>,
+    modifier: Modifier = Modifier,
+    lineStyle: CardLineStyle = CardLineStyle.COMPASS,
+) {
+    var tab by remember { mutableStateOf(LibraryTab.DRILLS) }
+    var drillsState by remember(drills) { mutableStateOf(DrillsLibraryState(drills)) }
+    var techniqueState by remember(techniqueCards) { mutableStateOf(TechniqueLibraryState(techniqueCards)) }
+
+    Column(modifier = modifier.fillMaxSize()) {
+        PrimaryTabRow(selectedTabIndex = tab.ordinal) {
+            Tab(
+                selected = tab == LibraryTab.DRILLS,
+                onClick = { tab = LibraryTab.DRILLS },
+                text = { Text(stringResource(LibraryTab.DRILLS.label)) },
+                icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = null) },
+            )
+            Tab(
+                selected = tab == LibraryTab.TECHNIQUES,
+                onClick = { tab = LibraryTab.TECHNIQUES },
+                text = { Text(stringResource(LibraryTab.TECHNIQUES.label)) },
+                icon = { Icon(Icons.AutoMirrored.Filled.MenuBook, contentDescription = null) },
+            )
+        }
+        when (tab) {
+            LibraryTab.DRILLS -> DrillsTab(
+                state = drillsState,
+                onStateChange = { drillsState = it },
+                modifier = Modifier.weight(1f),
+                lineStyle = lineStyle,
+            )
+            LibraryTab.TECHNIQUES -> TechniquesTab(
+                state = techniqueState,
+                onStateChange = { techniqueState = it },
+                modifier = Modifier.weight(1f),
+                lineStyle = lineStyle,
+            )
+        }
+    }
+}
+
+@Composable
+private fun DrillsTab(
+    state: DrillsLibraryState,
+    onStateChange: (DrillsLibraryState) -> Unit,
+    modifier: Modifier = Modifier,
+    lineStyle: CardLineStyle = CardLineStyle.COMPASS,
+) {
+    val actionCounts = remember(state.allDrills) { state.allDrills.map { it.rightHandCard.actions.size }.distinct().sorted() }
+
+    Column(modifier = modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            modifier = Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            actionCounts.forEach { count ->
+                SelectableChip(
+                    selected = state.filter.actionCount == count,
+                    label = pluralStringResource(R.plurals.library_filter_actions, count, count),
+                    onClick = {
+                        val newCount = if (state.filter.actionCount == count) null else count
+                        onStateChange(state.withFilter(state.filter.copy(actionCount = newCount)))
+                    },
+                )
+            }
+        }
+        Row(
+            modifier = Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            (0..3).forEach { count ->
+                SelectableChip(
+                    selected = state.filter.thrustCount == count,
+                    label = pluralStringResource(R.plurals.library_filter_thrusts, count, count),
+                    onClick = {
+                        val newCount = if (state.filter.thrustCount == count) null else count
+                        onStateChange(state.withFilter(state.filter.copy(thrustCount = newCount)))
+                    },
+                )
+            }
+        }
+        TextButton(onClick = { onStateChange(state.toggleHand()) }) {
+            Icon(Icons.Filled.SwapHoriz, contentDescription = null, modifier = Modifier.size(20.dp))
+            Text(
+                " " + stringResource(
+                    R.string.library_hand,
+                    stringResource(
+                        if (state.hand == Hand.RIGHT) R.string.library_hand_right else R.string.library_hand_left,
+                    ),
+                ),
+            )
+        }
+
+        val current = state.current
+        CardArea(modifier = Modifier.weight(1f)) {
+            if (current != null) {
+                MeyerSquareCard(current.card(state.hand), modifier = it, lineStyle = lineStyle)
+            } else {
+                Text(stringResource(R.string.library_no_drills_match), style = MaterialTheme.typography.bodyLarge)
+            }
+        }
+        if (current != null) {
+            Text(
+                stringResource(R.string.library_drill_position, state.position.index + 1, state.visibleDrills.size),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+
+        BrowseControls(
+            enabled = current != null,
+            onFirst = { onStateChange(state.first()) },
+            onFastBackward = { onStateChange(state.fastBackward()) },
+            onPrevious = { onStateChange(state.previous()) },
+            onNext = { onStateChange(state.next()) },
+            onFastForward = { onStateChange(state.fastForward()) },
+            onLast = { onStateChange(state.last()) },
+            onRandom = { onStateChange(state.random()) },
+        )
+    }
+}
+
+@Composable
+private fun TechniquesTab(
+    state: TechniqueLibraryState,
+    onStateChange: (TechniqueLibraryState) -> Unit,
+    modifier: Modifier = Modifier,
+    lineStyle: CardLineStyle = CardLineStyle.COMPASS,
+) {
+    Column(modifier = modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            modifier = Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            SelectableChip(
+                selected = state.filter.instruction == null,
+                label = stringResource(R.string.library_filter_all),
+                onClick = { onStateChange(state.withFilter(TechniqueFilter(null))) },
+            )
+            Instruction.entries.forEach { instruction ->
+                SelectableChip(
+                    selected = state.filter.instruction == instruction,
+                    label = instruction.displayName(LocalContext.current.resources),
+                    onClick = { onStateChange(state.withFilter(TechniqueFilter(instruction))) },
+                )
+            }
+        }
+
+        val current = state.current
+        CardArea(modifier = Modifier.weight(1f)) {
+            if (current != null) {
+                MeyerSquareCard(current, modifier = it, lineStyle = lineStyle)
+            } else {
+                Text(stringResource(R.string.library_no_techniques_match), style = MaterialTheme.typography.bodyLarge)
+            }
+        }
+        if (current != null) {
+            Text(
+                stringResource(R.string.library_card_position, state.position.index + 1, state.visibleCards.size),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+
+        BrowseControls(
+            enabled = current != null,
+            onFirst = { onStateChange(state.first()) },
+            onFastBackward = { onStateChange(state.fastBackward()) },
+            onPrevious = { onStateChange(state.previous()) },
+            onNext = { onStateChange(state.next()) },
+            onFastForward = { onStateChange(state.fastForward()) },
+            onLast = { onStateChange(state.last()) },
+            onRandom = { onStateChange(state.random()) },
+        )
+    }
+}
+
+/** A filter chip with a check mark when selected — Material3's FilterChip doesn't show one by default. */
+@Composable
+private fun SelectableChip(selected: Boolean, label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    FilterChip(
+        selected = selected,
+        onClick = onClick,
+        label = { Text(label) },
+        leadingIcon = if (selected) {
+            { Icon(Icons.Filled.Check, contentDescription = null, modifier = Modifier.size(FilterChipDefaults.IconSize)) }
+        } else {
+            null
+        },
+        modifier = modifier,
+    )
+}
+
+/** First/±10/previous/next/±10/last/random — one row, shared by both tabs. */
+@Composable
+private fun BrowseControls(
+    onFirst: () -> Unit,
+    onFastBackward: () -> Unit,
+    onPrevious: () -> Unit,
+    onNext: () -> Unit,
+    onFastForward: () -> Unit,
+    onLast: () -> Unit,
+    onRandom: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) {
+    // Disabled, not hidden, when there is nothing to navigate to (an empty filter result):
+    // a user who reaches this state by narrowing filters still sees the controls they were
+    // just using, just visibly inert, rather than the layout jumping as the row disappears.
+    Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+        IconButton(onClick = onFirst, enabled = enabled) { Icon(Icons.Filled.FirstPage, contentDescription = stringResource(R.string.library_nav_first)) }
+        IconButton(onClick = onFastBackward, enabled = enabled) { Icon(Icons.Filled.FastRewind, contentDescription = stringResource(R.string.library_nav_back_ten)) }
+        IconButton(onClick = onPrevious, enabled = enabled) { Icon(Icons.Filled.ChevronLeft, contentDescription = stringResource(R.string.library_nav_previous)) }
+        IconButton(onClick = onNext, enabled = enabled) { Icon(Icons.Filled.ChevronRight, contentDescription = stringResource(R.string.library_nav_next)) }
+        IconButton(onClick = onFastForward, enabled = enabled) { Icon(Icons.Filled.FastForward, contentDescription = stringResource(R.string.library_nav_forward_ten)) }
+        IconButton(onClick = onLast, enabled = enabled) { Icon(Icons.AutoMirrored.Filled.LastPage, contentDescription = stringResource(R.string.library_nav_last)) }
+        IconButton(onClick = onRandom, enabled = enabled) { Icon(Icons.Filled.Shuffle, contentDescription = stringResource(R.string.library_nav_random)) }
+    }
+}

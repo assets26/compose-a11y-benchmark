@@ -1,0 +1,4 @@
+model,n,parse_rate,truncated_rate,error_rate,syntactic_ok,api_valid,addresses_defect,fully_correct,mean_similarity,mean_lines_dropped_frac,top_hallucinations
+claude-sonnet,144,0.931,0.069,0.0,0.985,0.91,0.575,0.5,0.964,0.028,"{'onClickLabel_outside_click': 10, 'role_on_component': 2}"
+gemini-flash,144,1.0,0.0,0.0,0.979,0.931,0.611,0.542,0.957,0.029,"{'onClickLabel_outside_click': 4, 'invented_semantics_key': 4, 'role_on_component': 2}"
+gpt-mini,144,1.0,0.0,0.0,0.986,0.944,0.632,0.611,0.932,0.023,"{'contentDescription_on_layout': 5, 'role_on_component': 2, 'stateDescription_as_param': 1}"

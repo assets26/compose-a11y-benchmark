@@ -1,0 +1,606 @@
+package com.chmouel.liseur.reader.chrome
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Notes
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.CloudSync
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import com.chmouel.liseur.R
+import com.chmouel.liseur.data.db.AnnotationKind
+import com.chmouel.liseur.data.db.BookAnnotation
+import com.chmouel.liseur.data.settings.ReaderTheme
+import com.chmouel.liseur.reader.annotations.HighlightTint
+import com.chmouel.liseur.ui.contentWidthCap
+import com.chmouel.liseur.ui.windowWidth
+import org.readium.r2.shared.publication.Link
+import org.readium.r2.shared.publication.Publication
+
+/** One line of the contents, with how deeply it is nested. */
+data class ContentsEntry(val depth: Int, val link: Link)
+
+/** The four ways of getting around a book. */
+private enum class ContentsTab(val labelRes: Int) {
+    CONTENTS(R.string.reader_contents),
+    BOOKMARKS(R.string.reader_bookmarks),
+    HIGHLIGHTS(R.string.reader_highlights),
+    NOTES(R.string.reader_notes),
+}
+
+/**
+ * Everything you can use to move around a book, on its own screen.
+ *
+ * A book's contents can run to hundreds of lines and is the thing people
+ * jump around in, so it gets the full height of the display rather than a
+ * sheet that has to be fought to scroll. Bookmarks, highlights and notes
+ * sit alongside as tabs: anchored marks get back to a particular place,
+ * while book notes make the notebook useful without inventing one.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ContentsScreen(
+    publication: Publication,
+    theme: ReaderTheme,
+    currentHref: String?,
+    annotations: List<BookAnnotation>,
+    onEntrySelected: (Link) -> Unit,
+    onAnnotationSelected: (BookAnnotation) -> Unit,
+    onBookNoteAdded: () -> Unit,
+    onAnnotationDeleted: (BookAnnotation) -> Unit,
+    onExport: () -> Unit,
+    onClose: () -> Unit,
+    /** Null when this book has nowhere to sync to. */
+    onSyncBook: (() -> Unit)? = null,
+    modifier: Modifier = Modifier,
+) {
+    var tab by rememberSaveable { mutableStateOf(ContentsTab.CONTENTS) }
+    // Which marks the reader has opened out to read in full. It lives here
+    // rather than in AnnotationList because each tab is a separate branch of
+    // the `when` below: switching tabs disposes the branch, and state saved
+    // inside a subtree that has been removed does not come back.
+    val expandedIds = rememberSaveable(saver = ExpandedIdsSaver) { mutableStateListOf<String>() }
+    val toggleExpanded: (BookAnnotation) -> Unit = { annotation ->
+        if (!expandedIds.remove(annotation.id)) expandedIds.add(annotation.id)
+    }
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        containerColor = theme.background,
+        // safeDrawing, not systemBars: a landscape display cutout falls on
+        // the side edges, where there is no status bar to stand in for it,
+        // and would otherwise cut into the chapter and annotation rows.
+        contentWindowInsets = WindowInsets.safeDrawing,
+        topBar = {
+            Column {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = stringResource(R.string.reader_navigate),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onClose) {
+                            Icon(
+                                Icons.Outlined.Close,
+                                contentDescription = stringResource(R.string.close),
+                            )
+                        }
+                    },
+                    actions = {
+                        if (onSyncBook != null) {
+                            IconButton(onClick = onSyncBook) {
+                                Icon(
+                                    Icons.Outlined.CloudSync,
+                                    contentDescription =
+                                    stringResource(R.string.reader_sync_book),
+                                )
+                            }
+                        }
+                        if (tab == ContentsTab.NOTES) {
+                            IconButton(onClick = onBookNoteAdded) {
+                                Icon(
+                                    Icons.Outlined.Add,
+                                    contentDescription =
+                                    stringResource(R.string.annotation_add_book_note),
+                                )
+                            }
+                        }
+                        if (annotations.isNotEmpty() && tab != ContentsTab.CONTENTS) {
+                            IconButton(onClick = onExport) {
+                                Icon(
+                                    Icons.Outlined.Share,
+                                    contentDescription =
+                                    stringResource(R.string.annotation_export),
+                                )
+                            }
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = theme.background,
+                        titleContentColor = theme.foreground,
+                        navigationIconContentColor = theme.foreground,
+                        actionIconContentColor = theme.foreground,
+                    ),
+                )
+                val tabs: @Composable () -> Unit = {
+                    ContentsTab.entries.forEach { entry ->
+                        Tab(
+                            selected = tab == entry,
+                            onClick = { tab = entry },
+                            selectedContentColor = theme.foreground,
+                            unselectedContentColor = theme.foreground.copy(alpha = 0.6f),
+                            text = {
+                                Text(
+                                    text = stringResource(entry.labelRes),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    maxLines = 1,
+                                )
+                            },
+                        )
+                    }
+                }
+                // Four equal tabs fit side by side at the normal font size,
+                // with the labels kept small so "Bookmarks" is not clipped.
+                // Once the reader enlarges the system font there is no
+                // compact style that keeps them all, so the row scrolls
+                // instead of truncating words.
+                if (LocalDensity.current.fontScale <= 1f) {
+                    TabRow(
+                        selectedTabIndex = tab.ordinal,
+                        containerColor = theme.background,
+                        contentColor = theme.foreground,
+                    ) {
+                        tabs()
+                    }
+                } else {
+                    ScrollableTabRow(
+                        selectedTabIndex = tab.ordinal,
+                        containerColor = theme.background,
+                        contentColor = theme.foreground,
+                        edgePadding = 0.dp,
+                    ) {
+                        tabs()
+                    }
+                }
+            }
+        },
+    ) { padding ->
+        Box(
+            Modifier
+                .fillMaxSize()
+                .padding(padding),
+        ) {
+            // A chapter title or a highlight is one line of prose, and a
+            // line of prose is only readable so wide. Left to itself the
+            // list rules the whole width of a tablet and leaves each row
+            // a thread of text with a hand's width of nothing after it.
+            Box(
+                Modifier
+                    .align(Alignment.TopCenter)
+                    .widthIn(max = contentWidthCap(windowWidth()))
+                    .fillMaxSize(),
+            ) {
+                when (tab) {
+                    ContentsTab.CONTENTS -> ContentsList(
+                        publication = publication,
+                        theme = theme,
+                        currentHref = currentHref,
+                        onEntrySelected = onEntrySelected,
+                    )
+
+                    ContentsTab.BOOKMARKS -> AnnotationList(
+                        annotations = annotations.filter {
+                            it.kind == AnnotationKind.BOOKMARK.name
+                        },
+                        theme = theme,
+                        emptyRes = R.string.reader_no_bookmarks,
+                        expandedIds = expandedIds,
+                        onSelected = onAnnotationSelected,
+                        onToggleExpanded = toggleExpanded,
+                        onDeleted = onAnnotationDeleted,
+                    )
+
+                    ContentsTab.HIGHLIGHTS -> AnnotationList(
+                        annotations = annotations.filter {
+                            it.kind != AnnotationKind.BOOKMARK.name &&
+                                it.kind != AnnotationKind.BOOK_NOTE.name
+                        },
+                        theme = theme,
+                        emptyRes = R.string.reader_no_highlights,
+                        expandedIds = expandedIds,
+                        onSelected = onAnnotationSelected,
+                        onToggleExpanded = toggleExpanded,
+                        onDeleted = onAnnotationDeleted,
+                    )
+
+                    ContentsTab.NOTES -> AnnotationList(
+                        annotations = annotations.filter { !it.note.isNullOrBlank() },
+                        theme = theme,
+                        emptyRes = R.string.reader_no_notes,
+                        expandedIds = expandedIds,
+                        onSelected = onAnnotationSelected,
+                        onToggleExpanded = toggleExpanded,
+                        onDeleted = onAnnotationDeleted,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ContentsList(
+    publication: Publication,
+    theme: ReaderTheme,
+    currentHref: String?,
+    onEntrySelected: (Link) -> Unit,
+) {
+    val entries = remember(publication) { publication.tableOfContents.flatten() }
+    // Contents entries point at an anchor inside a chapter file, while the
+    // reader usually only knows which file it is in. Match the anchor when we
+    // have one, otherwise fall back to the first entry of that file so the
+    // chapter itself is highlighted rather than its last sub-section.
+    val currentIndex = remember(entries, currentHref) {
+        val here = currentHref ?: return@remember -1
+        val exact = entries.indexOfFirst { it.link.href.toString() == here }
+        if (exact >= 0) return@remember exact
+        val file = here.substringBefore('#')
+        entries.indexOfFirst { it.link.href.toString().substringBefore('#') == file }
+    }
+    val listState = rememberLazyListState()
+
+    // Land on the chapter being read rather than at the top of a long book.
+    LaunchedEffect(currentIndex) {
+        if (currentIndex > 2) listState.scrollToItem(currentIndex - 2)
+    }
+
+    if (entries.isEmpty()) {
+        EmptyMessage(theme, R.string.reader_no_contents)
+        return
+    }
+
+    LazyColumn(
+        state = listState,
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(bottom = 24.dp),
+    ) {
+        itemsIndexed(
+            entries,
+            key = { index, entry -> "$index:${entry.link.href}" },
+        ) { index, entry ->
+            ContentsRow(
+                entry = entry,
+                theme = theme,
+                current = index == currentIndex,
+                onClick = { onEntrySelected(entry.link) },
+            )
+            HorizontalDivider(color = theme.foreground.copy(alpha = 0.08f))
+        }
+    }
+}
+
+@Composable
+private fun AnnotationList(
+    annotations: List<BookAnnotation>,
+    theme: ReaderTheme,
+    emptyRes: Int,
+    expandedIds: List<String>,
+    onSelected: (BookAnnotation) -> Unit,
+    onToggleExpanded: (BookAnnotation) -> Unit,
+    onDeleted: (BookAnnotation) -> Unit,
+) {
+    if (annotations.isEmpty()) {
+        EmptyMessage(theme, emptyRes)
+        return
+    }
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(bottom = 24.dp),
+    ) {
+        items(annotations, key = { it.id }) { annotation ->
+            AnnotationRow(
+                annotation = annotation,
+                theme = theme,
+                expanded = annotation.id in expandedIds,
+                onClick = { onSelected(annotation) },
+                onToggleExpanded = { onToggleExpanded(annotation) },
+                onDelete = { onDeleted(annotation) },
+            )
+            HorizontalDivider(color = theme.foreground.copy(alpha = 0.08f))
+        }
+    }
+}
+
+/**
+ * Whether a mark still has more to show.
+ *
+ * Measured overflow is only believed while the row is collapsed: an
+ * expanded row has no line cap, so it always reports that it fits, and
+ * taking that at face value would make the control flicker away on the
+ * frame the row folds back up.
+ */
+internal fun latchedOverflow(previous: Boolean, expanded: Boolean, measured: Boolean): Boolean =
+    if (expanded) previous else measured
+
+/**
+ * Whether the row shows its open/close control.
+ *
+ * An open row always shows it, whatever the last measurement said. Rows
+ * are torn down as they scroll out of a lazy list and their measurements
+ * go with them, and an open row that comes back has no line cap to
+ * overflow: deciding this on the measurement alone would leave a mark
+ * opened out with no way to fold it again.
+ */
+internal fun showsExpandToggle(
+    expanded: Boolean,
+    excerptOverflow: Boolean,
+    noteOverflow: Boolean,
+): Boolean = expanded || excerptOverflow || noteOverflow
+
+@Composable
+private fun AnnotationRow(
+    annotation: BookAnnotation,
+    theme: ReaderTheme,
+    expanded: Boolean,
+    onClick: () -> Unit,
+    onToggleExpanded: () -> Unit,
+    onDelete: () -> Unit,
+) {
+    val excerpt = annotation.text?.trim()?.takeIf { it.isNotEmpty() }
+    val note = annotation.note?.trim()?.takeIf { it.isNotEmpty() }
+    val bookNote = annotation.kind == AnnotationKind.BOOK_NOTE.name
+    // Keyed on the words themselves: a mark keeps its id when it is edited,
+    // so a note trimmed down to nothing would otherwise leave a "Show more"
+    // behind with nothing left to show.
+    var excerptOverflow by remember(excerpt) { mutableStateOf(false) }
+    var noteOverflow by remember(note) { mutableStateOf(false) }
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(start = 20.dp, end = 8.dp, top = 14.dp, bottom = 14.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        if (bookNote) {
+            Icon(
+                Icons.AutoMirrored.Outlined.Notes,
+                contentDescription = null,
+                tint = theme.foreground.copy(alpha = 0.65f),
+                modifier = Modifier
+                    .padding(top = 1.dp)
+                    .size(18.dp),
+            )
+        } else if (annotation.kind != AnnotationKind.BOOKMARK.name) {
+            Box(
+                Modifier
+                    .padding(top = 4.dp)
+                    .size(12.dp)
+                    .clip(CircleShape)
+                    .background(HighlightTint.fromName(annotation.tint).color),
+            )
+        }
+        Column(Modifier.weight(1f)) {
+            val where = listOfNotNull(
+                annotation.chapter?.takeIf { it.isNotBlank() },
+                annotation.position?.let { stringResource(R.string.reader_page_short, it) },
+            ).joinToString(" · ")
+            if (where.isNotEmpty()) {
+                Text(
+                    text = where,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = theme.foreground.copy(alpha = 0.6f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            excerpt?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = theme.foreground,
+                    maxLines = if (expanded) Int.MAX_VALUE else 4,
+                    overflow = if (expanded) TextOverflow.Clip else TextOverflow.Ellipsis,
+                    onTextLayout = { layout ->
+                        excerptOverflow =
+                            latchedOverflow(excerptOverflow, expanded, layout.hasVisualOverflow)
+                    },
+                    modifier = Modifier.padding(top = 2.dp),
+                )
+            }
+            note?.let {
+                Text(
+                    text = it,
+                    style = if (bookNote) {
+                        MaterialTheme.typography.bodyMedium
+                    } else {
+                        MaterialTheme.typography.bodySmall
+                    },
+                    fontStyle = if (bookNote) FontStyle.Normal else FontStyle.Italic,
+                    color = if (bookNote) {
+                        theme.foreground
+                    } else {
+                        theme.foreground.copy(alpha = 0.75f)
+                    },
+                    maxLines = when {
+                        expanded -> Int.MAX_VALUE
+                        bookNote -> 5
+                        else -> 3
+                    },
+                    overflow = if (expanded) TextOverflow.Clip else TextOverflow.Ellipsis,
+                    onTextLayout = { layout ->
+                        noteOverflow =
+                            latchedOverflow(noteOverflow, expanded, layout.hasVisualOverflow)
+                    },
+                    modifier = Modifier.padding(top = 6.dp),
+                )
+            }
+            if (showsExpandToggle(expanded, excerptOverflow, noteOverflow)) {
+                // Its own click target, so opening a mark out to read it is
+                // never mistaken for asking to be taken to it.
+                Box(
+                    Modifier
+                        .clip(RoundedCornerShape(6.dp))
+                        .clickable(role = Role.Button, onClick = onToggleExpanded)
+                        .heightIn(min = 48.dp)
+                        .padding(horizontal = 4.dp),
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    Text(
+                        text = stringResource(
+                            if (expanded) {
+                                R.string.annotation_show_less
+                            } else {
+                                R.string.annotation_show_more
+                            },
+                        ),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = theme.foreground.copy(alpha = 0.75f),
+                    )
+                }
+            }
+        }
+        IconButton(onClick = onDelete) {
+            Icon(
+                Icons.Outlined.Delete,
+                contentDescription = stringResource(R.string.annotation_delete),
+                tint = theme.foreground.copy(alpha = 0.6f),
+            )
+        }
+    }
+}
+
+@Composable
+private fun EmptyMessage(theme: ReaderTheme, textRes: Int) {
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text(
+            text = stringResource(textRes),
+            style = MaterialTheme.typography.bodyMedium,
+            color = theme.foreground.copy(alpha = 0.7f),
+            modifier = Modifier.padding(horizontal = 32.dp),
+        )
+    }
+}
+
+@Composable
+private fun ContentsRow(
+    entry: ContentsEntry,
+    theme: ReaderTheme,
+    current: Boolean,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(
+                start = 20.dp + (entry.depth * 16).dp,
+                end = 20.dp,
+                top = 14.dp,
+                bottom = 14.dp,
+            ),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        // A bar rather than a tick: it reads as "you are here" without
+        // stealing attention from the titles around it.
+        Box(
+            Modifier
+                .width(3.dp)
+                .height(20.dp)
+                .clip(RoundedCornerShape(50))
+                .background(if (current) theme.foreground else Color.Transparent),
+        )
+        Column(Modifier.weight(1f)) {
+            Text(
+                text = entry.link.title.orEmpty().ifBlank {
+                    stringResource(R.string.reader_untitled_section)
+                },
+                style = if (entry.depth == 0) {
+                    MaterialTheme.typography.bodyLarge
+                } else {
+                    MaterialTheme.typography.bodyMedium
+                },
+                fontWeight = if (current) FontWeight.SemiBold else FontWeight.Normal,
+                color = theme.foreground.copy(alpha = if (entry.depth == 0) 1f else 0.82f),
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+}
+
+private fun List<Link>.flatten(depth: Int = 0): List<ContentsEntry> =
+    flatMap { link ->
+        listOf(ContentsEntry(depth, link)) + link.children.flatten(depth + 1)
+    }
+
+/**
+ * Keeps the opened-out marks across a rotation.
+ *
+ * A [SnapshotStateList] is not something a Bundle can hold, so it is saved
+ * as the plain list of ids it stands for.
+ */
+private val ExpandedIdsSaver = listSaver<SnapshotStateList<String>, String>(
+    save = { it.toList() },
+    restore = { it.toMutableStateList() },
+)

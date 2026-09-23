@@ -1,0 +1,379 @@
+package com.iris.gallery.ui
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculateZoom
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.Surface
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.material.icons.outlined.ArrowDownward
+import androidx.compose.material.icons.outlined.ArrowUpward
+import androidx.compose.material.icons.outlined.PushPin
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.Card
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.iris.gallery.data.AlbumSort
+import com.iris.gallery.data.CornerStyle
+import com.iris.gallery.data.GridSpacing
+import com.iris.gallery.data.MediaImage
+import com.iris.gallery.data.NaturalOrderComparator
+
+data class MediaAlbum(
+    val id: Long,
+    val name: String,
+    val cover: MediaImage,
+    val images: List<MediaImage>,
+    val isSdCard: Boolean = false,
+    val storageLabel: String = "",
+)
+
+@Composable
+fun AlbumsGrid(
+    images: List<MediaImage>,
+    padding: PaddingValues,
+    state: LazyGridState,
+    cellSize: Dp = 156.dp,
+    onCellSizeChange: ((Dp) -> Unit)? = null,
+    cornerStyle: CornerStyle = CornerStyle.ROUNDED,
+    gridSpacing: GridSpacing = GridSpacing.STANDARD,
+    showCount: Boolean = true,
+    pinned: Set<Long> = emptySet(),
+    covers: Map<Long, Long> = emptyMap(),
+    sort: AlbumSort = AlbumSort.NEWEST,
+    customOrder: List<Long> = emptyList(),
+    onTogglePinned: (Long) -> Unit = {},
+    onSortChanged: (AlbumSort) -> Unit = {},
+    onOrderChanged: (List<Long>) -> Unit = {},
+    onOpen: (MediaAlbum) -> Unit,
+) {
+    val currentCellSize by rememberUpdatedState(cellSize)
+    val currentOnCellSizeChange by rememberUpdatedState(onCellSizeChange)
+    var searchQuery by remember { mutableStateOf("") }
+
+    val albums = remember(images, pinned, covers, sort, customOrder) {
+        val base = images.groupBy { it.bucketId }.map { (id, media) ->
+            val samplePath = media.firstOrNull { it.path.isNotBlank() }?.path.orEmpty()
+            val isSd = samplePath.isNotBlank() && !samplePath.startsWith("/storage/emulated/0") && !samplePath.startsWith("/data/")
+            MediaAlbum(
+                id = id,
+                name = media.first().bucketName,
+                cover = media.firstOrNull { it.id == covers[id] } ?: media.first(),
+                images = media,
+                isSdCard = isSd,
+                storageLabel = if (isSd) "SD Card" else ""
+            )
+        }
+        val orderIndex = customOrder.withIndex().associate { it.value to it.index }
+        base.sortedWith(compareByDescending<MediaAlbum> { it.id in pinned }.thenComparator { a, b ->
+            when (sort) {
+                AlbumSort.NEWEST -> b.cover.dateTaken.compareTo(a.cover.dateTaken)
+                AlbumSort.OLDEST -> a.cover.dateTaken.compareTo(b.cover.dateTaken)
+                AlbumSort.NAME -> NaturalOrderComparator.compare(a.name, b.name)
+                AlbumSort.ITEM_COUNT -> b.images.size.compareTo(a.images.size)
+                AlbumSort.CUSTOM -> (orderIndex[a.id] ?: Int.MAX_VALUE).compareTo(orderIndex[b.id] ?: Int.MAX_VALUE)
+            }
+        })
+    }
+    val effectiveOrder = remember(albums, customOrder) {
+        customOrder.filter { id -> albums.any { it.id == id } } + albums.map { it.id }.filterNot(customOrder::contains)
+    }
+
+    val filteredAlbums = remember(albums, searchQuery) {
+        if (searchQuery.isBlank()) albums
+        else albums.filter { it.name.contains(searchQuery.trim(), ignoreCase = true) }
+    }
+
+    val spacingDp = gridSpacing.dp.dp
+
+    Box(
+        Modifier
+            .fillMaxSize()
+            .padding(padding)
+            .pointerInput(Unit) {
+                if (currentOnCellSizeChange == null) return@pointerInput
+                awaitEachGesture {
+                    awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
+                    do {
+                        val event = awaitPointerEvent(PointerEventPass.Initial)
+                        val downChanges = event.changes.filter { it.pressed }
+                        if (downChanges.size >= 2) {
+                            val zoom = event.calculateZoom()
+                            if (kotlin.math.abs(zoom - 1f) > 0.001f) {
+                                val nextSize = (currentCellSize.value * zoom).coerceIn(48f, 420f)
+                                currentOnCellSizeChange?.invoke(nextSize.dp)
+                                event.changes.forEach { it.consume() }
+                            }
+                        }
+                    } while (event.changes.any { it.pressed })
+                }
+            }
+    ) {
+        val targetThumbnailPx = remember(cellSize) { getThumbnailTargetSizePx(cellSize.value) }
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(cellSize),
+            state = state,
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(spacingDp + 8.dp),
+            verticalArrangement = Arrangement.spacedBy(spacingDp + 12.dp),
+        ) {
+            item(key = "album-search-and-sort", span = { GridItemSpan(maxLineSpan) }) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    // Search albums input field
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = { Text(androidx.compose.ui.res.stringResource(com.iris.gallery.R.string.search_albums_placeholder, albums.size)) },
+                        leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+                        trailingIcon = {
+                            if (searchQuery.isNotEmpty()) {
+                                IconButton(onClick = { searchQuery = "" }) {
+                                    Icon(Icons.Filled.Clear, contentDescription = androidx.compose.ui.res.stringResource(com.iris.gallery.R.string.clear_search))
+                                }
+                            }
+                        },
+                        singleLine = true,
+                        shape = RoundedCornerShape(24.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            unfocusedBorderColor = androidx.compose.ui.graphics.Color.Transparent,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary
+                        )
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        listOf(
+                            AlbumSort.NEWEST to com.iris.gallery.R.string.sort_recent,
+                            AlbumSort.NAME to com.iris.gallery.R.string.sort_name,
+                            AlbumSort.ITEM_COUNT to com.iris.gallery.R.string.sort_size,
+                            AlbumSort.CUSTOM to com.iris.gallery.R.string.sort_custom
+                        ).forEach { (value, strRes) ->
+                            FilterChip(
+                                selected = sort == value,
+                                onClick = {
+                                    if (value == AlbumSort.CUSTOM && customOrder.isEmpty()) onOrderChanged(albums.map { it.id })
+                                    onSortChanged(value)
+                                },
+                                label = { Text(androidx.compose.ui.res.stringResource(strRes)) }
+                            )
+                        }
+                    }
+                }
+            }
+
+            if (filteredAlbums.isEmpty() && searchQuery.isNotBlank()) {
+                item(key = "empty-search", span = { GridItemSpan(maxLineSpan) }) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 48.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            androidx.compose.ui.res.stringResource(com.iris.gallery.R.string.empty_search_albums, searchQuery),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center
+                        )
+                        TextButton(onClick = { searchQuery = "" }) {
+                            Text(androidx.compose.ui.res.stringResource(com.iris.gallery.R.string.clear_search))
+                        }
+                    }
+                }
+            }
+
+            items(filteredAlbums, key = { it.id }) { album ->
+                val isPinned = album.id in pinned
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .animateItem()
+                        .clickable { onOpen(album) }
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
+                    ) {
+                        Card(
+                            shape = RoundedCornerShape(cornerStyle.dp.dp),
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            MediaThumbnail(
+                                album.cover,
+                                Modifier.fillMaxSize(),
+                                targetSizePx = targetThumbnailPx,
+                            )
+                        }
+
+                        // Floating Pin Button on top-right of album image
+                        if (sort != AlbumSort.CUSTOM) {
+                            Surface(
+                                shape = CircleShape,
+                                color = if (isPinned) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.95f)
+                                        else Color.Black.copy(alpha = 0.42f),
+                                contentColor = if (isPinned) MaterialTheme.colorScheme.onPrimaryContainer else Color.White,
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(6.dp)
+                                    .size(30.dp)
+                                    .clickable { onTogglePinned(album.id) },
+                            ) {
+                                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                                    Icon(
+                                        if (isPinned) Icons.Filled.PushPin else Icons.Outlined.PushPin,
+                                        contentDescription = if (isPinned) androidx.compose.ui.res.stringResource(com.iris.gallery.R.string.album_unpin)
+                                            else androidx.compose.ui.res.stringResource(com.iris.gallery.R.string.album_pin),
+                                        modifier = Modifier.size(16.dp),
+                                    )
+                                }
+                            }
+                        } else {
+                            val index = effectiveOrder.indexOf(album.id)
+                            Row(
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(4.dp),
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                if (index > 0) {
+                                    Surface(
+                                        shape = CircleShape,
+                                        color = Color.Black.copy(alpha = 0.55f),
+                                        contentColor = Color.White,
+                                        modifier = Modifier.size(28.dp).clickable {
+                                            val next = effectiveOrder.toMutableList()
+                                            next.add(index - 1, next.removeAt(index))
+                                            onOrderChanged(next)
+                                        }
+                                    ) {
+                                        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                                            Icon(Icons.Outlined.ArrowUpward, null, modifier = Modifier.size(15.dp))
+                                        }
+                                    }
+                                }
+                                if (index in 0 until effectiveOrder.lastIndex) {
+                                    Surface(
+                                        shape = CircleShape,
+                                        color = Color.Black.copy(alpha = 0.55f),
+                                        contentColor = Color.White,
+                                        modifier = Modifier.size(28.dp).clickable {
+                                            val next = effectiveOrder.toMutableList()
+                                            next.add(index + 1, next.removeAt(index))
+                                            onOrderChanged(next)
+                                        }
+                                    ) {
+                                        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                                            Icon(Icons.Outlined.ArrowDownward, null, modifier = Modifier.size(15.dp))
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Full-width album text container
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 6.dp, start = 2.dp, end = 2.dp),
+                        verticalArrangement = Arrangement.spacedBy(2.dp)
+                    ) {
+                        Text(
+                            album.name,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(5.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            if (album.isSdCard) {
+                                Surface(
+                                    color = MaterialTheme.colorScheme.secondaryContainer,
+                                    shape = RoundedCornerShape(4.dp),
+                                ) {
+                                    Text(
+                                        text = androidx.compose.ui.res.stringResource(com.iris.gallery.R.string.storage_sd_card),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                                    )
+                                }
+                            }
+                            if (showCount) {
+                                Text(
+                                    androidx.compose.ui.res.stringResource(com.iris.gallery.R.string.album_items_count, album.images.size),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

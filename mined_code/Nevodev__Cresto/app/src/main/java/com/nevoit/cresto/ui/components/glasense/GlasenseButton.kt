@@ -1,0 +1,439 @@
+package com.nevoit.cresto.ui.components.glasense
+
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.kyant.shapes.Capsule
+import com.nevoit.glasense.core.interaction.DimIndication
+import com.nevoit.glasense.theme.local.LocalContentColor
+
+@Immutable
+data class GlasenseButtonColors(
+    val containerColor: Color,
+    val contentColor: Color,
+    val disabledContainerColor: Color,
+    val disabledContentColor: Color,
+)
+
+/**
+ * A custom button with press animations.
+ *
+ * @param enabled Controls the enabled state of the button.
+ * @param shape The shape of the button.
+ * @param onClick The callback to be invoked when the button is clicked.
+ * @param modifier The modifier to be applied to the button.
+ * @param colors The colors for the button in different states.
+ * @param animated Whether to enable press animations.
+ * @param content The content to be displayed inside the button.
+ */
+@Composable
+fun GlasenseButton(
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    shape: Shape = Capsule(),
+    onClick: () -> Unit,
+    colors: GlasenseButtonColors,
+    animated: Boolean = true,
+    content: @Composable () -> Unit,
+) {
+    val contentColor = if (enabled) colors.contentColor else colors.disabledContentColor
+    val backgroundColor = if (enabled) colors.containerColor else colors.disabledContainerColor
+    val interactionSource = remember { MutableInteractionSource() }
+
+    // Animate scale and alpha for press feedback.
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 1.2f else 1.0f,
+        animationSpec = spring(0.5f, 300f, 0.0001f)
+    )
+    val alpha by animateFloatAsState(
+        targetValue = if (isPressed) 0.2f else 0f,
+        animationSpec = spring(0.5f, 300f, 0.001f)
+    )
+    Box(
+        modifier = modifier
+            // Apply scale animation for press effect.
+            .then(
+                if (animated) Modifier.graphicsLayer {
+                    scaleY = scale
+                    scaleX = scale
+                    transformOrigin = TransformOrigin.Center
+                } else Modifier
+            )
+            .then(if (animated) Modifier.clip(shape) else Modifier)
+            // Handle click events.
+            .clickable(
+                enabled = enabled,
+                interactionSource = interactionSource,
+                onClick = { onClick() },
+                indication = null,
+                role = Role.Button
+            )
+            .height(48.dp)
+            .background(color = backgroundColor, shape = shape)
+            // Draw a white flash overlay on press.
+            .then(
+                if (animated) {
+                    Modifier.drawBehind {
+                        drawRect(
+                            size = this.size,
+                            color = Color.White,
+                            alpha = alpha,
+                            blendMode = BlendMode.Plus
+                        )
+                    }
+                } else {
+                    Modifier
+                }
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        CompositionLocalProvider(
+            LocalContentColor provides contentColor
+        ) {
+            content()
+        }
+    }
+}
+
+/**
+ * An alternative, simpler version of [GlasenseButton] without press animations.
+ *
+ * @param enabled Controls the enabled state of the button.
+ * @param shape The shape of the button.
+ * @param onClick The callback to be invoked when the button is clicked.
+ * @param modifier The modifier to be applied to the button.
+ * @param colors The colors for the button in different states.
+ * @param indication Whether to show a ripple indication on click.
+ * @param content The content to be displayed inside the button.
+ */
+@Composable
+fun GlasenseButtonAlt(
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    shape: Shape = Capsule(),
+    onClick: () -> Unit,
+    colors: GlasenseButtonColors,
+    indication: Boolean = true,
+    content: @Composable () -> Unit,
+) {
+    val contentColor = if (enabled) colors.contentColor else colors.disabledContentColor
+    val backgroundColor = if (enabled) colors.containerColor else colors.disabledContainerColor
+    val interactionSource = remember { MutableInteractionSource() }
+
+    Box(
+        modifier = modifier
+            // Handle click events.
+            .clip(shape)
+            .defaultMinSize(minHeight = 48.dp)
+            .background(color = backgroundColor, shape = shape)
+            .clickable(
+                interactionSource = interactionSource,
+                onClick = { onClick() },
+                indication = if (indication) DimIndication() else null,
+                enabled = enabled,
+                role = Role.Button
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        CompositionLocalProvider(
+            LocalContentColor provides contentColor
+        ) {
+            content()
+        }
+    }
+}
+
+/**
+ * A version of [GlasenseButton] with an adaptable size.
+ *
+ * @param width A lambda that returns the width of the button.
+ * @param height A lambda that returns the height of the button.
+ * @param padding Padding to be applied around the button.
+ * @param tint An optional tint color for the content.
+ * @param enabled Controls the enabled state of the button.
+ * @param shape The shape of the button.
+ * @param onClick The callback to be invoked when the button is clicked.
+ * @param modifier The modifier to be applied to the button.
+ * @param colors The colors for the button in different states.
+ * @param animated Whether to enable press animations.
+ * @param content The content to be displayed inside the button.
+ */
+@Composable
+fun GlasenseButtonAdaptable(
+    modifier: Modifier,
+    width: () -> Dp,
+    height: () -> Dp,
+    padding: PaddingValues = PaddingValues(),
+    tint: Color? = null,
+    enabled: Boolean = true,
+    shape: Shape = Capsule(),
+    onClick: () -> Unit,
+    colors: GlasenseButtonColors,
+    animated: Boolean = true,
+    content: @Composable () -> Unit,
+) {
+    val contentColor = tint ?: if (enabled) colors.contentColor else colors.disabledContentColor
+    val backgroundColor = if (enabled) colors.containerColor else colors.disabledContainerColor
+    val interactionSource = remember { MutableInteractionSource() }
+
+    // Animate scale and alpha for press feedback.
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 1.2f else 1.0f,
+        animationSpec = spring(0.5f, 300f, 0.0001f)
+    )
+    val alpha by animateFloatAsState(
+        targetValue = if (isPressed) 0.2f else 0f,
+        animationSpec = spring(0.5f, 300f, 0.001f)
+    )
+    Box(
+        modifier = Modifier
+            .padding(padding)
+            .width(width())
+            .height(height())
+            // Apply scale animation for press effect.
+            .then(
+                if (animated) Modifier.graphicsLayer {
+                    scaleY = scale
+                    scaleX = scale
+                    transformOrigin = TransformOrigin.Center
+                } else Modifier
+            )
+            .then(modifier)
+            .then(if (animated) Modifier.clip(shape) else Modifier)
+            // Handle click events.
+            .clickable(
+                enabled = enabled,
+                interactionSource = interactionSource,
+                onClick = { onClick() },
+                indication = null,
+                role = Role.Button
+            )
+            .height(48.dp)
+            .background(color = backgroundColor, shape = shape)
+            // Draw a white flash overlay on press.
+            .then(
+                if (animated) {
+                    Modifier.drawBehind {
+                        drawRect(
+                            size = this.size,
+                            color = Color.White,
+                            alpha = alpha,
+                            blendMode = BlendMode.Plus
+                        )
+                    }
+                } else {
+                    Modifier
+                }
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        CompositionLocalProvider(
+            LocalContentColor provides contentColor
+        ) {
+            content()
+        }
+    }
+}
+
+@Composable
+fun GlasenseButtonCompact(
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    shape: Shape = Capsule(),
+    onClick: () -> Unit,
+    colors: GlasenseButtonColors,
+    indication: Boolean = true,
+    padding: PaddingValues = PaddingValues(vertical = 8.dp, horizontal = 16.dp),
+    content: @Composable () -> Unit
+) {
+    val contentColor = if (enabled) colors.contentColor else colors.disabledContentColor
+    val backgroundColor = if (enabled) colors.containerColor else colors.disabledContainerColor
+    val interactionSource = remember { MutableInteractionSource() }
+
+    Box(
+        modifier = modifier
+            // Handle click events.
+            .clip(shape)
+            .background(color = backgroundColor, shape = shape)
+            .clickable(
+                interactionSource = interactionSource,
+                onClick = { onClick() },
+                indication = if (indication) DimIndication() else null,
+                enabled = enabled,
+                role = Role.Button
+            )
+            .padding(padding),
+        contentAlignment = Alignment.Center
+    ) {
+        CompositionLocalProvider(
+            LocalContentColor provides contentColor
+        ) {
+            content()
+        }
+    }
+}
+
+@Composable
+fun GlasenseButton(
+    modifier: Modifier = Modifier,
+    interactionSource: MutableInteractionSource,
+    enabled: Boolean = true,
+    shape: Shape = Capsule(),
+    onClick: () -> Unit,
+    colors: GlasenseButtonColors,
+    animated: Boolean = true,
+    content: @Composable () -> Unit,
+) {
+    val contentColor = if (enabled) colors.contentColor else colors.disabledContentColor
+    val backgroundColor = if (enabled) colors.containerColor else colors.disabledContainerColor
+
+    // Animate scale and alpha for press feedback.
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 1.2f else 1.0f,
+        animationSpec = spring(0.5f, 300f, 0.0001f)
+    )
+    val alpha by animateFloatAsState(
+        targetValue = if (isPressed) 0.2f else 0f,
+        animationSpec = spring(0.5f, 300f, 0.001f)
+    )
+    Box(
+        modifier = modifier
+            // Apply scale animation for press effect.
+            .then(
+                if (animated) Modifier.graphicsLayer {
+                    scaleY = scale
+                    scaleX = scale
+                    transformOrigin = TransformOrigin.Center
+                } else Modifier
+            )
+            .then(if (animated) Modifier.clip(shape) else Modifier)
+            // Handle click events.
+            .clickable(
+                enabled = enabled,
+                interactionSource = interactionSource,
+                onClick = { onClick() },
+                indication = null,
+                role = Role.Button
+            )
+            .height(48.dp)
+            .background(color = backgroundColor, shape = shape)
+            // Draw a white flash overlay on press.
+            .then(
+                if (animated) {
+                    Modifier.drawBehind {
+                        drawRect(
+                            size = this.size,
+                            color = Color.White,
+                            alpha = alpha,
+                            blendMode = BlendMode.Plus
+                        )
+                    }
+                } else {
+                    Modifier
+                }
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        CompositionLocalProvider(
+            LocalContentColor provides contentColor
+        ) {
+            content()
+        }
+    }
+}
+
+@Composable
+fun GlasenseButtonToolBar(
+    modifier: Modifier = Modifier,
+    interactionSource: MutableInteractionSource,
+    enabled: Boolean = true,
+    shape: Shape = Capsule(),
+    onClick: () -> Unit,
+    colors: GlasenseButtonColors,
+    animated: () -> Boolean = { true },
+    content: @Composable () -> Unit,
+) {
+    val contentColor = if (enabled) colors.contentColor else colors.disabledContentColor
+    val backgroundColor = if (enabled) colors.containerColor else colors.disabledContainerColor
+
+    // Animate scale and alpha for press feedback.
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val pressed = isPressed && animated()
+
+    val scale by animateFloatAsState(
+        targetValue = if (pressed) 1.2f else 1.0f,
+        animationSpec = spring(0.5f, 300f, 0.0001f)
+    )
+    val alpha by animateFloatAsState(
+        targetValue = if (pressed) 0.2f else 0f,
+        animationSpec = spring(0.5f, 300f, 0.001f)
+    )
+    Box(
+        modifier = Modifier
+            // Apply scale animation for press effect.
+            .graphicsLayer {
+                scaleY = scale
+                scaleX = scale
+                transformOrigin = TransformOrigin.Center
+            }
+            .then(modifier)
+            .clip(shape)
+            // Handle click events.
+            .clickable(
+                enabled = enabled,
+                interactionSource = interactionSource,
+                onClick = { onClick() },
+                indication = null,
+                role = Role.Button
+            )
+            .height(48.dp)
+            .background(color = backgroundColor, shape = shape)
+            // Draw a white flash overlay on press.
+            .drawBehind {
+                if (alpha > 0f) {
+                    drawRect(
+                        size = this.size,
+                        color = Color.White,
+                        alpha = alpha,
+                        blendMode = BlendMode.Plus
+                    )
+                }
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        CompositionLocalProvider(
+            LocalContentColor provides contentColor
+        ) {
+            content()
+        }
+    }
+}

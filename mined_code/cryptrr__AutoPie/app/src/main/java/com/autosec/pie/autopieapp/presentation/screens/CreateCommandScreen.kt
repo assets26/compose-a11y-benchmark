@@ -1,0 +1,380 @@
+package com.autopi.autopieapp.presentation.screens
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.UnfoldMore
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Text
+import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
+import com.autopi.autopieapp.data.CommandExtra
+import com.autopi.autopieapp.data.ScriptFlags
+import com.autopi.autopieapp.domain.AppNotification
+import com.autopi.autopieapp.domain.ViewModelEvent
+import com.autopi.autopieapp.presentation.elements.CommandExtraElement
+import com.autopi.autopieapp.presentation.elements.GenericFormSwitch
+import com.autopi.autopieapp.presentation.elements.GenericTextFormField
+import com.autopi.autopieapp.presentation.elements.PackagesListDialog
+import com.autopi.utils.Utils
+import com.autopi.autopieapp.presentation.viewModels.CreateCommandViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+
+
+@Composable
+fun CreateCommandScreen(open: MutableState<Boolean>) {
+
+    val viewModel: CreateCommandViewModel = koinViewModel()
+
+    var showPackagesDialog by remember { mutableStateOf(false) }
+
+
+    fun addExtra() {
+        viewModel.commandExtras.value += CommandExtra(id = Utils.getRandomNumericalId(), type = "STRING")
+    }
+
+    Column {
+
+        Column(
+            Modifier
+                .verticalScroll(rememberScrollState())
+                .weight(1F, true)
+        ) {
+
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "New Command",
+                    fontSize = 33.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
+
+
+
+            Spacer(modifier = Modifier.height(25.dp))
+
+            SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+                viewModel.creationModeOptions.forEachIndexed { index, label ->
+                    SegmentedButton(
+                        shape = SegmentedButtonDefaults.itemShape(
+                            index = index,
+                            count = viewModel.creationModeOptions.size,
+                            baseShape = RoundedCornerShape(10.dp)
+                        ),
+                        onClick = { viewModel.selectedCreationModeIndex = index },
+                        colors = SegmentedButtonDefaults.colors().copy(
+                            inactiveContainerColor = Color.Transparent,
+                            activeContentColor = MaterialTheme.colorScheme.primary
+                        ),
+                        selected = index == viewModel.selectedCreationModeIndex
+                    ) {
+                        Text(label)
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            if (viewModel.isRawJsonMode) {
+                GenericTextFormField(
+                    text = viewModel.rawJson,
+                    title = "RAW JSON*",
+                    subtitle = "Add one or more commands as an object keyed by command name. Existing commands with the same name will be replaced.",
+                    placeholder = "{\n  \"local.command-id\": {\n    \"command\": \"echo hello\",\n    \"type\": \"SHARE\"\n  }\n}",
+                    singleLine = false,
+                    modifier = Modifier.defaultMinSize(minHeight = 220.dp)
+                )
+            } else {
+                SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+                    viewModel.commandTypeOptions.forEachIndexed { index, label ->
+                        SegmentedButton(
+                            shape = SegmentedButtonDefaults.itemShape(
+                                index = index,
+                                count = viewModel.commandTypeOptions.size,
+                                baseShape = RoundedCornerShape(10.dp)
+                            ),
+                            onClick = {
+                                viewModel.selectedICommandTypeIndex = index
+                                viewModel.selectedCommandType = when (label) {
+                                    "Observer" -> "FILE_OBSERVER"
+                                    "Cron" -> "CRON"
+                                    else -> "SHARE"
+                                }
+                            },
+                            colors = SegmentedButtonDefaults.colors().copy(
+                                inactiveContainerColor = Color.Transparent,
+                                activeContentColor = MaterialTheme.colorScheme.primary
+                            ),
+                            selected = index == viewModel.selectedICommandTypeIndex
+                        ) {
+                            Text(label)
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(15.dp))
+
+                GenericTextFormField(text = viewModel.commandName, "NAME*")
+
+//            Spacer(modifier = Modifier.height(20.dp))
+//            GenericTextFormField(text = viewModel.execFile, "PROGRAM*"){
+//                Box(
+//                    Modifier
+//                        .padding(horizontal = 5.dp)
+//                        .clip(RoundedCornerShape(15.dp))
+//                        .background(MaterialTheme.colorScheme.surfaceColorAtElevation(10.dp))
+//                        .clickable {
+//                            showPackagesDialog = true
+//                        }
+//                        .padding(10.dp)
+//                ) {
+//                    Icon(
+//                        imageVector = Icons.Default.UnfoldMore,
+//                        tint = MaterialTheme.colorScheme.primary,
+//                        contentDescription = "Show more options",
+//                        modifier = Modifier.size(22.dp)
+//                    )
+//                }
+//            }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                GenericTextFormField(
+                    text = viewModel.command,
+                    "Command".uppercase(),
+                    placeholder = "command",
+                    singleLine = false,
+                    modifier = Modifier.defaultMinSize(minHeight = 120.dp),
+                    subtitle = "Bash and Python scripting syntax are supported.",
+                    contentAfterSubtitle = {
+                        CommandLanguageSelector(
+                            command = viewModel.command.value,
+                            onCommandChange = { viewModel.command.value = it }
+                        )
+                    }
+                )
+
+
+                if (viewModel.selectedCommandType == "FILE_OBSERVER") {
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    GenericTextFormField(
+                        text = viewModel.selectors,
+                        "Selectors".uppercase(),
+                        subtitle = "Selector is a regex pattern to filter for this command.\nFor Example, to select only PNG files, use \"^.*\\\\.png$\""
+                    )
+                }
+
+                if (viewModel.selectedCommandType == "CRON") {
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                GenericTextFormField(
+                    text = viewModel.cronInterval,
+                    "Cron Interval*".uppercase(),
+                    subtitle = "The interval in which this needs to run once.\nUse values like 15m, 30m, 1h etc.\nAndroid Limits periodic jobs to minimum of 15m."
+                )
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                GenericTextFormField(
+                    text = viewModel.directory,
+                    subtitle = "The folder to set as the CWD.",
+                    title = "DIRECTORY",
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                if (viewModel.commandExtras.value.isNotEmpty()) {
+                    CommandExtraElement(
+                        extrasElements = viewModel.commandExtras,
+                        onAddCommandExtra = { viewModel.addCommandExtra(it) },
+                        onRemoveCommandExtra = { viewModel.removeCommandExtra(it) }
+                    )
+                }
+
+                OutlinedButton(
+                    modifier = Modifier
+                        .padding(vertical = 15.dp)
+                        .height(52.dp)
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(20),
+                    enabled = viewModel.isValidCommand,
+                    onClick = { addExtra() }
+                ) {
+                    Text(
+                        text = "ADD EXTRA",
+                        letterSpacing = 1.11.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+
+        }
+
+
+
+        Row {
+//            Button(
+//                modifier = Modifier
+//                    .padding(vertical = 15.dp)
+//                    .height(52.dp)
+//                    .width(75.dp),
+//                enabled = viewModel.isValidCommand,
+//                shape = RoundedCornerShape(20),
+//                contentPadding = PaddingValues(vertical = 10.dp),
+//                onClick = {
+//                    addExtra()
+//                },
+//
+//                ) {
+//                Icon(
+//                    modifier = Modifier
+//
+//                        .size(27.dp),
+//                    imageVector = Icons.Default.AddCircle,
+//                    contentDescription = "Extras",
+//                )
+//
+//            }
+//
+//            Spacer(modifier = Modifier.width(11.dp))
+
+
+            Button(
+                modifier = Modifier
+                    .padding(vertical = 15.dp)
+                    .height(52.dp)
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(20),
+                //contentPadding = PaddingValues(vertical = 20.dp),
+                enabled = viewModel.isValidCommand,
+                onClick = {
+                    viewModel.createNewCommand { open.value = false }
+                },
+
+                ) {
+                Text(
+                    text = "CREATE",
+                    //modifier = Modifier.align(Alignment.Center),
+                    letterSpacing = 1.11.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+
+            }
+        }
+
+    }
+//    PackagesListDialog(
+//        showDialog = showPackagesDialog,
+//        title = "Installed Packages",
+//        value= viewModel.execFile,
+//        onDismissRequest = {
+//            showPackagesDialog = false
+//        }
+//    )
+    }
+
+@Composable
+private fun CommandLanguageSelector(
+    command: String,
+    onCommandChange: (String) -> Unit
+) {
+    val commandLanguageOptions = listOf("BASH", "PYTHON")
+    val selectedIndex = if (Utils.isPythonScript(command)) 1 else 0
+
+    SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+        commandLanguageOptions.forEachIndexed { index, label ->
+            SegmentedButton(
+                shape = SegmentedButtonDefaults.itemShape(
+                    index = index,
+                    count = commandLanguageOptions.size,
+                    baseShape = RoundedCornerShape(10.dp)
+                ),
+                onClick = {
+                    onCommandChange(
+                        when (label) {
+                            "PYTHON" -> command.withPythonHeader()
+                            else -> command.withoutPythonHeader()
+                        }
+                    )
+                },
+                colors = SegmentedButtonDefaults.colors().copy(
+                    inactiveContainerColor = Color.Transparent,
+                    activeContentColor = MaterialTheme.colorScheme.primary
+                ),
+                selected = index == selectedIndex
+            ) {
+                Text(label)
+            }
+        }
+    }
+}
+
+private fun String.withPythonHeader(): String {
+    val commandWithoutHeader = withoutPythonHeader()
+    return if (commandWithoutHeader.isBlank()) {
+        "${ScriptFlags.PYTHON.value}\n"
+    } else {
+        "${ScriptFlags.PYTHON.value}\n$commandWithoutHeader"
+    }
+}
+
+private fun String.withoutPythonHeader(): String {
+    var readingHeaders = true
+    return lineSequence()
+        .filter { line ->
+            val trimmedLine = line.trim()
+            if (readingHeaders && trimmedLine.startsWith("#@")) {
+                !trimmedLine.startsWith(ScriptFlags.PYTHON.value)
+            } else {
+                readingHeaders = false
+                true
+            }
+        }
+        .joinToString("\n")
+}

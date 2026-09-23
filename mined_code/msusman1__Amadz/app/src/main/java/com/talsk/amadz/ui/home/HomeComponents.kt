@@ -1,0 +1,279 @@
+package com.talsk.amadz.ui.home
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.navigation3.runtime.NavKey
+import com.talsk.amadz.R
+import com.talsk.amadz.domain.entity.CallLogData
+import com.talsk.amadz.domain.entity.CallLogType
+import com.talsk.amadz.domain.entity.Contact
+import com.talsk.amadz.ui.components.ContactAvatar
+import com.talsk.amadz.util.toReadableFormat
+import kotlinx.serialization.Serializable
+
+/**
+ * Created by Muhammad Usman : msusman97@gmail.com on 11/18/2023.
+ */
+
+@Serializable
+data object FavouritesKey : NavKey
+
+@Serializable
+data object RecentsKey : NavKey
+
+@Serializable
+data object ContactsKey : NavKey
+
+@Serializable
+data object SettingsKey : NavKey
+
+@Serializable
+data object BlockedNumbersKey : NavKey
+
+@Serializable
+data class CallLogHistoryKey(
+    val phone: String,
+    val contactName: String,
+    val contactId: Long?
+) : NavKey
+
+fun homeRoutes(): List<BottomNavMenu> {
+
+    return listOf(
+        BottomNavMenu(
+            icon = R.drawable.baseline_star_border_24,
+            iconSelected = R.drawable.baseline_star_24,
+            label = "Favourites",
+            navKey = FavouritesKey
+        ),
+        BottomNavMenu(
+            icon = R.drawable.baseline_access_time_24,
+            iconSelected = R.drawable.baseline_access_time_filled_24,
+            label = "Recents",
+            navKey = RecentsKey
+        ),
+
+        BottomNavMenu(
+            icon = R.drawable.outline_people_alt_24,
+            iconSelected = R.drawable.baseline_people_alt_24,
+            label = "Contacts",
+            navKey = ContactsKey
+        ),
+
+        )
+}
+
+data class BottomNavMenu(
+    val icon: Int, val iconSelected: Int, val label: String, val navKey: NavKey
+)
+
+
+@Composable
+fun HeaderItem(text: String, modifier: Modifier = Modifier) {
+    Text(
+        text = text,
+        modifier = modifier.padding(vertical = 16.dp, horizontal = 16.dp),
+        style = MaterialTheme.typography.bodySmall
+    )
+}
+
+@Composable
+fun HeaderItemLargeBold(text: String, modifier: Modifier = Modifier) {
+    Text(
+        text = text,
+        modifier = modifier.padding(vertical = 16.dp, horizontal = 16.dp),
+        style = MaterialTheme.typography.titleLarge,
+        fontWeight = FontWeight.Bold
+    )
+}
+
+@Composable
+fun EmptyContactItem() {
+    Spacer(
+        modifier = Modifier.size(56.dp),
+    )
+}
+
+
+@Composable
+fun FavouriteItemGroup(
+    contacts: List<Contact>,
+    onCallClick: (Contact) -> Unit,
+    onContactDetailClick: (Contact) -> Unit,
+    onRemoveFromFavouriteClick: (Contact) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        val first = contacts.getOrNull(0)
+        val second = contacts.getOrNull(1)
+        val third = contacts.getOrNull(2)
+        if (first != null) {
+            FavouriteItem(first, onCallClick, onContactDetailClick, onRemoveFromFavouriteClick)
+        }
+        if (second != null) {
+            FavouriteItem(second, onCallClick, onContactDetailClick, onRemoveFromFavouriteClick)
+        } else {
+            Spacer(modifier = Modifier.size(96.dp))
+        }
+        if (third != null) {
+            FavouriteItem(third, onCallClick, onContactDetailClick, onRemoveFromFavouriteClick)
+        } else {
+            Spacer(modifier = Modifier.size(96.dp))
+        }
+    }
+
+}
+
+@Composable
+@OptIn(ExperimentalFoundationApi::class)
+fun FavouriteItem(
+    contact: Contact,
+    onCallClick: (Contact) -> Unit,
+    onContactDetailClick: (Contact) -> Unit,
+    onRemoveFromFavouriteClick: (Contact) -> Unit
+) {
+    var menuExpanded by remember { mutableStateOf(false) }
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .padding(vertical = 16.dp, horizontal = 8.dp)
+            .combinedClickable(
+                onClick = { onCallClick(contact) },
+                onLongClick = { menuExpanded = true }
+            )) {
+        Spacer(modifier = Modifier.height(12.dp))
+        ContactAvatar(
+            modifier = Modifier.size(96.dp),
+            contact = contact
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(
+            text = contact.name,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        DropdownMenu(
+            expanded = menuExpanded,
+            onDismissRequest = { menuExpanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text("Contact detail") },
+                onClick = {
+                    menuExpanded = false
+                    onContactDetailClick(contact)
+                }
+            )
+            DropdownMenuItem(
+                text = { Text("Remove from fav") },
+                onClick = {
+                    menuExpanded = false
+                    onRemoveFromFavouriteClick(contact)
+                }
+            )
+        }
+    }
+
+}
+
+
+@Composable
+fun CallLogItem(
+    logData: CallLogData,
+    onCallLogClick: (CallLogData) -> Unit,
+    onCallClick: (CallLogData) -> Unit,
+    onContactDetailClick: (CallLogData) -> Unit
+) {
+    fun getCallIcon(): Int {
+        return when (logData.callLogType) {
+            CallLogType.MISSED -> R.drawable.baseline_call_missed_24
+            CallLogType.INCOMING -> R.drawable.baseline_call_received_24
+            CallLogType.OUTGOING -> R.drawable.baseline_call_made_24
+            CallLogType.REJECTED -> R.drawable.baseline_call_missed_24
+        }
+    }
+    ListItem(
+        modifier = Modifier.clickable { onCallLogClick(logData) },
+        leadingContent = {
+            ContactAvatar(
+                modifier = Modifier
+                    .size(56.dp),
+                contact = logData.toContactData(),
+                onClick = { onContactDetailClick(logData) }
+            )
+        },
+        headlineContent = { Text(text = logData.name.takeIf { it.isNotEmpty() } ?: logData.phone) },
+        supportingContent = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+
+                Icon(
+                    modifier = Modifier
+                        .size(18.dp)
+                        .padding(end = 4.dp),
+                    painter = painterResource(id = getCallIcon()),
+                    tint = if (logData.callLogType == CallLogType.MISSED || logData.callLogType == CallLogType.REJECTED) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onBackground,
+                    contentDescription = null
+                )
+                Text(
+                    text = logData.time.toReadableFormat(),
+                    color = if (logData.callLogType == CallLogType.MISSED || logData.callLogType == CallLogType.REJECTED) MaterialTheme.colorScheme.error else Color.Unspecified
+                )
+                if (logData.simSlot != null && logData.simSlot >= 0) {
+                    Text(
+                        text = "SIM ${logData.simSlot + 1}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+            }
+
+        },
+        trailingContent = {
+            IconButton(onClick = { onCallClick(logData) }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_call_24),
+                    contentDescription = "Call"
+                )
+            }
+
+        })
+}
+
+

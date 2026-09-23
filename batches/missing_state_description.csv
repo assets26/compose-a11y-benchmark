@@ -1,0 +1,2286 @@
+item_id,category,repo,file,composable,evidence,snippet,verdict,notes,abs_path,resolve_method,file_found,decl_line,decl_name,decl_confidence,anchor_line,anchor_pattern,anchor_scope,anchor_text,anchor_found,context,imports
+pilot-0181,missing_state_description,chmouel__noise-timer,chmouel__noise-timer/app/src/main/kotlin/com/chmouel/noisetimer/MainActivity.kt,NoiseTimerScreen,Switch without stateDescription,"
+@Composable
+fun NoiseTimerScreen() {
+    val context = LocalContext.current
+    val state by NoiseEngine.state.collectAsStateWithLifecycle()
+    var customMinutesText by remember { mutableStateOf("""") }
+
+    // Play/Pause are the only actions that need to go through the service,
+    // since starting/stopping the foreground service (and its lifetime) is
+    // the service's whole job.
+    fun sendPlaybackAction(action: String) {
+        NoiseService.start(context, action)
+    }
+
+    val accent by animateColorAsState(state.noiseType.accent(), tween(600), label = ""accent"")
+    val background = MaterialTheme.colorScheme.background",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/chmouel__noise-timer/app/src/main/kotlin/com/chmouel/noisetimer/MainActivity.kt,exact,True,125,NoiseTimerScreen,1.0,312.0,\.toggleable\s*\(,body,.toggleable(,True,"  300 |                         ) {
+  301 |                             Text(stringResource(R.string.set))
+  302 |                         }
+  303 |                     }
+  304 | 
+  305 |                     Spacer(Modifier.height(14.dp))
+  306 | 
+  307 |                     Row(
+  308 |                         verticalAlignment = Alignment.CenterVertically,
+  309 |                         horizontalArrangement = Arrangement.SpaceBetween,
+  310 |                         modifier = Modifier
+  311 |                             .fillMaxWidth()
+  312 |                             .toggleable(
+  313 |                                 value = state.fadeOutEnabled,
+  314 |                                 role = Role.Switch,
+  315 |                                 onValueChange = { checked -> NoiseEngine.setFadeOutEnabled(checked) },
+  316 |                             ),
+  317 |                     ) {
+  318 |                         Text(stringResource(R.string.fade_out_label))
+  319 |                         Switch(
+  320 |                             checked = state.fadeOutEnabled,
+  321 |                             onCheckedChange = null,
+  322 |                             colors = SwitchDefaults.colors(checkedTrackColor = accent),
+  323 |                         )
+  324 |                     }
+  325 |                 }
+  326 |             }
+  327 | 
+  328 |             Spacer(Modifier.height(28.dp))
+  329 | 
+  330 |             if (state.isPlaying && state.timerMinutes > 0) {
+  331 |                 Text(
+  332 |                     text = formatMillis(state.remainingMillis),
+  333 |                     style = MaterialTheme.typography.displayLarge,
+  334 |                     color = accent,
+  335 |                 )
+  336 |             } else {
+  337 |                 Text(
+  338 |                     text = stringResource(R.string.no_timer),
+  339 |                     style = MaterialTheme.typography.bodyMedium,
+  340 |                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+  341 |                 )
+  342 |             }
+  343 | 
+  344 |             Spacer(Modifier.height(24.dp))
+  345 |         }
+  346 |     }
+  347 | }
+  348 | 
+  349 | @Composable
+  350 | private fun NoiseCard(
+  351 |     type: NoiseType,
+  352 |     selected: Boolean,","import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.VolumeDown
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.chmouel.noisetimer.ui.theme.AccentBrown
+import com.chmouel.noisetimer.ui.theme.AccentPink
+import com.chmouel.noisetimer.ui.theme.AccentWhite
+import com.chmouel.noisetimer.ui.theme.NoiseTimerTheme"
+pilot-0182,missing_state_description,demosten-com__SrednaBG,demosten-com__SrednaBG/android/app/src/main/kotlin/com/demosten/srednabg/app/ui/screens/SettingsScreen.kt,SettingsScreen,Switch without stateDescription,"@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@Composable
+fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
+    val voiceEnabled by viewModel.voiceEnabled.collectAsStateWithLifecycle()
+    val periodicVoiceUpdates by viewModel.periodicVoiceUpdates.collectAsStateWithLifecycle()
+    val announceOnlyWhenOver by viewModel.announceOnlyWhenOver.collectAsStateWithLifecycle()
+    val appLanguage by viewModel.appLanguage.collectAsStateWithLifecycle()
+    val vehicleType by viewModel.vehicleType.collectAsStateWithLifecycle()
+    val autoStopHours by viewModel.autoStopHours.collectAsStateWithLifecycle()
+    val historyRetention by viewModel.historyRetention.collectAsStateWithLifecycle()
+    val mapThemeMode by viewModel.mapThemeMode.collectAsStateWithLifecycle()
+    val zoneSyncEnabled by viewModel.zoneSyncEnabled.collectAsStateWithLifecycle()
+    val overlayEnabled by viewModel.overlayEnabled.collectAsStateWithLifecycle()
+    val isSyncing by viewModel.isSyncing.collectAsStateWithLifecycle()
+    val zoneDataVersion by viewModel.zoneDataVersion.collectAsStateWithLifecycle()
+    val zoneDataHash by viewModel.zoneDataHash.collectAsStateWithLifecycle()",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/demosten-com__SrednaBG/android/app/src/main/kotlin/com/demosten/srednabg/app/ui/screens/SettingsScreen.kt,exact,True,73,SettingsScreen,1.0,136.0,\bSwitch\s*\(,body,Switch(,True,"  124 |         ) {
+  125 |             Column(modifier = Modifier.weight(1f)) {
+  126 |                 Text(
+  127 |                     text = stringResource(R.string.setting_voice_alerts),
+  128 |                     style = MaterialTheme.typography.titleMedium,
+  129 |                 )
+  130 |                 Text(
+  131 |                     text = stringResource(R.string.setting_voice_alerts_desc),
+  132 |                     style = MaterialTheme.typography.bodyMedium,
+  133 |                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+  134 |                 )
+  135 |             }
+  136 |             Switch(
+  137 |                 checked = voiceEnabled,
+  138 |                 onCheckedChange = { viewModel.setVoiceEnabled(it) },
+  139 |             )
+  140 |         }
+  141 | 
+  142 |         Spacer(modifier = Modifier.height(12.dp))
+  143 | 
+  144 |         // Periodic voice updates — sub-toggle under Voice alerts
+  145 |         Row(
+  146 |             modifier = Modifier.fillMaxWidth(),
+  147 |             verticalAlignment = Alignment.CenterVertically,
+  148 |         ) {
+  149 |             Column(modifier = Modifier.weight(1f)) {
+  150 |                 Text(
+  151 |                     text = stringResource(R.string.setting_periodic_updates),
+  152 |                     style = MaterialTheme.typography.titleMedium,
+  153 |                 )
+  154 |                 Text(
+  155 |                     text = stringResource(R.string.setting_periodic_updates_desc),
+  156 |                     style = MaterialTheme.typography.bodyMedium,
+  157 |                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+  158 |                 )
+  159 |             }
+  160 |             Switch(
+  161 |                 checked = periodicVoiceUpdates,
+  162 |                 onCheckedChange = { viewModel.setPeriodicVoiceUpdates(it) },
+  163 |                 enabled = voiceEnabled,
+  164 |             )
+  165 |         }
+  166 | 
+  167 |         Spacer(modifier = Modifier.height(12.dp))
+  168 | 
+  169 |         // Only-when-over-limit — nested under Periodic voice updates
+  170 |         Row(
+  171 |             modifier = Modifier.fillMaxWidth().padding(start = 16.dp),
+  172 |             verticalAlignment = Alignment.CenterVertically,
+  173 |         ) {
+  174 |             Column(modifier = Modifier.weight(1f)) {
+  175 |                 Text(
+  176 |                     text = stringResource(R.string.setting_overspeed_only),","import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.core.os.LocaleListCompat
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.demosten.srednabg.BuildConfig
+import com.demosten.srednabg.R
+import com.demosten.srednabg.app.data.SyncResult
+import com.demosten.srednabg.app.ui.util.formatZoneVersion
+import com.demosten.srednabg.app.ui.util.shortZoneHash
+import com.demosten.srednabg.app.ui.viewmodel.SettingsViewModel
+import com.demosten.srednabg.core.MapThemeMode"
+pilot-0183,missing_state_description,zhishengplus__ZhishengWeather,zhishengplus__ZhishengWeather/app/src/main/kotlin/com/zhisheng/weather/ui/SettingsScreen.kt,ToggleRow,Switch without stateDescription,"
+@Composable
+private fun ToggleRow(label: String, hint: String, checked: Boolean, onToggle: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth()
+            // 单一 toggleable 事件源：Switch 只负责绘制，避免父子点击同时触发。
+            .toggleable(value = checked, role = Role.Switch) { onToggle() }
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text(label, style = MaterialTheme.typography.titleSmall, color = ZhishengText)
+            Text(hint, style = MaterialTheme.typography.labelSmall, color = ZhishengTextTertiary)
+        }
+        Switch(
+            checked = checked,",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/zhishengplus__ZhishengWeather/app/src/main/kotlin/com/zhisheng/weather/ui/SettingsScreen.kt,exact,True,1114,ToggleRow,1.0,1118.0,\.toggleable\s*\(,body,".toggleable(value = checked, role = Role.Switch) { onToggle() }",True," 1106 |                     )
+ 1107 |                 }
+ 1108 |             }
+ 1109 |         }
+ 1110 |     }
+ 1111 | }
+ 1112 | 
+ 1113 | @Composable
+ 1114 | private fun ToggleRow(label: String, hint: String, checked: Boolean, onToggle: () -> Unit) {
+ 1115 |     Row(
+ 1116 |         modifier = Modifier.fillMaxWidth()
+ 1117 |             // 单一 toggleable 事件源：Switch 只负责绘制，避免父子点击同时触发。
+ 1118 |             .toggleable(value = checked, role = Role.Switch) { onToggle() }
+ 1119 |             .padding(horizontal = 16.dp, vertical = 8.dp),
+ 1120 |         verticalAlignment = Alignment.CenterVertically,
+ 1121 |     ) {
+ 1122 |         Column(Modifier.weight(1f)) {
+ 1123 |             Text(label, style = MaterialTheme.typography.titleSmall, color = ZhishengText)
+ 1124 |             Text(hint, style = MaterialTheme.typography.labelSmall, color = ZhishengTextTertiary)
+ 1125 |         }
+ 1126 |         Switch(
+ 1127 |             checked = checked,
+ 1128 |             onCheckedChange = null,
+ 1129 |             colors = SwitchDefaults.colors(
+ 1130 |                 checkedThumbColor = ZhishengBg,
+ 1131 |                 checkedTrackColor = ZhishengMint,
+ 1132 |                 uncheckedThumbColor = ZhishengTextTertiary,
+ 1133 |                 uncheckedTrackColor = ZhishengCardBorder,
+ 1134 |                 uncheckedBorderColor = ZhishengCardBorder,
+ 1135 |             ),
+ 1136 |         )
+ 1137 |     }
+ 1138 | }
+ 1139 | 
+ 1140 | @Composable
+ 1141 | private fun ModuleOrderEditor(
+ 1142 |     order: List<HomeModule>,
+ 1143 |     onMove: (from: Int, to: Int) -> Unit,
+ 1144 | ) {
+ 1145 |     order.forEachIndexed { index, module ->
+ 1146 |         Row(
+ 1147 |             modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
+ 1148 |             verticalAlignment = Alignment.CenterVertically,
+ 1149 |         ) {
+ 1150 |             Text(
+ 1151 |                 ""%02d"".format(index + 1),
+ 1152 |                 style = MaterialTheme.typography.labelSmall,
+ 1153 |                 color = ZhishengOrange,
+ 1154 |                 fontWeight = FontWeight.Bold,
+ 1155 |             )
+ 1156 |             Spacer(Modifier.width(10.dp))
+ 1157 |             Column(Modifier.weight(1f)) {
+ 1158 |                 Text(module.cn, style = MaterialTheme.typography.titleSmall, color = ZhishengText)","import android.content.Context
+import android.content.Intent
+import android.content.res.Configuration
+import android.net.Uri
+import android.provider.Settings as AndroidSettings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.disabled
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.zhisheng.weather.data.AccentTone
+import com.zhisheng.weather.data.AppLanguage
+import com.zhisheng.weather.data.AppIconManager
+import com.zhisheng.weather.data.AppIconStyle
+import com.zhisheng.weather.data.AppUpdateInfo
+import com.zhisheng.weather.data.WidgetBackgroundMode
+import com.zhisheng.weather.data.AmbienceLevel
+import com.zhisheng.weather.data.CaiyunApi
+import com.zhisheng.weather.data.HomeModule
+import com.zhisheng.weather.data.HomeBriefingStyle
+import com.zhisheng.weather.data.LocationSource
+import com.zhisheng.weather.data.LifeIndexMetric
+import com.zhisheng.weather.data.LandscapeStandbyStyle
+import com.zhisheng.weather.data.QWeatherApi
+import com.zhisheng.weather.data.SecretStore
+import com.zhisheng.weather.data.SettingsRepository
+import com.zhisheng.weather.widget.ZhishengWidgetProvider
+import com.zhisheng.weather.data.SourcePref
+import com.zhisheng.weather.data.TelemetryMetric
+import com.zhisheng.weather.data.ThemeMode
+import com.zhisheng.weather.i18n.AppLanguageState
+import com.zhisheng.weather.i18n.uiText
+import com.zhisheng.weather.ui.theme.ZhishengBg
+import com.zhisheng.weather.ui.theme.ZhishengCard
+import com.zhisheng.weather.ui.theme.ZhishengCardBorder
+import com.zhisheng.weather.ui.theme.ZhishengCyan
+import com.zhisheng.weather.ui.theme.ZhishengMint
+import com.zhisheng.weather.ui.theme.ZhishengOrange
+import com.zhisheng.weather.ui.theme.ZhishengRed
+import com.zhisheng.weather.ui.theme.ZhishengSurface
+import com.zhisheng.weather.ui.theme.ZhishengText
+import com.zhisheng.weather.ui.theme.ZhishengTextSecondary
+import com.zhisheng.weather.ui.theme.ZhishengTextTertiary
+import kotlinx.coroutines.launch"
+pilot-0184,missing_state_description,iOrchid__android-jetpack-demo,iOrchid__android-jetpack-demo/compose/src/main/java/org/zhiwei/compose/screen/basic/material3/WidgetScreen.kt,UI_Radio,RadioButton without stateDescription,"
+@Composable
+private fun UI_Radio() {
+    Title_Text(title = ""RadioButton"")
+    Title_Sub_Text(title = ""RadioButton可单个使用，一般也是用在radioGroup中组合使用"")
+    //在compose中，每个基础控件都是细颗粒度的，通过多样化组合来实现想要的效果
+    var isRadioSelected by remember { mutableStateOf(true) }
+    Title_Desc_Text(desc = ""常规使用，启用与禁用的状态，及点击选中，颜色配置等"")
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+        // 可用状态
+        RadioButton(selected = isRadioSelected, onClick = { isRadioSelected = !isRadioSelected })
+        RadioButton(
+            selected = !isRadioSelected,
+            onClick = { isRadioSelected = !isRadioSelected },
+            colors = RadioButtonDefaults.colors(
+                selectedColor = Color(0xffE91E63),",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/iOrchid__android-jetpack-demo/compose/src/main/java/org/zhiwei/compose/screen/basic/material3/WidgetScreen.kt,exact,True,335,UI_Radio,1.0,343.0,\bRadioButton\s*\(,body,"RadioButton(selected = isRadioSelected, onClick = { isRadioSelected = !isRadioSelected })",True,"  331 | 
+  332 | }
+  333 | 
+  334 | @Composable
+  335 | private fun UI_Radio() {
+  336 |     Title_Text(title = ""RadioButton"")
+  337 |     Title_Sub_Text(title = ""RadioButton可单个使用，一般也是用在radioGroup中组合使用"")
+  338 |     //在compose中，每个基础控件都是细颗粒度的，通过多样化组合来实现想要的效果
+  339 |     var isRadioSelected by remember { mutableStateOf(true) }
+  340 |     Title_Desc_Text(desc = ""常规使用，启用与禁用的状态，及点击选中，颜色配置等"")
+  341 |     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+  342 |         // 可用状态
+  343 |         RadioButton(selected = isRadioSelected, onClick = { isRadioSelected = !isRadioSelected })
+  344 |         RadioButton(
+  345 |             selected = !isRadioSelected,
+  346 |             onClick = { isRadioSelected = !isRadioSelected },
+  347 |             colors = RadioButtonDefaults.colors(
+  348 |                 selectedColor = Color(0xffE91E63),
+  349 |                 unselectedColor = Color(0xffFFEB3B),
+  350 |                 disabledSelectedColor = Color(0XFF607D8B),
+  351 |                 disabledUnselectedColor = Color(0XFF997D8B),
+  352 |             )
+  353 |         )
+  354 |         // 禁用状态
+  355 |         RadioButton(
+  356 |             enabled = false,
+  357 |             selected = false,
+  358 |             onClick = {},
+  359 |             colors = RadioButtonDefaults.colors(
+  360 |                 disabledSelectedColor = Color(0XFF607D8B)
+  361 |             )
+  362 |         )
+  363 |         RadioButton(
+  364 |             enabled = false,
+  365 |             selected = true,
+  366 |             onClick = {},
+  367 |             colors = RadioButtonDefaults.colors(
+  368 |                 disabledSelectedColor = Color(0xff607D8B)
+  369 |             )
+  370 |         )
+  371 |     }
+  372 |     Title_Sub_Text(title = ""二选一效果RadioGroup"")
+  373 |     Title_Desc_Text(desc = ""点击切换选择"")
+  374 |     Spacer(Modifier.height(8.dp))
+  375 |     //演示 二选一
+  376 |     var state by remember { mutableStateOf(true) }
+  377 |     Row(
+  378 |         Modifier
+  379 |             .selectableGroup()
+  380 |             .padding(8.dp)
+  381 |     ) {
+  382 |         RadioButton(
+  383 |             selected = state,","import android.widget.Toast
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.CutCornerShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.ProgressIndicatorDefaults
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.RangeSlider
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TriStateCheckbox
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.state.ToggleableState
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import org.zhiwei.compose.ui.widget.Title_Desc_Text
+import org.zhiwei.compose.ui.widget.Title_Sub_Text
+import org.zhiwei.compose.ui.widget.Title_Text"
+pilot-0185,missing_state_description,hwki__SimpleBitcoinWidget,hwki__SimpleBitcoinWidget/bitcoin/src/main/java/com/brentpanther/bitcoinwidget/ui/settings/SettingsComponents.kt,RadioDialogItem,RadioButton without stateDescription,"
+@Composable
+private fun RadioDialogItem(
+    item: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .height(48.dp)
+            .selectable(
+                selected = selected,
+                onClick = onClick,
+                role = Role.RadioButton
+            )",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/hwki__SimpleBitcoinWidget/bitcoin/src/main/java/com/brentpanther/bitcoinwidget/ui/settings/SettingsComponents.kt,exact,True,368,RadioDialogItem,1.0,385.0,\bRadioButton\s*\(,body,RadioButton(,True,"  368 | private fun RadioDialogItem(
+  369 |     item: String,
+  370 |     selected: Boolean,
+  371 |     onClick: () -> Unit
+  372 | ) {
+  373 |     Row(
+  374 |         Modifier
+  375 |             .fillMaxWidth()
+  376 |             .height(48.dp)
+  377 |             .selectable(
+  378 |                 selected = selected,
+  379 |                 onClick = onClick,
+  380 |                 role = Role.RadioButton
+  381 |             )
+  382 |             .padding(horizontal = 20.dp),
+  383 |         verticalAlignment = Alignment.CenterVertically
+  384 |     ) {
+  385 |         RadioButton(
+  386 |             selected = selected,
+  387 |             onClick = null
+  388 |         )
+  389 |         Text(
+  390 |             text = item,
+  391 |             style = MaterialTheme.typography.bodyLarge,
+  392 |             modifier = Modifier.padding(start = 16.dp)
+  393 |         )
+  394 |     }
+  395 | }","import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Card
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import java.lang.Integer.max
+import java.util.Locale"
+pilot-0186,missing_state_description,norsehorse-dev__BurnPonyAndroid,norsehorse-dev__BurnPonyAndroid/app/src/main/kotlin/com/burnpony/app/ui/compose/ComposeScreen.kt,ToggleRow,Switch without stateDescription,"
+@Composable
+private fun ToggleRow(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+        Text(label, color = BurnPonyTheme.ink)
+        Spacer(Modifier.weight(1f))
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            colors = SwitchDefaults.colors(
+                checkedTrackColor = BurnPonyTheme.ember,
+                checkedThumbColor = BurnPonyTheme.buttonInk,
+            ),
+        )
+    }
+}",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/norsehorse-dev__BurnPonyAndroid/app/src/main/kotlin/com/burnpony/app/ui/compose/ComposeScreen.kt,exact,True,516,ToggleRow,1.0,520.0,\bSwitch\s*\(,body,Switch(,True,"  508 |     Text(
+  509 |         text,
+  510 |         style = MaterialTheme.typography.bodySmall,
+  511 |         color = BurnPonyTheme.dim,
+  512 |     )
+  513 | }
+  514 | 
+  515 | @Composable
+  516 | private fun ToggleRow(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+  517 |     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+  518 |         Text(label, color = BurnPonyTheme.ink)
+  519 |         Spacer(Modifier.weight(1f))
+  520 |         Switch(
+  521 |             checked = checked,
+  522 |             onCheckedChange = onCheckedChange,
+  523 |             colors = SwitchDefaults.colors(
+  524 |                 checkedTrackColor = BurnPonyTheme.ember,
+  525 |                 checkedThumbColor = BurnPonyTheme.buttonInk,
+  526 |             ),
+  527 |         )
+  528 |     }
+  529 | }
+  530 | 
+  531 | @Composable
+  532 | private fun ChoiceRow(
+  533 |     choices: List<Pair<Int, Int>>,
+  534 |     selected: Int,
+  535 |     onSelect: (Int) -> Unit,
+  536 | ) {
+  537 |     Row(
+  538 |         modifier = Modifier
+  539 |             .fillMaxWidth()
+  540 |             .horizontalScroll(rememberScrollState()),
+  541 |         horizontalArrangement = Arrangement.spacedBy(8.dp),
+  542 |     ) {
+  543 |         for ((labelRes, value) in choices) {
+  544 |             val isSelected = value == selected
+  545 |             Text(
+  546 |                 text = stringResource(labelRes),
+  547 |                 style = MaterialTheme.typography.bodySmall,
+  548 |                 color = if (isSelected) BurnPonyTheme.buttonInk else BurnPonyTheme.ink,
+  549 |                 modifier = Modifier
+  550 |                     .background(
+  551 |                         if (isSelected) BurnPonyTheme.ember else BurnPonyTheme.fieldBackground,
+  552 |                         RoundedCornerShape(8.dp),
+  553 |                     )
+  554 |                     .clickable { onSelect(value) }
+  555 |                     .padding(horizontal = 10.dp, vertical = 6.dp),
+  556 |             )
+  557 |         }
+  558 |     }
+  559 | }
+  560 | ","import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DoNotTouch
+import androidx.compose.material.icons.filled.Key
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.burnpony.app.R
+import com.burnpony.app.push.PushSupport
+import com.burnpony.app.theme.BurnPonyTheme
+import com.burnpony.app.ui.result.ResultScreen
+import com.burnpony.core.BurnPonyLimits"
+pilot-0187,missing_state_description,norsehorse-dev__AgePonyAndroid,norsehorse-dev__AgePonyAndroid/app/src/main/java/com/agepony/app/ui/identities/IdentitiesScreen.kt,GenerateSecurityKey,Switch without stateDescription,"
+@Composable
+private fun GenerateSecurityKey(vault: Vault, onDone: () -> Unit, onCancel: () -> Unit) {
+    val activity = LocalContext.current as? FragmentActivity
+    var name by rememberSaveable { mutableStateOf("""") }
+    var useP256 by rememberSaveable { mutableStateOf(false) }
+    var busy by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
+    var pin by rememberSaveable { mutableStateOf("""") }
+    var needsPin by remember { mutableStateOf(false) }
+
+    Column(
+        Modifier.fillMaxSize().padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/norsehorse-dev__AgePonyAndroid/app/src/main/java/com/agepony/app/ui/identities/IdentitiesScreen.kt,exact,True,541,GenerateSecurityKey,1.0,570.0,\bSwitch\s*\(,body,"Switch(checked = useP256, onCheckedChange = { useP256 = it })",True,"  541 | private fun GenerateSecurityKey(vault: Vault, onDone: () -> Unit, onCancel: () -> Unit) {
+  542 |     val activity = LocalContext.current as? FragmentActivity
+  543 |     var name by rememberSaveable { mutableStateOf("""") }
+  544 |     var useP256 by rememberSaveable { mutableStateOf(false) }
+  545 |     var busy by remember { mutableStateOf(false) }
+  546 |     var error by remember { mutableStateOf<String?>(null) }
+  547 |     val scope = rememberCoroutineScope()
+  548 |     var pin by rememberSaveable { mutableStateOf("""") }
+  549 |     var needsPin by remember { mutableStateOf(false) }
+  550 | 
+  551 |     Column(
+  552 |         Modifier.fillMaxSize().padding(24.dp),
+  553 |         verticalArrangement = Arrangement.spacedBy(16.dp),
+  554 |     ) {
+  555 |         Text(""Security key"", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
+  556 |         Text(
+  557 |             ""Enrolls a FIDO security key (YubiKey, Token2) as a signing identity over NFC. "" +
+  558 |                 ""The private key never leaves the key."",
+  559 |             style = MaterialTheme.typography.bodyMedium,
+  560 |             color = MaterialTheme.colorScheme.onSurfaceVariant,
+  561 |         )
+  562 |         OutlinedTextField(
+  563 |             value = name,
+  564 |             onValueChange = { name = it },
+  565 |             label = { Text(""Name"") },
+  566 |             singleLine = true,
+  567 |             modifier = Modifier.fillMaxWidth(),
+  568 |         )
+  569 |         Row(verticalAlignment = Alignment.CenterVertically) {
+  570 |             Switch(checked = useP256, onCheckedChange = { useP256 = it })
+  571 |             Text(""Use NIST P-256 (default is Ed25519)"", modifier = Modifier.padding(start = 12.dp))
+  572 |         }
+  573 |         if (needsPin) {
+  574 |             OutlinedTextField(
+  575 |                 value = pin,
+  576 |                 onValueChange = { pin = it },
+  577 |                 label = { Text(""Security key PIN"") },
+  578 |                 singleLine = true,
+  579 |                 visualTransformation = PasswordVisualTransformation(),
+  580 |                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+  581 |                 modifier = Modifier.fillMaxWidth(),
+  582 |             )
+  583 |         }
+  584 |         Text(
+  585 |             ""When you tap Enroll, hold your security key to the back of the phone until it finishes. "" +
+  586 |                 ""If the key has a PIN, you'll be asked for it first."",
+  587 |             style = MaterialTheme.typography.bodySmall,
+  588 |             color = MaterialTheme.colorScheme.onSurfaceVariant,
+  589 |         )
+  590 |         if (error != null) {
+  591 |             Text(error!!, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+  592 |         }
+  593 |         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+  594 |             Button(
+  595 |                 onClick = {
+  596 |                     val act = activity ?: run { error = ""Couldn't access the screen for NFC.""; return@Button }
+  597 |                     if (busy) return@Button
+  598 |                     busy = true; error = null
+  599 |                     scope.launch {
+  600 |                         try {
+  601 |                             val stored = withContext(Dispatchers.IO) {
+  602 |                                 val service = SecurityKeyService(act)
+  603 |                                 val algo = if (useP256) SecurityKeyService.Algorithm.ECDSA_P256
+  604 |                                 else SecurityKeyService.Algorithm.ED25519
+  605 |                                 service.enroll(name.trim().ifBlank { ""security key"" }, algo, pin = pin.ifBlank { null })
+  606 |                             }
+  607 |                             vault.addIdentity(stored)
+  608 |                             busy = false
+  609 |                             onDone()
+  610 |                         } catch (e: SecurityKeyService.PinRequiredException) {","import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
+import com.agepony.app.security.SecurityKeyService
+import com.agepony.app.security.keystore.HardwareKeyService
+import com.agepony.app.ui.components.PostQuantumBadge
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import com.agepony.app.vault.IdentityImport
+import com.agepony.app.vault.IdentityImportException
+import com.agepony.app.vault.StoredIdentity
+import com.agepony.app.vault.StoredIdentityType
+import com.agepony.app.vault.Vault
+import com.agepony.app.vault.b64e
+import com.agepony.app.vault.isPostQuantum
+import com.agepony.app.vault.publicDisplayString
+import com.agepony.core.recipients.HybridIdentity
+import com.agepony.core.recipients.SSHEd25519Identity
+import com.agepony.core.recipients.X25519Identity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.UUID"
+pilot-0188,missing_state_description,maxwhipw__marmalade-tts-android,maxwhipw__marmalade-tts-android/app/src/main/java/app/marmalade/tts/ui/screen/AdvancedSettingsScreen.kt,DeveloperEnginesSection,.toggleable without stateDescription," */
+@Composable
+private fun DeveloperEnginesSection(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+) {
+    SectionHeader(stringResource(R.string.settings_developer))
+
+    ListItem(
+        modifier = Modifier.toggleable(
+            value = checked,
+            role = Role.Switch,
+            onValueChange = onCheckedChange,
+        ),
+        headlineContent = { Text(stringResource(R.string.settings_show_developer_engines)) },
+        supportingContent = {",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/maxwhipw__marmalade-tts-android/app/src/main/java/app/marmalade/tts/ui/screen/AdvancedSettingsScreen.kt,exact,True,180,DeveloperEnginesSection,1.0,187.0,\.toggleable\s*\(,body,modifier = Modifier.toggleable(,True,"  175 |  * both build types so an interested user can reveal them — the default value
+  176 |  * differs (on in debug, off in release), wired through
+  177 |  * [app.marmalade.tts.data.SettingsRepository.showDeveloperEngines].
+  178 |  */
+  179 | @Composable
+  180 | private fun DeveloperEnginesSection(
+  181 |     checked: Boolean,
+  182 |     onCheckedChange: (Boolean) -> Unit,
+  183 | ) {
+  184 |     SectionHeader(stringResource(R.string.settings_developer))
+  185 | 
+  186 |     ListItem(
+  187 |         modifier = Modifier.toggleable(
+  188 |             value = checked,
+  189 |             role = Role.Switch,
+  190 |             onValueChange = onCheckedChange,
+  191 |         ),
+  192 |         headlineContent = { Text(stringResource(R.string.settings_show_developer_engines)) },
+  193 |         supportingContent = {
+  194 |             Text(text = stringResource(R.string.settings_show_developer_engines_desc))
+  195 |         },
+  196 |         trailingContent = {
+  197 |             Switch(checked = checked, onCheckedChange = null)
+  198 |         },
+  199 |         colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surface),
+  200 |     )
+  201 | }
+  202 | 
+  203 | /**
+  204 |  * Debug-only entry point to the benchmark surface. Only shown when
+  205 |  * `BuildConfig.DEBUG` (gated by AppRoot passing a non-null lambda).
+  206 |  * Release builds never render this section.
+  207 |  */
+  208 | @Composable
+  209 | private fun BenchmarkSection(onClick: () -> Unit) {
+  210 |     SectionHeader(stringResource(R.string.settings_debug))
+  211 | 
+  212 |     ListItem(
+  213 |         modifier = Modifier.clickable(onClick = onClick),
+  214 |         headlineContent = { Text(stringResource(R.string.settings_benchmark)) },
+  215 |         supportingContent = {
+  216 |             Text(text = stringResource(R.string.settings_benchmark_desc))
+  217 |         },
+  218 |         trailingContent = {
+  219 |             Icon(
+  220 |                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+  221 |                 contentDescription = null,
+  222 |             )
+  223 |         },
+  224 |         colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surface),
+  225 |     )
+  226 | }
+  227 | ","import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import app.marmalade.tts.R
+import app.marmalade.tts.ui.MarmaladeFilterChip"
+pilot-0189,missing_state_description,shardulvs__pdfinspector-android,shardulvs__pdfinspector-android/app/src/main/java/SVS/pdfinspector/ui/ElementEditSheet.kt,ElementEditSheet,Checkbox without stateDescription,"@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ElementEditSheet(
+    target: EditTarget,
+    onApply: (EditRequest) -> Unit,
+    onImportFont: (Uri) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val caps = target.caps
+    val id = target.node.id
+    var x by remember(id) { mutableStateOf(fmt(target.x)) }
+    var y by remember(id) { mutableStateOf(fmt(target.y)) }
+    var w by remember(id) { mutableStateOf(fmt(target.w)) }
+    var h by remember(id) { mutableStateOf(fmt(target.h)) }
+    var fill by remember(id) { mutableStateOf(target.fillArgb?.let(::argbToHex) ?: """") }
+    var stroke by remember(id) { mutableStateOf(target.strokeArgb?.let(::argbToHex) ?: """") }",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/shardulvs__pdfinspector-android/app/src/main/java/SVS/pdfinspector/ui/ElementEditSheet.kt,exact,True,44,ElementEditSheet,1.0,140.0,\bCheckbox\s*\(,body,Checkbox(,True,"  128 |                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+  129 |                 )
+  130 |             }
+  131 | 
+  132 |             if (caps.canText) {
+  133 |                 OutlinedTextField(
+  134 |                     value = text,
+  135 |                     onValueChange = { text = it },
+  136 |                     label = { Text(""Text"") },
+  137 |                     modifier = Modifier.fillMaxWidth(),
+  138 |                 )
+  139 |                 Row(verticalAlignment = Alignment.CenterVertically) {
+  140 |                     Checkbox(
+  141 |                         checked = useFallback,
+  142 |                         onCheckedChange = { on ->
+  143 |                             useFallback = on
+  144 |                             if (on && fontId == null) fontId = AUTO_FONT_ID
+  145 |                         },
+  146 |                     )
+  147 |                     Text(""Use fallback font"")
+  148 |                 }
+  149 |                 if (useFallback) {
+  150 |                     FontPicker(
+  151 |                         options = target.fontOptions,
+  152 |                         selectedId = fontId ?: AUTO_FONT_ID,
+  153 |                         onSelect = { fontId = it },
+  154 |                         onAddCustom = { importLauncher.launch(""*/*"") },
+  155 |                     )
+  156 |                 }
+  157 |                 Text(
+  158 |                     if (useFallback) {
+  159 |                         ""Auto picks the closest match to the original font. Pick "" +
+  160 |                             ""another or add your own from the list.""
+  161 |                     } else {
+  162 |                         ""Re-encoded with the element's own font, swapping to an "" +
+  163 |                             ""exact match only when one is recognised.""
+  164 |                     },
+  165 |                     style = MaterialTheme.typography.bodySmall,
+  166 |                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+  167 |                 )
+  168 |             }
+  169 | 
+  170 |             Row(
+  171 |                 modifier = Modifier.fillMaxWidth(),
+  172 |                 horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End),
+  173 |             ) {
+  174 |                 TextButton(onClick = onDismiss) { Text(""Cancel"") }
+  175 |                 Button(onClick = {
+  176 |                     onApply(
+  177 |                         buildRequest(
+  178 |                             target, x, y, w, h, fill, stroke, text,
+  179 |                             if (useFallback) fontId ?: AUTO_FONT_ID else null,
+  180 |                         ),","import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import SVS.pdfinspector.AUTO_FONT_ID
+import SVS.pdfinspector.EditTarget
+import SVS.pdfinspector.FontOption
+import SVS.pdfinspector.FontSource
+import SVS.pdfinspector.engine.EditRequest"
+pilot-0190,missing_state_description,DigitaleGesellschaft__EventFahrplan,DigitaleGesellschaft__EventFahrplan/app/src/main/java/nerd/tuxmobil/fahrplan/congress/settings/widgets/SwitchPreference.kt,SwitchPreference,Switch without stateDescription,"
+@Composable
+internal fun SwitchPreference(
+    title: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    subtitle: String? = null,
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+
+    Row(
+        verticalAlignment = CenterVertically,
+        modifier = modifier
+            .fillMaxWidth()
+            .minimumInteractiveComponentSize()",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/DigitaleGesellschaft__EventFahrplan/app/src/main/java/nerd/tuxmobil/fahrplan/congress/settings/widgets/SwitchPreference.kt,exact,True,20,SwitchPreference,1.0,34.0,\.toggleable\s*\(,body,.toggleable(,True,"   20 | internal fun SwitchPreference(
+   21 |     title: String,
+   22 |     checked: Boolean,
+   23 |     onCheckedChange: (Boolean) -> Unit,
+   24 |     modifier: Modifier = Modifier,
+   25 |     subtitle: String? = null,
+   26 | ) {
+   27 |     val interactionSource = remember { MutableInteractionSource() }
+   28 | 
+   29 |     Row(
+   30 |         verticalAlignment = CenterVertically,
+   31 |         modifier = modifier
+   32 |             .fillMaxWidth()
+   33 |             .minimumInteractiveComponentSize()
+   34 |             .toggleable(
+   35 |                 value = checked,
+   36 |                 interactionSource = interactionSource,
+   37 |                 indication = ripple(),
+   38 |                 role = Role.Switch,
+   39 |                 onValueChange = onCheckedChange,
+   40 |             )
+   41 |             .padding(
+   42 |                 horizontal = PREFERENCE_HORIZONTAL_PADDING_DP.dp,
+   43 |                 vertical = PREFERENCE_VERTICAL_PADDING_DP.dp,
+   44 |             )
+   45 |     ) {
+   46 |         PreferenceText(
+   47 |             title = title,
+   48 |             subtitle = subtitle,
+   49 |             modifier = Modifier.weight(1f),
+   50 |         )
+   51 | 
+   52 |         // The ripple effect is displayed on the Row. Don't show a separate one on the Switch.
+   53 |         WithoutRipple {
+   54 |             Switch(
+   55 |                 checked = checked,
+   56 |                 onCheckedChange = null,
+   57 |                 // Clicks on the row will highlight the switch thumb
+   58 |                 interactionSource = interactionSource,
+   59 |                 modifier = Modifier.padding(start = 16.dp),
+   60 |             )
+   61 |         }
+   62 |     }
+   63 | }","import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.dp
+import nerd.tuxmobil.fahrplan.congress.designsystem.buttons.Switch
+import nerd.tuxmobil.fahrplan.congress.designsystem.indicators.ripple
+import nerd.tuxmobil.fahrplan.congress.designsystem.modifiers.WithoutRipple
+import nerd.tuxmobil.fahrplan.congress.designsystem.modifiers.minimumInteractiveComponentSize"
+pilot-0191,missing_state_description,norsehorse-dev__BurnPonyAndroid,norsehorse-dev__BurnPonyAndroid/app/src/main/kotlin/com/burnpony/app/ui/settings/SettingsScreen.kt,ProxyModeRow,RadioButton without stateDescription,"
+@Composable
+private fun ProxyModeRow(
+    id: String,
+    labelRes: Int,
+    selected: String,
+    onSelect: (String) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(role = Role.RadioButton) { onSelect(id) }
+            .padding(vertical = 2.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        RadioButton(",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/norsehorse-dev__BurnPonyAndroid/app/src/main/kotlin/com/burnpony/app/ui/settings/SettingsScreen.kt,exact,True,408,ProxyModeRow,1.0,421.0,\bRadioButton\s*\(,body,RadioButton(,True,"  408 | private fun ProxyModeRow(
+  409 |     id: String,
+  410 |     labelRes: Int,
+  411 |     selected: String,
+  412 |     onSelect: (String) -> Unit,
+  413 | ) {
+  414 |     Row(
+  415 |         modifier = Modifier
+  416 |             .fillMaxWidth()
+  417 |             .clickable(role = Role.RadioButton) { onSelect(id) }
+  418 |             .padding(vertical = 2.dp),
+  419 |         verticalAlignment = Alignment.CenterVertically,
+  420 |     ) {
+  421 |         RadioButton(
+  422 |             selected = selected == id,
+  423 |             onClick = { onSelect(id) },
+  424 |             colors = RadioButtonDefaults.colors(
+  425 |                 selectedColor = BurnPonyTheme.ember,
+  426 |                 unselectedColor = BurnPonyTheme.dim,
+  427 |             ),
+  428 |         )
+  429 |         Text(stringResource(labelRes), color = BurnPonyTheme.ink)
+  430 |     }
+  431 | }
+  432 | 
+  433 | @Composable
+  434 | private fun SectionPanel(header: String?, content: @Composable () -> Unit) {
+  435 |     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+  436 |         if (header != null) {
+  437 |             Text(
+  438 |                 header.uppercase(),
+  439 |                 style = MaterialTheme.typography.labelSmall,
+  440 |                 color = BurnPonyTheme.dim,
+  441 |                 modifier = Modifier.padding(start = 4.dp),
+  442 |             )
+  443 |         }
+  444 |         Column(
+  445 |             modifier = Modifier
+  446 |                 .fillMaxWidth()
+  447 |                 .background(BurnPonyTheme.panel, RoundedCornerShape(12.dp))
+  448 |                 .padding(14.dp),
+  449 |             verticalArrangement = Arrangement.spacedBy(10.dp),
+  450 |         ) {
+  451 |             content()
+  452 |         }
+  453 |     }
+  454 | }","import android.content.Intent
+import androidx.core.net.toUri
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.burnpony.app.R
+import com.burnpony.app.data.api.BurnPonyApi
+import com.burnpony.app.data.api.ProxyPrefs
+import com.burnpony.app.ui.language.LanguagePickerRows
+import com.burnpony.app.ui.legal.LegalDocument
+import com.burnpony.app.theme.BurnPonyTheme
+import com.burnpony.app.ui.compose.editorColors"
+pilot-0192,missing_state_description,EventFahrplan__EventFahrplan,EventFahrplan__EventFahrplan/app/src/main/java/nerd/tuxmobil/fahrplan/congress/settings/widgets/SwitchPreference.kt,SwitchPreference,Switch without stateDescription,"
+@Composable
+internal fun SwitchPreference(
+    title: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    subtitle: String? = null,
+    showDivider: Boolean = false,
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+
+    PreferenceItemContainer(
+        modifier = modifier,
+        showDivider = showDivider,
+    ) {",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/EventFahrplan__EventFahrplan/app/src/main/java/nerd/tuxmobil/fahrplan/congress/settings/widgets/SwitchPreference.kt,exact,True,20,SwitchPreference,1.0,39.0,\.toggleable\s*\(,body,.toggleable(,True,"   20 | internal fun SwitchPreference(
+   21 |     title: String,
+   22 |     checked: Boolean,
+   23 |     onCheckedChange: (Boolean) -> Unit,
+   24 |     modifier: Modifier = Modifier,
+   25 |     subtitle: String? = null,
+   26 |     showDivider: Boolean = false,
+   27 | ) {
+   28 |     val interactionSource = remember { MutableInteractionSource() }
+   29 | 
+   30 |     PreferenceItemContainer(
+   31 |         modifier = modifier,
+   32 |         showDivider = showDivider,
+   33 |     ) {
+   34 |         Row(
+   35 |             verticalAlignment = CenterVertically,
+   36 |             modifier = Modifier
+   37 |                 .fillMaxWidth()
+   38 |                 .minimumInteractiveComponentSize()
+   39 |                 .toggleable(
+   40 |                     value = checked,
+   41 |                     interactionSource = interactionSource,
+   42 |                     indication = ripple(),
+   43 |                     role = Role.Switch,
+   44 |                     onValueChange = onCheckedChange,
+   45 |                 )
+   46 |                 .padding(
+   47 |                     horizontal = PREFERENCE_HORIZONTAL_PADDING_DP.dp,
+   48 |                     vertical = PREFERENCE_VERTICAL_PADDING_DP.dp,
+   49 |                 )
+   50 |         ) {
+   51 |             PreferenceText(
+   52 |                 title = title,
+   53 |                 subtitle = subtitle,
+   54 |                 modifier = Modifier.weight(1f),
+   55 |             )
+   56 | 
+   57 |             // The ripple effect is displayed on the Row. Don't show a separate one on the Switch.
+   58 |             WithoutRipple {
+   59 |                 Switch(
+   60 |                     checked = checked,
+   61 |                     onCheckedChange = null,
+   62 |                     // Clicks on the row will highlight the switch thumb
+   63 |                     interactionSource = interactionSource,
+   64 |                     modifier = Modifier.padding(start = 16.dp),
+   65 |                 )
+   66 |             }
+   67 |         }
+   68 |     }
+   69 | }","import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.dp
+import nerd.tuxmobil.fahrplan.congress.designsystem.buttons.Switch
+import nerd.tuxmobil.fahrplan.congress.designsystem.indicators.ripple
+import nerd.tuxmobil.fahrplan.congress.designsystem.modifiers.WithoutRipple
+import nerd.tuxmobil.fahrplan.congress.designsystem.modifiers.minimumInteractiveComponentSize"
+pilot-0193,missing_state_description,isotjs__todosian-app,isotjs__todosian-app/app/src/main/java/com/isotjs/todosian/ui/settings/SettingsScreen.kt,SettingsScreen,Switch without stateDescription,"@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SettingsScreen(
+    fileRepository: FileRepository,
+    appSettingsRepository: AppSettingsRepository,
+    preferencesManager: PreferencesManager,
+    onBack: () -> Unit,
+    onRequireOnboarding: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val viewModel: SettingsViewModel = viewModel(
+        factory = SettingsViewModelFactory(fileRepository),
+    )
+
+    var showChangelogSheet by remember { mutableStateOf(false) }
+",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/isotjs__todosian-app/app/src/main/java/com/isotjs/todosian/ui/settings/SettingsScreen.kt,exact,True,99,SettingsScreen,1.0,489.0,\bSwitch\s*\(,body,Switch(,True,"  477 |                             headlineContent = { Text(text = stringResource(R.string.settings_dynamic_color)) },
+  478 |                             supportingContent = {
+  479 |                                 Text(
+  480 |                                     text = if (dynamicEnabled) {
+  481 |                                         stringResource(R.string.settings_dynamic_color_subtitle)
+  482 |                                     } else {
+  483 |                                         stringResource(R.string.settings_dynamic_color_unavailable)
+  484 |                                     },
+  485 |                                 )
+  486 |                             },
+  487 |                             leadingContent = { Icon(imageVector = Icons.Filled.ViewDay, contentDescription = null) },
+  488 |                             trailingContent = {
+  489 |                                 Switch(
+  490 |                                     checked = settings.dynamicColorEnabled,
+  491 |                                     onCheckedChange = { appSettingsRepository.setDynamicColorEnabled(it) },
+  492 |                                     enabled = dynamicEnabled,
+  493 |                                 )
+  494 |                             },
+  495 |                             colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+  496 |                         )
+  497 |                     }
+  498 |                 }
+  499 | 
+  500 |                 item {
+  501 |                     SectionTitle(text = stringResource(R.string.settings_behaviour))
+  502 |                 }
+  503 |                 item {
+  504 |                     Card(
+  505 |                         shape = MaterialTheme.shapes.medium,
+  506 |                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+  507 |                     ) {
+  508 |                         ListItem(
+  509 |                             headlineContent = { Text(text = stringResource(R.string.settings_show_daily_focus)) },
+  510 |                             supportingContent = { Text(text = stringResource(R.string.settings_show_daily_focus_subtitle)) },
+  511 |                             leadingContent = { Icon(imageVector = Icons.Filled.Info, contentDescription = null) },
+  512 |                             trailingContent = {
+  513 |                                 Switch(
+  514 |                                     checked = settings.showDailyFocus,
+  515 |                                     onCheckedChange = { appSettingsRepository.setShowDailyFocus(it) },
+  516 |                                 )
+  517 |                             },
+  518 |                             colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+  519 |                         )
+  520 | 
+  521 |                         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+  522 | 
+  523 |                         if (settings.showDailyFocus) {
+  524 |                             ListItem(
+  525 |                                 headlineContent = { Text(text = stringResource(R.string.settings_daily_focus_mode)) },
+  526 |                                 supportingContent = { Text(text = dailyFocusModeLabel(settings.dailyFocusMode)) },
+  527 |                                 leadingContent = { Icon(imageVector = Icons.Filled.Info, contentDescription = null) },
+  528 |                                 trailingContent = {
+  529 |                                     Icon(","import android.Manifest
+import android.os.Build
+import android.content.pm.PackageManager
+import android.text.format.DateFormat
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.filled.ColorLens
+import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.RestartAlt
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.VerticalAlignTop
+import androidx.compose.material.icons.filled.ViewDay
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberTimePickerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.material.icons.filled.AutoAwesome
+import com.isotjs.todosian.BuildConfig
+import com.isotjs.todosian.R
+import com.isotjs.todosian.data.FileRepository
+import com.isotjs.todosian.data.PreferencesManager
+import com.isotjs.todosian.data.settings.AppSettings
+import com.isotjs.todosian.data.settings.AppSettingsRepository
+import com.isotjs.todosian.data.settings.CategorySort
+import com.isotjs.todosian.data.settings.DailyFocusMode
+import com.isotjs.todosian.data.settings.NewTodoFilePosition
+import com.isotjs.todosian.data.settings.ThemeMode
+import com.isotjs.todosian.data.settings.TodoGrouping
+import com.isotjs.todosian.data.settings.TodoSort
+import com.isotjs.todosian.ui.components.ChangelogBottomSheet
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.collectLatest
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle"
+pilot-0194,missing_state_description,Nyabsi__VRCAA,Nyabsi__VRCAA/app/src/main/java/cc/sovellus/vrcaa/ui/components/dialog/FavoriteDialog.kt,FavoriteDialog,RadioButton without stateDescription,"@SuppressLint(""LocalContextGetResourceValueCall"")
+@Composable
+fun FavoriteDialog(
+    type: IFavorites.FavoriteType,
+    id: String,
+    metadata: FavoriteManager.FavoriteMetadata,
+    groupMetadata: Map<String, FavoriteManager.FavoriteGroupMetadata>,
+    maximumFavorites: Int,
+    onDismiss: () -> Unit,
+    onConfirmation: () -> Unit
+) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
+    val selectedGroup = remember { mutableStateOf("""") }
+    val groups = remember { mutableStateListOf<String>() }",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/Nyabsi__VRCAA/app/src/main/java/cc/sovellus/vrcaa/ui/components/dialog/FavoriteDialog.kt,exact,True,49,FavoriteDialog,1.0,130.0,\bRadioButton\s*\(,body,"RadioButton(selected = it == selectedGroup.value, onClick = {",True,"  118 |                         val displayName = groupMetadata[it]?.displayName ?: groupMetadata[it]?.name ?: it
+  119 |                         val currentSize = groupMetadata[it]?.size ?: 0
+  120 | 
+  121 |                         Row(
+  122 |                             Modifier
+  123 |                                 .fillMaxWidth()
+  124 |                                 .selectable(
+  125 |                                     selected = (it == selectedGroup.value),
+  126 |                                     onClick = { selectedGroup.value = it }),
+  127 |                             horizontalArrangement = Arrangement.Start,
+  128 |                             verticalAlignment = Alignment.CenterVertically
+  129 |                         ) {
+  130 |                             RadioButton(selected = it == selectedGroup.value, onClick = {
+  131 |                                 selectedGroup.value = it
+  132 |                             })
+  133 |                             Text(text = ""$displayName ($currentSize/$maximumFavorites)"")
+  134 |                         }
+  135 |                     }
+  136 |                 }
+  137 |             }
+  138 |         },
+  139 |         onDismissRequest = {
+  140 |             onDismiss()
+  141 |         },
+  142 |         confirmButton = {
+  143 |             TextButton(
+  144 |                 onClick = {
+  145 |                     coroutineScope.launch {
+  146 |                         val result = if (selectedGroup.value.contains(""vrcPlusWorld"")) {
+  147 |                             FavoriteManager.addFavorite(IFavorites.FavoriteType.FAVORITE_VRC_PLUS_WORLD, id, selectedGroup.value, metadata)
+  148 |                         } else {
+  149 |                             FavoriteManager.addFavorite(type, id, selectedGroup.value, metadata)
+  150 |                         }
+  151 | 
+  152 |                         if (result) {
+  153 |                             Toast.makeText(
+  154 |                                 context,
+  155 |                                 context.getString(R.string.favorite_toast_favorite_added).format(metadata.name),
+  156 |                                 Toast.LENGTH_SHORT
+  157 |                             ).show()
+  158 |                         } else {
+  159 |                             Toast.makeText(
+  160 |                                 context,
+  161 |                                 context.getString(R.string.favorite_toast_favorite_added_failed).format(metadata.name),
+  162 |                                 Toast.LENGTH_SHORT
+  163 |                             ).show()
+  164 |                         }
+  165 | 
+  166 |                         onConfirmation()
+  167 |                     }
+  168 |                 }
+  169 |             ) {
+  170 |                 Text(stringResource(R.string.favorite_dialog_button_add))","import android.annotation.SuppressLint
+import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import cc.sovellus.vrcaa.R
+import cc.sovellus.vrcaa.api.vrchat.http.interfaces.IFavorites
+import cc.sovellus.vrcaa.manager.FavoriteManager
+import kotlinx.coroutines.launch"
+pilot-0195,missing_state_description,gininaba__AIPOSPasswordManager,gininaba__AIPOSPasswordManager/app/src/main/java/com/aipos/aipospm/ui/screens/PasswordGeneratorScreen.kt,ToggleRow,Switch without stateDescription,"
+@Composable
+private fun ToggleRow(
+    label: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = label,",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/gininaba__AIPOSPasswordManager/app/src/main/java/com/aipos/aipospm/ui/screens/PasswordGeneratorScreen.kt,exact,True,363,ToggleRow,1.0,379.0,\bSwitch\s*\(,body,Switch(,True,"  363 | private fun ToggleRow(
+  364 |     label: String,
+  365 |     checked: Boolean,
+  366 |     onCheckedChange: (Boolean) -> Unit
+  367 | ) {
+  368 |     Row(
+  369 |         modifier = Modifier
+  370 |             .fillMaxWidth()
+  371 |             .padding(vertical = 4.dp),
+  372 |         horizontalArrangement = Arrangement.SpaceBetween,
+  373 |         verticalAlignment = Alignment.CenterVertically
+  374 |     ) {
+  375 |         Text(
+  376 |             text = label,
+  377 |             style = MaterialTheme.typography.bodyLarge
+  378 |         )
+  379 |         Switch(
+  380 |             checked = checked,
+  381 |             onCheckedChange = onCheckedChange
+  382 |         )
+  383 |     }
+  384 | }","import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Casino
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.platform.LocalContext
+import com.aipos.aipospm.security.ClipboardHelper
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.aipos.aipospm.ui.theme.DangerRed
+import com.aipos.aipospm.ui.theme.SecurityGreen
+import com.aipos.aipospm.ui.theme.WarningAmber
+import com.aipos.aipospm.ui.viewmodels.PasswordGeneratorViewModel
+import com.aipos.aipospm.ui.viewmodels.PasswordStrength
+import kotlinx.coroutines.launch
+import kotlin.math.roundToInt"
+pilot-0196,missing_state_description,alorma__Compose-Settings,alorma__Compose-Settings/samples/shared/src/commonMain/kotlin/com/alorma/compose/settings/sample/shared/SettingsScreenExpressive.kt,SettingsCheckboxSampleSectionExpressive,Checkbox without stateDescription,"@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun SettingsCheckboxSampleSectionExpressive(
+  colors: ListItemColors,
+) {
+  SampleSection(
+    title = ""SettingsCheckbox (Expressive)"",
+    verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+  ) {
+    val state = remember { mutableStateOf(false) }
+    SettingsCheckbox(
+      state = state.value,
+      colors = colors,
+      shapes = ListItemDefaults.segmentedShapes(0, 2),
+      title = { Text(text = ""Checkbox"") },
+      subtitle = { Text(text = ""Checkbox subtitle"") },",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/alorma__Compose-Settings/samples/shared/src/commonMain/kotlin/com/alorma/compose/settings/sample/shared/SettingsScreenExpressive.kt,exact,True,129,SettingsCheckboxSampleSectionExpressive,1.0,,,none,,False,"  129 | private fun SettingsCheckboxSampleSectionExpressive(
+  130 |   colors: ListItemColors,
+  131 | ) {
+  132 |   SampleSection(
+  133 |     title = ""SettingsCheckbox (Expressive)"",
+  134 |     verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+  135 |   ) {
+  136 |     val state = remember { mutableStateOf(false) }
+  137 |     SettingsCheckbox(
+  138 |       state = state.value,
+  139 |       colors = colors,
+  140 |       shapes = ListItemDefaults.segmentedShapes(0, 2),
+  141 |       title = { Text(text = ""Checkbox"") },
+  142 |       subtitle = { Text(text = ""Checkbox subtitle"") },
+  143 |       onCheckedChange = { state.value = it },
+  144 |     )
+  145 |     SettingsCheckbox(
+  146 |       state = !state.value,
+  147 |       colors = colors,
+  148 |       shapes = ListItemDefaults.segmentedShapes(1, 2),
+  149 |       title = { Text(text = ""Checkbox"") },
+  150 |       subtitle = { Text(text = ""Checkbox subtitle"") },
+  151 |       onCheckedChange = { state.value = !it },
+  152 |     )
+  153 |   }
+  154 | }
+  155 | 
+  156 | @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+  157 | @Composable
+  158 | private fun SettingsRadioButtonSampleSectionExpressive(
+  159 |   colors: ListItemColors,
+  160 | ) {
+  161 |   SampleSection(
+  162 |     title = ""SettingsRadioButton (Expressive)"",
+  163 |     verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+  164 |   ) {
+  165 |     val state = remember { mutableStateOf<String?>(null) }
+  166 | 
+  167 |     SampleData.items.forEachIndexed { index, sampleItem ->
+  168 |       SettingsRadioButton(
+  169 |         state = state.value == sampleItem.key,
+  170 |         colors = colors,
+  171 |         shapes = ListItemDefaults.segmentedShapes(index, SampleData.items.size),
+  172 |         title = { Text(text = sampleItem.title) },
+  173 |         subtitle = { Text(text = sampleItem.description) },
+  174 |         onClick = { state.value = sampleItem.key },
+  175 |       )
+  176 |     }
+  177 |   }
+  178 | }
+  179 | 
+  180 | @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+  181 | @Composable","import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.ListItemColors
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.state.ToggleableState
+import androidx.compose.ui.unit.dp
+import com.alorma.compose.settings.sample.shared.internal.SampleData
+import com.alorma.compose.settings.sample.shared.internal.SampleSection
+import com.alorma.compose.settings.ui.expressive.SettingsButtonGroup
+import com.alorma.compose.settings.ui.expressive.SettingsCheckbox
+import com.alorma.compose.settings.ui.expressive.SettingsMenuLink
+import com.alorma.compose.settings.ui.expressive.SettingsRadioButton
+import com.alorma.compose.settings.ui.expressive.SettingsSwitch
+import com.alorma.compose.settings.ui.expressive.SettingsTriStateCheckbox"
+pilot-0197,missing_state_description,braniik__slate,braniik__slate/app/src/main/java/com/braniik/slate/ui/drawer/list/ListEditDialog.kt,ListEditDialog,Switch without stateDescription,"
+@Composable
+fun ListEditDialog(
+    app: HomeScreenApp,
+    info: AppInfo,
+    onDismiss: () -> Unit,
+    onSave: (HomeScreenApp) -> Unit
+) {
+    var textSize by remember(app.key) { mutableIntStateOf(app.listTextSizeSp) }
+    var iconSize by remember(app.key) { mutableIntStateOf(app.listIconSizeDp) }
+    var showIcon by remember(app.key) { mutableStateOf(app.showLabel) }
+    var iconShape by remember(app.key) { mutableStateOf(app.iconShape) }
+    var rotation by remember(app.key) { mutableFloatStateOf(app.rotationDeg) }
+
+    EditDialogShell(
+        title = info.label,",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/braniik__slate/app/src/main/java/com/braniik/slate/ui/drawer/list/ListEditDialog.kt,exact,True,48,ListEditDialog,1.0,120.0,\bSwitch\s*\(,body,Switch(,True,"  108 |             colors = sliderColors,
+  109 |             modifier = Modifier.fillMaxWidth()
+  110 |         )
+  111 | 
+  112 |         Spacer(Modifier.height(12.dp))
+  113 | 
+  114 |         Row(
+  115 |             verticalAlignment = Alignment.CenterVertically,
+  116 |             horizontalArrangement = Arrangement.SpaceBetween,
+  117 |             modifier = Modifier.fillMaxWidth()
+  118 |         ) {
+  119 |             OptionLabel(""show icon"")
+  120 |             Switch(
+  121 |                 checked = showIcon,
+  122 |                 onCheckedChange = { showIcon = it },
+  123 |                 colors = switchColors
+  124 |             )
+  125 |         }
+  126 |     }
+  127 | }","import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.braniik.slate.data.HomeScreenApp
+import com.braniik.slate.data.key
+import com.braniik.slate.ui.drawer.AppInfo
+import com.braniik.slate.ui.drawer.common.EditDialogShell
+import com.braniik.slate.ui.drawer.common.IconShapePicker
+import com.braniik.slate.ui.drawer.common.OptionLabel
+import com.braniik.slate.ui.theme.SlateBackground
+import com.braniik.slate.ui.theme.SlateOnBackground
+import com.braniik.slate.ui.theme.SlateSubtle"
+pilot-0198,missing_state_description,dononcharles__NiceToast,dononcharles__NiceToast/app/src/main/java/com/dononcharles/nicetoastapp/MainActivity.kt,MainScreen,Checkbox without stateDescription,"
+@Composable
+fun MainScreen(
+    modifier: Modifier = Modifier,
+    fontFamily: FontFamily,
+    useCustom: Boolean,
+    isDarkMode: Boolean,
+    onDarkModeChecked: (Boolean) -> Unit,
+    fullBackground: Boolean,
+    onFullBackgroundChecked: (Boolean) -> Unit,
+    onSwitchChange: (Boolean) -> Unit,
+    onSuccessClick: () -> Unit,
+    onErrorClick: () -> Unit,
+    onWarningClick: () -> Unit,
+    onInfoClick: () -> Unit,
+    onDeleteClick: () -> Unit,",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/dononcharles__NiceToast/app/src/main/java/com/dononcharles/nicetoastapp/MainActivity.kt,exact,True,347,MainScreen,1.0,383.0,\bSwitch\s*\(,body,Switch(,True,"  347 | fun MainScreen(
+  348 |     modifier: Modifier = Modifier,
+  349 |     fontFamily: FontFamily,
+  350 |     useCustom: Boolean,
+  351 |     isDarkMode: Boolean,
+  352 |     onDarkModeChecked: (Boolean) -> Unit,
+  353 |     fullBackground: Boolean,
+  354 |     onFullBackgroundChecked: (Boolean) -> Unit,
+  355 |     onSwitchChange: (Boolean) -> Unit,
+  356 |     onSuccessClick: () -> Unit,
+  357 |     onErrorClick: () -> Unit,
+  358 |     onWarningClick: () -> Unit,
+  359 |     onInfoClick: () -> Unit,
+  360 |     onDeleteClick: () -> Unit,
+  361 |     onNoInternetClick: () -> Unit,
+  362 |     useCompose: Boolean,
+  363 |     onComposeSwitchChange: (Boolean) -> Unit
+  364 | ) {
+  365 |     Box(
+  366 |         modifier = modifier
+  367 |             .fillMaxSize()
+  368 |             .background(color = MaterialTheme.colorScheme.background),
+  369 |     ) {
+  370 |         val scrollState = rememberScrollState()
+  371 | 
+  372 |         Column(
+  373 |             horizontalAlignment = Alignment.CenterHorizontally,
+  374 |             modifier = Modifier
+  375 |                 .padding(start = 72.dp, end = 72.dp, bottom = 32.dp)
+  376 |                 .verticalScroll(scrollState)
+  377 |         ) {
+  378 |             Row(
+  379 |                 modifier = Modifier
+  380 |                     .fillMaxWidth(),
+  381 |                 verticalAlignment = Alignment.CenterVertically
+  382 |             ) {
+  383 |                 Switch(
+  384 |                     checked = useCompose,
+  385 |                     onCheckedChange = onComposeSwitchChange
+  386 |                 )
+  387 |                 Text(text = stringResource(R.string.use_compose), modifier = Modifier.padding(start = 8.dp), color = MaterialTheme.colorScheme.onBackground)
+  388 |             }
+  389 | 
+  390 |             Row(
+  391 |                 modifier = Modifier
+  392 |                     .fillMaxWidth(),
+  393 |                 verticalAlignment = Alignment.CenterVertically
+  394 |             ) {
+  395 |                 Switch(
+  396 |                     checked = useCustom,
+  397 |                     onCheckedChange = onSwitchChange
+  398 |                 )
+  399 |                 Text(text = stringResource(R.string.custom_colors), modifier = Modifier.padding(start = 8.dp), color = MaterialTheme.colorScheme.onBackground)
+  400 |             }
+  401 | 
+  402 |             Row(
+  403 |                 modifier = Modifier.fillMaxWidth(),
+  404 |                 verticalAlignment = Alignment.CenterVertically
+  405 |             ) {
+  406 |                 Checkbox(
+  407 |                     checked = fullBackground,
+  408 |                     onCheckedChange = onFullBackgroundChecked
+  409 |                 )
+  410 |                 Text(text = stringResource(R.string.full_background), modifier = Modifier.padding(start = 8.dp), color = MaterialTheme.colorScheme.onBackground)
+  411 |             }
+  412 | 
+  413 |             Row(
+  414 |                 modifier = Modifier.fillMaxWidth(),
+  415 |                 verticalAlignment = Alignment.CenterVertically
+  416 |             ) {
+  417 |                 Checkbox(
+  418 |                     checked = isDarkMode,
+  419 |                     onCheckedChange = onDarkModeChecked
+  420 |                 )
+  421 |                 Text(text = stringResource(R.string.dark_mode), modifier = Modifier.padding(start = 8.dp), color = MaterialTheme.colorScheme.onBackground)
+  422 |             }
+  423 | ","import android.content.Intent
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Preview
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.net.toUri
+import com.dononcharles.cnicetoast.CNiceToastConfiguration
+import com.dononcharles.cnicetoast.CNiceToastHost
+import com.dononcharles.cnicetoast.CNiceToastState
+import com.dononcharles.cnicetoast.CNiceToastType
+import com.dononcharles.cnicetoast.LocalCNiceToastConfig
+import com.dononcharles.nicetoast.LONG_DURATION
+import com.dononcharles.nicetoast.NiceToast
+import com.dononcharles.nicetoast.NiceToastType
+import com.dononcharles.nicetoast.SHORT_DURATION
+import com.dononcharles.nicetoast.TOAST_GRAVITY_BOTTOM
+import kotlinx.coroutines.launch"
+pilot-0199,missing_state_description,odaridavid__WeatherApp,odaridavid__WeatherApp/app/src/main/java/com/github/odaridavid/weatherapp/designsystem/organism/BottomSheets.kt,SingleSelectBottomSheet,RadioButton without stateDescription,"@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SingleSelectBottomSheet(
+    title: String,
+    items: List<BottomSheetItem>,
+    selectedItem: BottomSheetItem,
+    sheetState: SheetState,
+    onSaveState: (BottomSheetItem) -> Unit,
+    onDismiss: (() -> Unit)? = null,
+) {
+    val scope = rememberCoroutineScope()
+    ModalBottomSheet(
+        onDismissRequest = {
+            scope.launch {
+                sheetState.hide()
+            }",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/odaridavid__WeatherApp/app/src/main/java/com/github/odaridavid/weatherapp/designsystem/organism/BottomSheets.kt,exact,True,110,SingleSelectBottomSheet,1.0,146.0,\bRadioButton\s*\(,body,RadioButton(,True,"  110 | fun SingleSelectBottomSheet(
+  111 |     title: String,
+  112 |     items: List<BottomSheetItem>,
+  113 |     selectedItem: BottomSheetItem,
+  114 |     sheetState: SheetState,
+  115 |     onSaveState: (BottomSheetItem) -> Unit,
+  116 |     onDismiss: (() -> Unit)? = null,
+  117 | ) {
+  118 |     val scope = rememberCoroutineScope()
+  119 |     ModalBottomSheet(
+  120 |         onDismissRequest = {
+  121 |             scope.launch {
+  122 |                 sheetState.hide()
+  123 |             }
+  124 |             if (onDismiss != null) {
+  125 |                 onDismiss()
+  126 |             }
+  127 |         },
+  128 |         sheetState = sheetState,
+  129 | //        windowInsets = WindowInsets.navigationBars,
+  130 |     ) {
+  131 |         Column(
+  132 |             modifier = Modifier.fillMaxWidth()
+  133 |         ) {
+  134 |             SmallHeadline(
+  135 |                 text = title,
+  136 |                 modifier = Modifier.padding(
+  137 |                     vertical = WeatherAppTheme.dimens.small,
+  138 |                     horizontal = WeatherAppTheme.dimens.medium
+  139 |                 )
+  140 |             )
+  141 | 
+  142 |             val selectedItemsState = remember { mutableStateOf(selectedItem) }
+  143 |             LazyColumn(Modifier.weight(1f, false)) {
+  144 |                 items(items) { item ->
+  145 |                     Row {
+  146 |                         RadioButton(
+  147 |                             selected = selectedItemsState.value.id == item.id,
+  148 |                             onClick = {
+  149 |                                 selectedItemsState.value = item.copy(isSelected = true)
+  150 |                             }
+  151 |                         )
+  152 |                         MediumBody(
+  153 |                             text = item.name,
+  154 |                             modifier = Modifier.padding(
+  155 |                                 horizontal = WeatherAppTheme.dimens.small,
+  156 |                                 vertical = WeatherAppTheme.dimens.medium
+  157 |                             )
+  158 |                         )
+  159 |                     }
+  160 |                 }
+  161 |             }
+  162 |             SingleSelectSaveButtonSection(
+  163 |                 sheetState = sheetState,
+  164 |                 coroutineScope = scope,
+  165 |                 onSaveState = onSaveState,
+  166 |                 selectedItemState = selectedItemsState,
+  167 |             )
+  168 |         }
+  169 |     }
+  170 | }
+  171 | 
+  172 | @OptIn(ExperimentalMaterial3Api::class)
+  173 | @Composable
+  174 | fun SingleSelectSaveButtonSection(
+  175 |     sheetState: SheetState,
+  176 |     coroutineScope: CoroutineScope,
+  177 |     onSaveState: (BottomSheetItem) -> Unit,
+  178 |     selectedItemState: MutableState<BottomSheetItem>,
+  179 | ) {
+  180 |     SaveButton(
+  181 |         sheetState = sheetState,
+  182 |         coroutineScope = coroutineScope,
+  183 |     ) {
+  184 |         onSaveState(selectedItemState.value)
+  185 |     }
+  186 | }","import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.github.odaridavid.weatherapp.R
+import com.github.odaridavid.weatherapp.designsystem.WeatherAppTheme
+import com.github.odaridavid.weatherapp.designsystem.molecule.MediumBody
+import com.github.odaridavid.weatherapp.designsystem.molecule.PositiveButton
+import com.github.odaridavid.weatherapp.designsystem.molecule.SmallHeadline
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch"
+pilot-0200,missing_state_description,norsehorse-dev__AgePonyAndroid,norsehorse-dev__AgePonyAndroid/app/src/main/java/com/agepony/app/ui/sign/SignFileFlow.kt,SigningKeyRow,RadioButton without stateDescription,"
+@Composable
+private fun SigningKeyRow(identity: StoredIdentity, selected: Boolean, onSelect: () -> Unit) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .selectable(selected = selected, onClick = onSelect)
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        RadioButton(selected = selected, onClick = onSelect)
+        Column(Modifier.padding(start = 4.dp)) {
+            Text(identity.name, style = MaterialTheme.typography.bodyLarge)
+            Text(
+                signingTypeLabel(identity.type),
+                style = MaterialTheme.typography.bodySmall,",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/norsehorse-dev__AgePonyAndroid/app/src/main/java/com/agepony/app/ui/sign/SignFileFlow.kt,exact,True,255,SigningKeyRow,1.0,263.0,\bRadioButton\s*\(,body,"RadioButton(selected = selected, onClick = onSelect)",True,"  251 |     }
+  252 | }
+  253 | 
+  254 | @Composable
+  255 | private fun SigningKeyRow(identity: StoredIdentity, selected: Boolean, onSelect: () -> Unit) {
+  256 |     Row(
+  257 |         Modifier
+  258 |             .fillMaxWidth()
+  259 |             .selectable(selected = selected, onClick = onSelect)
+  260 |             .padding(vertical = 8.dp),
+  261 |         verticalAlignment = Alignment.CenterVertically,
+  262 |     ) {
+  263 |         RadioButton(selected = selected, onClick = onSelect)
+  264 |         Column(Modifier.padding(start = 4.dp)) {
+  265 |             Text(identity.name, style = MaterialTheme.typography.bodyLarge)
+  266 |             Text(
+  267 |                 signingTypeLabel(identity.type),
+  268 |                 style = MaterialTheme.typography.bodySmall,
+  269 |                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+  270 |             )
+  271 |         }
+  272 |     }
+  273 | }
+  274 | 
+  275 | private fun signingTypeLabel(type: StoredIdentityType): String = when (type) {
+  276 |     StoredIdentityType.SSH_ED25519 -> ""SSH Ed25519 · in-app key""
+  277 |     StoredIdentityType.SSH_RSA -> ""SSH RSA · in-app key""
+  278 |     StoredIdentityType.HARDWARE_KEY -> ""Hardware key · signs in the device keystore""
+  279 |     StoredIdentityType.SK_ED25519 -> ""Security key · Ed25519 over NFC""
+  280 |     StoredIdentityType.SK_ECDSA_P256 -> ""Security key · ECDSA P-256 over NFC""
+  281 |     else -> """"
+  282 | }","import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
+import com.agepony.app.security.SecurityKeyService
+import com.agepony.app.signing.FileSigner
+import com.agepony.app.ui.files.SafIo
+import com.agepony.app.ui.files.SourceRef
+import com.agepony.app.vault.StoredIdentity
+import com.agepony.app.vault.StoredIdentityType
+import com.agepony.app.vault.Vault
+import com.agepony.core.signing.SSHSig
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext"

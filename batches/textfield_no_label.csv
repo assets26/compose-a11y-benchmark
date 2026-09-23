@@ -1,0 +1,2277 @@
+item_id,category,repo,file,composable,evidence,snippet,verdict,notes,abs_path,resolve_method,file_found,decl_line,decl_name,decl_confidence,anchor_line,anchor_pattern,anchor_scope,anchor_text,anchor_found,context,imports
+pilot-0261,textfield_no_label,iTsMe-Zen__Areada,iTsMe-Zen__Areada/app/src/main/java/app/areada/ui/reader/ReaderDialogs.kt,GoToPositionDialog,OutlinedTextField with placeholder but no label,"
+@Composable
+internal fun GoToPositionDialog(
+    label: String,
+    currentIndex: Int,
+    total: Int,
+    title: String? = null,
+    onDismiss: () -> Unit,
+    onConfirm: (Int) -> Unit,
+) {
+    val dialogTitle = title ?: stringResource(R.string.go_to)
+    val safeTotal = total.coerceAtLeast(1)
+    var input by rememberSaveable(label, currentIndex, safeTotal) {
+        mutableStateOf((currentIndex + 1).coerceIn(1, safeTotal).toString())
+    }
+    val targetIndex = input.toIntOrNull()?.minus(1)",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/iTsMe-Zen__Areada/app/src/main/java/app/areada/ui/reader/ReaderDialogs.kt,exact,True,224,GoToPositionDialog,1.0,271.0,OutlinedTextField\s*\(,body,OutlinedTextField(,True,"  259 |                 ) {
+  260 |                     Text(
+  261 |                         text = dialogTitle,
+  262 |                         style = MaterialTheme.typography.headlineSmall,
+  263 |                     )
+  264 |                     Text(
+  265 |                         text = ""$label ${currentIndex + 1} / $safeTotal"",
+  266 |                         style = MaterialTheme.typography.bodyLarge,
+  267 |                         color = MaterialTheme.colorScheme.onSurfaceVariant,
+  268 |                     )
+  269 |                 }
+  270 |                 Spacer(modifier = Modifier.height(12.dp))
+  271 |                 OutlinedTextField(
+  272 |                     value = input,
+  273 |                     onValueChange = { value ->
+  274 |                         input = value.filter { it.isDigit() }.take(6)
+  275 |                     },
+  276 |                     singleLine = true,
+  277 |                     isError = input.isNotBlank() && !targetIsValid,
+  278 |                     placeholder = {
+  279 |                         Text(text = ""1-$safeTotal"")
+  280 |                     },
+  281 |                     modifier = Modifier.fillMaxWidth(),
+  282 |                 )
+  283 |                 Spacer(modifier = Modifier.height(14.dp))
+  284 |                 Row(
+  285 |                     modifier = Modifier.fillMaxWidth(),
+  286 |                     horizontalArrangement = Arrangement.spacedBy(14.dp),
+  287 |                 ) {
+  288 |                     PromptChoiceButton(
+  289 |                         label = stringResource(R.string.ok),
+  290 |                         highlighted = true,
+  291 |                         enabled = targetIsValid,
+  292 |                         onClick = {
+  293 |                             onConfirm(targetIndex ?: return@PromptChoiceButton)
+  294 |                         },
+  295 |                         modifier = Modifier.weight(1f),
+  296 |                     )
+  297 |                     PromptChoiceButton(
+  298 |                         label = stringResource(R.string.cancel),
+  299 |                         highlighted = false,
+  300 |                         onClick = onDismiss,
+  301 |                         modifier = Modifier.weight(1f),
+  302 |                     )
+  303 |                 }
+  304 |             }
+  305 |         }
+  306 |     }
+  307 | }
+  308 | 
+  309 | @Composable
+  310 | internal fun CompactChoiceDialog(
+  311 |     question: String,","import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import app.areada.R
+import app.areada.data.ZipBookEntry
+import app.areada.data.reader.DocumentType"
+pilot-0262,textfield_no_label,beradeep__aiyo,beradeep__aiyo/ui/src/main/java/com/beradeep/aiyo/ui/screens/components/ModelSelectionSheet.kt,ModelSelectionSheet,TextField with placeholder but no label,"
+@Composable
+fun ModelSelectionSheet(
+    isVisible: Boolean,
+    modifier: Modifier = Modifier,
+    isFetchingModels: Boolean,
+    fetchModels: () -> Unit,
+    models: List<Model>,
+    selectedModel: Model,
+    onModelSelected: (Model) -> Unit,
+    onDismiss: () -> Unit
+) {
+    ModalBottomSheet(
+        isVisible = isVisible,
+        onDismissRequest = onDismiss,
+        sheetGesturesEnabled = false",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/beradeep__aiyo/ui/src/main/java/com/beradeep/aiyo/ui/screens/components/ModelSelectionSheet.kt,exact,True,41,ModelSelectionSheet,1.0,79.0,\bTextField\s*\(,body,TextField(,True,"   67 |                 .padding(vertical = 16.dp)
+   68 |         ) {
+   69 |             LaunchedEffect(Unit) {
+   70 |                 fetchModels()
+   71 |             }
+   72 | 
+   73 |             Text(
+   74 |                 modifier = Modifier.padding(horizontal = 16.dp),
+   75 |                 text = ""Select Model"",
+   76 |                 style = LocalTypography.current.h2
+   77 |             )
+   78 |             Spacer(modifier = Modifier.height(12.dp))
+   79 |             TextField(
+   80 |                 modifier = Modifier.padding(horizontal = 16.dp),
+   81 |                 value = searchText,
+   82 |                 onValueChange = { searchText = it },
+   83 |                 leadingIcon = { Icon(Icons.Rounded.Search) },
+   84 |                 placeholder = { Text(""Search"") },
+   85 |                 shape = CircleShape
+   86 |             )
+   87 |             Spacer(modifier = Modifier.height(12.dp))
+   88 |             AnimatedVisibility(isFetchingModels) {
+   89 |                 LinearProgressIndicator(Modifier.fillMaxWidth(), strokeCap = StrokeCap.Square)
+   90 |             }
+   91 |             LazyColumn {
+   92 |                 items(
+   93 |                     items = filteredModels,
+   94 |                     key = { it.id }
+   95 |                 ) { model ->
+   96 |                     val isSelected = model.id == selectedModel.id
+   97 |                     Surface(
+   98 |                         color = if (isSelected) AiyoTheme.colors.surface else AiyoTheme.colors.background
+   99 |                     ) {
+  100 |                         Row(
+  101 |                             modifier =
+  102 |                             Modifier
+  103 |                                 .fillMaxWidth()
+  104 |                                 .padding(horizontal = 16.dp)
+  105 |                                 .clip(RoundedCornerShape(8.dp))
+  106 |                                 .clickable {
+  107 |                                     onModelSelected(model)
+  108 |                                 }
+  109 |                         ) {
+  110 |                             Column(
+  111 |                                 modifier =
+  112 |                                 Modifier
+  113 |                                     .weight(1f)
+  114 |                                     .padding(vertical = 12.dp),
+  115 |                                 verticalArrangement = Arrangement.Center
+  116 |                             ) {
+  117 |                                 Text(
+  118 |                                     text = model.ownedBy ?: model.id.substringBefore('/'),
+  119 |                                     style = LocalTypography.current.h4","import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.unit.dp
+import com.beradeep.aiyo.domain.model.Model
+import com.beradeep.aiyo.ui.AiyoTheme
+import com.beradeep.aiyo.ui.LocalTypography
+import com.beradeep.aiyo.ui.basics.components.Icon
+import com.beradeep.aiyo.ui.basics.components.ModalBottomSheet
+import com.beradeep.aiyo.ui.basics.components.Surface
+import com.beradeep.aiyo.ui.basics.components.Text
+import com.beradeep.aiyo.ui.basics.components.progressindicators.LinearProgressIndicator
+import com.beradeep.aiyo.ui.basics.components.textfield.TextField"
+pilot-0263,textfield_no_label,norsehorse-dev__BurnPonyAndroid,norsehorse-dev__BurnPonyAndroid/app/src/main/kotlin/com/burnpony/app/ui/settings/SettingsScreen.kt,SettingsScreen,TextField with placeholder but no label,"@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SettingsScreen(
+    viewModel: SettingsViewModel,
+    onOpenLegal: (LegalDocument) -> Unit,
+) {
+    val context = LocalContext.current
+    val serverBaseUrl by viewModel.serverBaseUrl.collectAsStateWithLifecycle()
+    val serverField by viewModel.serverField.collectAsStateWithLifecycle()
+    val serverProblem by viewModel.serverProblem.collectAsStateWithLifecycle()
+    val proxyMode by viewModel.proxyMode.collectAsStateWithLifecycle()
+    val proxyHost by viewModel.proxyHost.collectAsStateWithLifecycle()
+    val proxyPort by viewModel.proxyPort.collectAsStateWithLifecycle()
+    val proxyUsername by viewModel.proxyUsername.collectAsStateWithLifecycle()
+    val proxyPassword by viewModel.proxyPassword.collectAsStateWithLifecycle()
+",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/norsehorse-dev__BurnPonyAndroid/app/src/main/kotlin/com/burnpony/app/ui/settings/SettingsScreen.kt,exact,True,79,SettingsScreen,1.0,160.0,\bTextField\s*\(,body,TextField(,True,"  148 |                         color = BurnPonyTheme.ember,
+  149 |                     )
+  150 |                     Text(
+  151 |                         stringResource(R.string.settings_replay_walkthrough_subtitle),
+  152 |                         style = MaterialTheme.typography.bodySmall,
+  153 |                         color = BurnPonyTheme.dim,
+  154 |                     )
+  155 |                 }
+  156 |             }
+  157 | 
+  158 |             // Self-hosting (advanced)
+  159 |             SectionPanel(header = stringResource(R.string.settings_selfhost_header)) {
+  160 |                 TextField(
+  161 |                     value = serverField,
+  162 |                     onValueChange = viewModel::setServerField,
+  163 |                     placeholder = { Text(BurnPonyApi.DEFAULT_BASE_URL, color = BurnPonyTheme.dim) },
+  164 |                     singleLine = true,
+  165 |                     keyboardOptions = KeyboardOptions(
+  166 |                         keyboardType = KeyboardType.Uri,
+  167 |                         imeAction = ImeAction.Done,
+  168 |                         autoCorrectEnabled = false,
+  169 |                     ),
+  170 |                     keyboardActions = KeyboardActions(onDone = { viewModel.applyServer() }),
+  171 |                     modifier = Modifier.fillMaxWidth(),
+  172 |                     colors = editorColors(),
+  173 |                 )
+  174 |                 if (serverProblem) {
+  175 |                     Text(
+  176 |                         stringResource(R.string.settings_server_invalid),
+  177 |                         style = MaterialTheme.typography.bodySmall,
+  178 |                         color = BurnPonyTheme.danger,
+  179 |                     )
+  180 |                 }
+  181 |                 if (serverBaseUrl != BurnPonyApi.DEFAULT_BASE_URL) {
+  182 |                     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+  183 |                         Text(
+  184 |                             stringResource(R.string.settings_active_server),
+  185 |                             style = MaterialTheme.typography.bodySmall,
+  186 |                             color = BurnPonyTheme.dim,
+  187 |                         )
+  188 |                         Spacer(Modifier.weight(1f))
+  189 |                         Text(
+  190 |                             serverBaseUrl,
+  191 |                             style = MaterialTheme.typography.bodySmall,
+  192 |                             color = BurnPonyTheme.ink,
+  193 |                         )
+  194 |                     }
+  195 |                     TextButton(onClick = viewModel::resetServer) {
+  196 |                         Text(stringResource(R.string.settings_reset_server), color = BurnPonyTheme.ember)
+  197 |                     }
+  198 |                 }
+  199 |                 Text(
+  200 |                     stringResource(R.string.settings_selfhost_footer),","import android.content.Intent
+import androidx.core.net.toUri
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.burnpony.app.R
+import com.burnpony.app.data.api.BurnPonyApi
+import com.burnpony.app.data.api.ProxyPrefs
+import com.burnpony.app.ui.language.LanguagePickerRows
+import com.burnpony.app.ui.legal.LegalDocument
+import com.burnpony.app.theme.BurnPonyTheme
+import com.burnpony.app.ui.compose.editorColors"
+pilot-0264,textfield_no_label,raheemadamboev__todo-app,raheemadamboev__todo-app/app/src/main/java/xyz/teamgravity/todo/presentation/component/topbar/TopBarSearch.kt,TopBarSearch,OutlinedTextField with placeholder but no label,"
+@Composable
+fun TopBarSearch(
+    query: String,
+    onQueryChange: (query: String) -> Unit,
+    onCancel: () -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        IconButtonPlain(
+            onClick = onCancel,
+            icon = Icons.AutoMirrored.Rounded.ArrowBack,
+            contentDescription = R.string.cd_back_button
+        )",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/raheemadamboev__todo-app/app/src/main/java/xyz/teamgravity/todo/presentation/component/topbar/TopBarSearch.kt,exact,True,20,TopBarSearch,1.0,34.0,OutlinedTextField\s*\(,body,OutlinedTextField(,True,"   20 | fun TopBarSearch(
+   21 |     query: String,
+   22 |     onQueryChange: (query: String) -> Unit,
+   23 |     onCancel: () -> Unit
+   24 | ) {
+   25 |     Row(
+   26 |         verticalAlignment = Alignment.CenterVertically,
+   27 |         modifier = Modifier.fillMaxWidth()
+   28 |     ) {
+   29 |         IconButtonPlain(
+   30 |             onClick = onCancel,
+   31 |             icon = Icons.AutoMirrored.Rounded.ArrowBack,
+   32 |             contentDescription = R.string.cd_back_button
+   33 |         )
+   34 |         OutlinedTextField(
+   35 |             value = query,
+   36 |             onValueChange = onQueryChange,
+   37 |             singleLine = true,
+   38 |             placeholder = {
+   39 |                 Text(
+   40 |                     text = stringResource(id = R.string.search),
+   41 |                     color = MaterialTheme.colorScheme.onPrimary,
+   42 |                     style = MaterialTheme.typography.bodyLarge
+   43 |                 )
+   44 |             },
+   45 |             colors = OutlinedTextFieldDefaults.colors(
+   46 |                 unfocusedBorderColor = Color.Transparent,
+   47 |                 focusedBorderColor = Color.Transparent,
+   48 |                 cursorColor = MaterialTheme.colorScheme.onPrimary,
+   49 |                 focusedTextColor = MaterialTheme.colorScheme.onPrimary,
+   50 |                 unfocusedTextColor = MaterialTheme.colorScheme.onPrimary
+   51 |             ),
+   52 |             textStyle = MaterialTheme.typography.bodyLarge
+   53 |         )
+   54 |     }
+   55 | }","import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import xyz.teamgravity.coresdkcompose.button.IconButtonPlain
+import xyz.teamgravity.todo.R"
+pilot-0265,textfield_no_label,crome1394__point-forecast,crome1394__point-forecast/forecast-point/app/src/main/java/com/crome/forecastpoint/ui/screens/MapScreen.kt,FieldRow,OutlinedTextField with placeholder but no label,"
+    @Composable
+    fun FieldRow() {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            OutlinedTextField(
+                value = query,
+                onValueChange = onQueryChange,
+                modifier = Modifier.weight(1f),
+                singleLine = true,
+                placeholder = { Text(""Search city…"", color = OnSurfaceMuted) },
+                leadingIcon = {
+                    Icon(Icons.Filled.Search, contentDescription = null, tint = OnSurfaceMuted)
+                },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/crome1394__point-forecast/forecast-point/app/src/main/java/com/crome/forecastpoint/ui/screens/MapScreen.kt,exact,True,627,FieldRow,1.0,629.0,OutlinedTextField\s*\(,body,OutlinedTextField(,True,"  617 |                     ) {
+  618 |                         Text(r.name, color = Color.White, fontSize = 15.sp)
+  619 |                         Text(r.displayName, color = OnSurfaceMuted, fontSize = 11.sp, maxLines = 1)
+  620 |                     }
+  621 |                 }
+  622 |             }
+  623 |         }
+  624 |     }
+  625 | 
+  626 |     @Composable
+  627 |     fun FieldRow() {
+  628 |         Row(verticalAlignment = Alignment.CenterVertically) {
+  629 |             OutlinedTextField(
+  630 |                 value = query,
+  631 |                 onValueChange = onQueryChange,
+  632 |                 modifier = Modifier.weight(1f),
+  633 |                 singleLine = true,
+  634 |                 placeholder = { Text(""Search city…"", color = OnSurfaceMuted) },
+  635 |                 leadingIcon = {
+  636 |                     Icon(Icons.Filled.Search, contentDescription = null, tint = OnSurfaceMuted)
+  637 |                 },
+  638 |                 colors = OutlinedTextFieldDefaults.colors(
+  639 |                     focusedTextColor = Color.White,
+  640 |                     unfocusedTextColor = Color.White,
+  641 |                     focusedBorderColor = PrimaryBlue,
+  642 |                     unfocusedBorderColor = Color(0xFF546E7A),
+  643 |                     cursorColor = PrimaryBlue,
+  644 |                 ),
+  645 |                 shape = RoundedCornerShape(10.dp),
+  646 |             )
+  647 |             IconButton(onClick = onMyLocationClick) {
+  648 |                 if (locating) {
+  649 |                     CircularProgressIndicator(
+  650 |                         modifier = Modifier
+  651 |                             .height(22.dp)
+  652 |                             .padding(2.dp),
+  653 |                         strokeWidth = 2.dp,
+  654 |                         color = PrimaryBlue,
+  655 |                     )
+  656 |                 } else {
+  657 |                     Icon(
+  658 |                         Icons.Filled.MyLocation,
+  659 |                         contentDescription = ""My location"",
+  660 |                         tint = PrimaryBlue,
+  661 |                     )
+  662 |                 }
+  663 |             }
+  664 |             IconButton(onClick = onClose) {
+  665 |                 Icon(Icons.Filled.Close, contentDescription = ""Hide search"", tint = OnSurfaceMuted)
+  666 |             }
+  667 |         }
+  668 |     }
+  669 | ","import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
+import android.os.Bundle
+import android.os.Looper
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.zIndex
+import androidx.core.content.ContextCompat
+import com.crome.forecastpoint.R
+import com.crome.forecastpoint.data.GeocodeResult
+import com.crome.forecastpoint.ui.theme.OnSurfaceMuted
+import com.crome.forecastpoint.ui.theme.PrimaryBlue
+import com.crome.forecastpoint.ui.theme.SurfaceDark
+import com.crome.forecastpoint.util.MapHelpers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import org.osmdroid.events.MapEventsReceiver
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.CustomZoomButtonsController
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.MapEventsOverlay
+import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.ScaleBarOverlay
+import com.crome.forecastpoint.util.MapTiles"
+pilot-0266,textfield_no_label,beradeep__aiyo,beradeep__aiyo/ui/src/main/java/com/beradeep/aiyo/ui/screens/chat/components/RenameConversationDialog.kt,RenameConversationDialog,OutlinedTextField with placeholder but no label,"
+@Composable
+fun RenameConversationDialog(
+    initial: String,
+    onSave: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var key by remember { mutableStateOf(initial) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        onConfirmClick = { onSave(key) },
+        title = ""Rename conversation"",
+        text = ""Rename conversation"",
+        confirmButtonText = ""Rename"",
+        dismissButtonText = ""Cancel"",
+        content = {",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/beradeep__aiyo/ui/src/main/java/com/beradeep/aiyo/ui/screens/chat/components/RenameConversationDialog.kt,exact,True,27,RenameConversationDialog,1.0,45.0,OutlinedTextField\s*\(,body,OutlinedTextField(,True,"   27 | fun RenameConversationDialog(
+   28 |     initial: String,
+   29 |     onSave: (String) -> Unit,
+   30 |     onDismiss: () -> Unit
+   31 | ) {
+   32 |     var key by remember { mutableStateOf(initial) }
+   33 |     AlertDialog(
+   34 |         onDismissRequest = onDismiss,
+   35 |         onConfirmClick = { onSave(key) },
+   36 |         title = ""Rename conversation"",
+   37 |         text = ""Rename conversation"",
+   38 |         confirmButtonText = ""Rename"",
+   39 |         dismissButtonText = ""Cancel"",
+   40 |         content = {
+   41 |             Card {
+   42 |                 Column(modifier = Modifier.padding(24.dp)) {
+   43 |                     Text(text = ""Rename conversation"", style = LocalTypography.current.h3)
+   44 |                     Spacer(modifier = Modifier.height(16.dp))
+   45 |                     OutlinedTextField(
+   46 |                         value = key,
+   47 |                         onValueChange = { key = it },
+   48 |                         placeholder = { Text(""Untitled"") }
+   49 |                     )
+   50 |                     Spacer(modifier = Modifier.height(16.dp))
+   51 |                     Row(
+   52 |                         modifier = Modifier.fillMaxWidth(),
+   53 |                         horizontalArrangement = Arrangement.End
+   54 |                     ) {
+   55 |                         Button(
+   56 |                             variant = ButtonVariant.Ghost,
+   57 |                             text = ""Cancel"",
+   58 |                             onClick = { onDismiss() }
+   59 |                         )
+   60 |                         Spacer(modifier = Modifier.width(16.dp))
+   61 |                         Button(
+   62 |                             text = ""Rename"",
+   63 |                             onClick = { onSave(key) },
+   64 |                             enabled = key.isNotBlank()
+   65 |                         )
+   66 |                     }
+   67 |                 }
+   68 |             }
+   69 |         }
+   70 |     )
+   71 | }","import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.beradeep.aiyo.ui.LocalTypography
+import com.beradeep.aiyo.ui.basics.components.AlertDialog
+import com.beradeep.aiyo.ui.basics.components.Button
+import com.beradeep.aiyo.ui.basics.components.ButtonVariant
+import com.beradeep.aiyo.ui.basics.components.Text
+import com.beradeep.aiyo.ui.basics.components.card.Card
+import com.beradeep.aiyo.ui.basics.components.textfield.OutlinedTextField"
+pilot-0267,textfield_no_label,raheemadamboev__todo-app,raheemadamboev__todo-app/app/src/main/java/xyz/teamgravity/todo/presentation/component/textfield/TodoTextField.kt,TodoTextField,TextField with placeholder but no label,"
+@Composable
+fun TodoTextField(
+    value: String,
+    onValueChange: (value: String) -> Unit
+) {
+    TextField(
+        value = value,
+        onValueChange = onValueChange,
+        placeholder = {
+            TextPlain(
+                id = R.string.task_name
+            )
+        },
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/raheemadamboev__todo-app/app/src/main/java/xyz/teamgravity/todo/presentation/component/textfield/TodoTextField.kt,exact,True,15,TodoTextField,1.0,19.0,\bTextField\s*\(,body,TextField(,True,"    7 | import androidx.compose.runtime.Composable
+    8 | import androidx.compose.ui.Modifier
+    9 | import androidx.compose.ui.graphics.Color
+   10 | import androidx.compose.ui.unit.dp
+   11 | import xyz.teamgravity.coresdkcompose.text.TextPlain
+   12 | import xyz.teamgravity.todo.R
+   13 | 
+   14 | @Composable
+   15 | fun TodoTextField(
+   16 |     value: String,
+   17 |     onValueChange: (value: String) -> Unit
+   18 | ) {
+   19 |     TextField(
+   20 |         value = value,
+   21 |         onValueChange = onValueChange,
+   22 |         placeholder = {
+   23 |             TextPlain(
+   24 |                 id = R.string.task_name
+   25 |             )
+   26 |         },
+   27 |         colors = TextFieldDefaults.colors(
+   28 |             focusedContainerColor = Color.Transparent,
+   29 |             unfocusedContainerColor = Color.Transparent,
+   30 |             disabledContainerColor = Color.Transparent,
+   31 |             errorContainerColor = Color.Transparent
+   32 |         ),
+   33 |         modifier = Modifier
+   34 |             .fillMaxWidth()
+   35 |             .padding(top = 8.dp, start = 8.dp, end = 8.dp),
+   36 |     )
+   37 | }","import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import xyz.teamgravity.coresdkcompose.text.TextPlain
+import xyz.teamgravity.todo.R"
+pilot-0268,textfield_no_label,KaushalVasava__XPhotogram,KaushalVasava__XPhotogram/app/src/main/java/com/lahsuak/apps/instagram/ui/screen/ChatScreen.kt,ChatScreen,TextField with placeholder but no label,"@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ChatScreen(
+    userId: String,
+    homeViewModel: HomeViewModel,
+    navController: NavController,
+) {
+    var isProgress by remember {
+        mutableStateOf(false)
+    }
+    val userState by remember {
+        mutableStateOf(homeViewModel.getUserById(userId))
+    }
+    if (isProgress) {
+        Box(
+            modifier = Modifier.fillMaxSize(),",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/KaushalVasava__XPhotogram/app/src/main/java/com/lahsuak/apps/instagram/ui/screen/ChatScreen.kt,exact,True,70,ChatScreen,1.0,212.0,\bTextField\s*\(,body,TextField(,True,"  200 |                 }
+  201 |                 IconButton(onClick = { /* no-op */ }) {
+  202 |                     Icon(
+  203 |                         painter = painterResource(id = R.drawable.ic_camera),
+  204 |                         modifier = Modifier
+  205 |                             .clip(CircleShape)
+  206 |                             .background(LIGHT_BLUE)
+  207 |                             .padding(4.dp),
+  208 |                         tint = Color.White,
+  209 |                         contentDescription = ""Camera"",
+  210 |                     )
+  211 |                 }
+  212 |                 TextField(
+  213 |                     value = text,
+  214 |                     placeholder = {
+  215 |                         Text(
+  216 |                             stringResource(R.string.message_hint),
+  217 |                             color = Color.Gray,
+  218 |                         )
+  219 |                     },
+  220 |                     onValueChange = {
+  221 |                         text = it
+  222 |                     },
+  223 |                     modifier = Modifier
+  224 |                         .weight(1f)
+  225 |                         .clip(RoundedCornerShape(16.dp))
+  226 |                 )
+  227 |                 IconButton(onClick = {
+  228 |                     navController.navigate(NavigationItem.CreatePost.route)
+  229 |                 }) {
+  230 |                     Icon(
+  231 |                         painter = painterResource(id = R.drawable.ic_image), ""Gallery"",
+  232 |                         tint = MaterialTheme.colorScheme.onBackground,
+  233 |                         modifier = Modifier.padding(4.dp)
+  234 |                     )
+  235 |                 }
+  236 |                 IconButton(onClick = { /* no-op */ }) {
+  237 |                     Icon(
+  238 |                         Icons.Outlined.Send, ""Send"",
+  239 |                         tint = MaterialTheme.colorScheme.onBackground,
+  240 |                     )
+  241 |                 }
+  242 |             }
+  243 |         }
+  244 |     }
+  245 | }
+  246 | 
+  247 | @Composable
+  248 | fun ChatItem(
+  249 |     userImageUrl: String,
+  250 |     message: Message,
+  251 |     isLeft: Boolean,
+  252 | ) {","import android.content.res.Configuration
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.outlined.Send
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.lahsuak.apps.instagram.R
+import com.lahsuak.apps.instagram.models.Chat
+import com.lahsuak.apps.instagram.models.Message
+import com.lahsuak.apps.instagram.ui.components.CircularImage
+import com.lahsuak.apps.instagram.ui.navigation.NavigationItem
+import com.lahsuak.apps.instagram.ui.screen.viewmodel.HomeViewModel
+import com.lahsuak.apps.instagram.ui.theme.JetPackComposeBasicTheme
+import com.lahsuak.apps.instagram.ui.theme.LIGHT_BLUE
+import com.lahsuak.apps.instagram.util.AppConstants.MY_USER_ID
+import com.lahsuak.apps.instagram.util.DemoData
+import kotlin.random.Random"
+pilot-0269,textfield_no_label,IacobIonut01__ReFra,IacobIonut01__ReFra/app/src/main/kotlin/com/dot/gallery/cloud/ui/settings/CloudNetworkingScreen.kt,CloudNetworkingScreen,OutlinedTextField with placeholder but no label,"
+@Composable
+fun CloudNetworkingScreen(configId: Long) {
+    val settingsVm = hiltViewModel<CloudSettingsViewModel>()
+    val config by settingsVm.config.collectAsStateWithLifecycle()
+    val loadState by settingsVm.loadState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(configId) { settingsVm.loadConfig(configId) }
+    if (config == null) {
+        AccountSettingsStateScreen(stringResource(R.string.cloud_networking), loadState)
+        return
+    }
+    val autoUrlSwitch = config?.autoUrlSwitch ?: false
+    val serverUrl = config?.serverUrl ?: """"
+    val wifiSsid = config?.localWifiSsid ?: """"
+    val localUrl = config?.localServerUrl ?: """"",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/IacobIonut01__ReFra/app/src/main/kotlin/com/dot/gallery/cloud/ui/settings/CloudNetworkingScreen.kt,exact,True,72,CloudNetworkingScreen,1.0,213.0,OutlinedTextField\s*\(,body,OutlinedTextField(,True,"  201 |         state = wifiSheetState,
+  202 |         currentSsid = wifiSsid,
+  203 |         onSave = { ssid -> settingsVm.updateConfig { copy(localWifiSsid = ssid) } }
+  204 |     )
+  205 | 
+  206 |     // Local URL edit dialog
+  207 |     if (showLocalUrlDialog) {
+  208 |         var text by remember { mutableStateOf(localUrl) }
+  209 |         AlertDialog(
+  210 |             onDismissRequest = { showLocalUrlDialog = false },
+  211 |             title = { Text(stringResource(R.string.cloud_net_edit_local_url)) },
+  212 |             text = {
+  213 |                 OutlinedTextField(
+  214 |                     value = text,
+  215 |                     onValueChange = { text = it },
+  216 |                     placeholder = { Text(stringResource(R.string.cloud_net_external_hint)) },
+  217 |                     singleLine = true,
+  218 |                     modifier = Modifier.fillMaxWidth()
+  219 |                 )
+  220 |             },
+  221 |             confirmButton = {
+  222 |                 TextButton(onClick = {
+  223 |                     settingsVm.updateConfig { copy(localServerUrl = text.trim()) }
+  224 |                     showLocalUrlDialog = false
+  225 |                 }) { Text(stringResource(R.string.action_save)) }
+  226 |             },
+  227 |             dismissButton = {
+  228 |                 TextButton(onClick = { showLocalUrlDialog = false }) {
+  229 |                     Text(stringResource(R.string.action_cancel))
+  230 |                 }
+  231 |             }
+  232 |         )
+  233 |     }
+  234 | 
+  235 |     // Add external URL dialog
+  236 |     if (showAddExternalDialog) {
+  237 |         var text by remember { mutableStateOf("""") }
+  238 |         AlertDialog(
+  239 |             onDismissRequest = { showAddExternalDialog = false },
+  240 |             title = { Text(stringResource(R.string.cloud_net_add_external)) },
+  241 |             text = {
+  242 |                 OutlinedTextField(
+  243 |                     value = text,
+  244 |                     onValueChange = { text = it },
+  245 |                     placeholder = { Text(stringResource(R.string.cloud_net_external_hint)) },
+  246 |                     singleLine = true,
+  247 |                     modifier = Modifier.fillMaxWidth()
+  248 |                 )
+  249 |             },
+  250 |             confirmButton = {
+  251 |                 TextButton(onClick = {
+  252 |                     if (text.isNotBlank()) {
+  253 |                         val current = parseExternalUrls(config?.externalUrls ?: ""[]"")","import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Public
+import androidx.compose.material.icons.outlined.Router
+import androidx.compose.material.icons.outlined.SwapHoriz
+import androidx.compose.material.icons.outlined.Wifi
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.dot.gallery.R
+import com.dot.gallery.cloud.ui.WifiSsidPickerSheet
+import com.dot.gallery.core.Position
+import com.dot.gallery.core.SettingsEntity
+import com.dot.gallery.feature_node.presentation.settings.components.BaseSettingsScreen
+import com.dot.gallery.feature_node.presentation.util.rememberAppBottomSheetState
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json"
+pilot-0270,textfield_no_label,gininaba__AIPOSPasswordManager,gininaba__AIPOSPasswordManager/app/src/main/java/com/aipos/aipospm/ui/screens/CategoryManagerScreen.kt,CategoryManagerScreen,OutlinedTextField with placeholder but no label,"@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CategoryManagerScreen(
+    categoryViewModel: CategoryViewModel,
+    onNavigateBack: () -> Unit
+) {
+    val categories by categoryViewModel.categories.collectAsStateWithLifecycle()
+    var newCategoryName by rememberSaveable { mutableStateOf("""") }
+    
+    var categoryToRename by remember { mutableStateOf<Category?>(null) }
+    var renameNewName by rememberSaveable(categoryToRename) { mutableStateOf(categoryToRename?.name ?: """") }
+    
+    var categoryToDelete by remember { mutableStateOf<Category?>(null) }
+
+    // Rename dialog
+    if (categoryToRename != null) {",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/gininaba__AIPOSPasswordManager/app/src/main/java/com/aipos/aipospm/ui/screens/CategoryManagerScreen.kt,exact,True,52,CategoryManagerScreen,1.0,71.0,OutlinedTextField\s*\(,body,OutlinedTextField(,True,"   52 | fun CategoryManagerScreen(
+   53 |     categoryViewModel: CategoryViewModel,
+   54 |     onNavigateBack: () -> Unit
+   55 | ) {
+   56 |     val categories by categoryViewModel.categories.collectAsStateWithLifecycle()
+   57 |     var newCategoryName by rememberSaveable { mutableStateOf("""") }
+   58 |     
+   59 |     var categoryToRename by remember { mutableStateOf<Category?>(null) }
+   60 |     var renameNewName by rememberSaveable(categoryToRename) { mutableStateOf(categoryToRename?.name ?: """") }
+   61 |     
+   62 |     var categoryToDelete by remember { mutableStateOf<Category?>(null) }
+   63 | 
+   64 |     // Rename dialog
+   65 |     if (categoryToRename != null) {
+   66 |         AlertDialog(
+   67 |             onDismissRequest = { categoryToRename = null },
+   68 |             title = { Text(""Rename Category"") },
+   69 |             text = {
+   70 |                 Column {
+   71 |                     OutlinedTextField(
+   72 |                         value = renameNewName,
+   73 |                         onValueChange = { renameNewName = it },
+   74 |                         label = { Text(""Category Name"") },
+   75 |                         singleLine = true,
+   76 |                         modifier = Modifier.fillMaxWidth()
+   77 |                     )
+   78 |                 }
+   79 |             },
+   80 |             confirmButton = {
+   81 |                 TextButton(
+   82 |                     onClick = {
+   83 |                         categoryToRename?.let {
+   84 |                             categoryViewModel.renameCategory(it, renameNewName)
+   85 |                         }
+   86 |                         categoryToRename = null
+   87 |                     },
+   88 |                     enabled = renameNewName.trim().isNotEmpty()
+   89 |                 ) {
+   90 |                     Text(""Rename"")
+   91 |                 }
+   92 |             },
+   93 |             dismissButton = {
+   94 |                 TextButton(onClick = { categoryToRename = null }) {
+   95 |                     Text(""Cancel"")
+   96 |                 }
+   97 |             }
+   98 |         )
+   99 |     }
+  100 | 
+  101 |     // Delete dialog
+  102 |     if (categoryToDelete != null) {
+  103 |         AlertDialog(
+  104 |             onDismissRequest = { categoryToDelete = null },
+  105 |             title = { Text(""Delete Category"") },
+  106 |             text = { Text(""Are you sure you want to delete the category \""${categoryToDelete?.name}\""? Passwords/Keys in this category will be kept, but set to uncategorized."") },
+  107 |             confirmButton = {
+  108 |                 TextButton(
+  109 |                     onClick = {
+  110 |                         categoryToDelete?.let {
+  111 |                             categoryViewModel.deleteCategory(it)","import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.aipos.aipospm.data.Category
+import com.aipos.aipospm.ui.viewmodels.CategoryViewModel"
+pilot-0271,textfield_no_label,KaushalVasava__XPhotogram,KaushalVasava__XPhotogram/app/src/main/java/com/lahsuak/apps/instagram/ui/screen/CreateTweetScreen.kt,CreateTweetScreen,TextField with placeholder but no label,"@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CreateTweetScreen(homeViewModel: HomeViewModel, navController: NavController) {
+    val user = DemoData.demoUser
+    var text by rememberSaveable {
+        mutableStateOf("""")
+    }
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                homeViewModel.updateTweet(
+                    tweet = Tweet(description = text, userId = user.id)
+                )
+                navController.popBackStack()
+            }) {
+                Icon(Icons.Default.Done, contentDescription = ""Add"")",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/KaushalVasava__XPhotogram/app/src/main/java/com/lahsuak/apps/instagram/ui/screen/CreateTweetScreen.kt,exact,True,52,CreateTweetScreen,1.0,110.0,\bTextField\s*\(,body,TextField(,True,"   98 |                     user.name,
+   99 |                     fontWeight = FontWeight.SemiBold,
+  100 |                     fontSize = 18.sp,
+  101 |                     modifier = Modifier.weight(1f)
+  102 |                 )
+  103 |                 Spacer(modifier = Modifier.width(8.dp))
+  104 |                 Text(
+  105 |                     DateUtil.getDateTime(System.currentTimeMillis()),
+  106 |                     color = Color.Gray,
+  107 |                     fontSize = 14.sp
+  108 |                 )
+  109 |             }
+  110 |             TextField(
+  111 |                 value = text,
+  112 |                 onValueChange = { q ->
+  113 |                     text = q
+  114 |                 },
+  115 |                 placeholder = {
+  116 |                     Text(""Write your thoughts"", color = Color.Gray)
+  117 |                 },
+  118 |                 modifier = Modifier.fillMaxSize(1f)
+  119 | 
+  120 |             )
+  121 |         }
+  122 |     }
+  123 | }
+  124 | 
+  125 | 
+  126 | @Preview(showBackground = true)
+  127 | @Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
+  128 | @Composable
+  129 | fun TweetItemPreview() {
+  130 |     JetPackComposeBasicTheme {
+  131 |         Surface(
+  132 |             modifier = Modifier.fillMaxSize(),
+  133 |             color = MaterialTheme.colorScheme.background
+  134 |         ) {
+  135 |             CreateTweetScreen(homeViewModel = viewModel(), rememberNavController())
+  136 |         }
+  137 |     }
+  138 | }","import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.lahsuak.apps.instagram.R
+import com.lahsuak.apps.instagram.models.Tweet
+import com.lahsuak.apps.instagram.ui.components.CircularImage
+import com.lahsuak.apps.instagram.ui.screen.viewmodel.HomeViewModel
+import com.lahsuak.apps.instagram.ui.theme.JetPackComposeBasicTheme
+import com.lahsuak.apps.instagram.util.DateUtil
+import com.lahsuak.apps.instagram.util.DemoData"
+pilot-0272,textfield_no_label,joelkanyi__NewsApp,joelkanyi__NewsApp/presentation/src/main/java/io/github/joelkanyi/presentation/search/SearchNewsScreen.kt,SearchTextField,TextField with placeholder but no label,"
+@Composable
+fun SearchTextField(
+    focusRequester: FocusRequester,
+    searchValue: String,
+    onSearchValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    TextField(
+        modifier = modifier
+            .testTag(stringResource(R.string.search_news_text_field))
+            .focusRequester(focusRequester),
+        value = searchValue,
+        onValueChange = onSearchValueChange,
+        placeholder = {
+            Text(",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/joelkanyi__NewsApp/presentation/src/main/java/io/github/joelkanyi/presentation/search/SearchNewsScreen.kt,exact,True,157,SearchTextField,1.0,163.0,\bTextField\s*\(,body,TextField(,True,"  151 |             }
+  152 |         }
+  153 |     }
+  154 | }
+  155 | 
+  156 | @Composable
+  157 | fun SearchTextField(
+  158 |     focusRequester: FocusRequester,
+  159 |     searchValue: String,
+  160 |     onSearchValueChange: (String) -> Unit,
+  161 |     modifier: Modifier = Modifier
+  162 | ) {
+  163 |     TextField(
+  164 |         modifier = modifier
+  165 |             .testTag(stringResource(R.string.search_news_text_field))
+  166 |             .focusRequester(focusRequester),
+  167 |         value = searchValue,
+  168 |         onValueChange = onSearchValueChange,
+  169 |         placeholder = {
+  170 |             Text(
+  171 |                 text = stringResource(R.string.search_placeholder),
+  172 |                 style =
+  173 |                 MaterialTheme.typography.bodyMedium.copy(
+  174 |                     color = MaterialTheme.colorScheme.onBackground.copy(.5f)
+  175 |                 )
+  176 |             )
+  177 |         },
+  178 |         textStyle = MaterialTheme.typography.bodyMedium,
+  179 |         colors =
+  180 |         TextFieldDefaults.colors(
+  181 |             disabledContainerColor = Color.Transparent,
+  182 |             focusedContainerColor = Color.Transparent,
+  183 |             unfocusedContainerColor = Color.Transparent,
+  184 |             disabledIndicatorColor = Color.Transparent,
+  185 |             focusedIndicatorColor = Color.Transparent,
+  186 |             unfocusedIndicatorColor = Color.Transparent
+  187 |         )
+  188 |     )
+  189 | }
+  190 | 
+  191 | @Preview
+  192 | @Composable
+  193 | private fun SearchNewsScreenPreview() {
+  194 |     NewsAppTheme {
+  195 |         SearchNewsScreenContent(
+  196 |             uiState = SearchNewsUiState(),
+  197 |             onClickBack = {},
+  198 |             onClickNews = {},
+  199 |             onSearchValueChange = {}
+  200 |         )
+  201 |     }
+  202 | }","import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.paging.compose.collectAsLazyPagingItems
+import io.github.joelkanyi.designsystem.components.EmptyStateComponent
+import io.github.joelkanyi.designsystem.theme.NewsAppTheme
+import io.github.joelkanyi.presentation.R
+import io.github.joelkanyi.presentation.components.NewsList
+import io.github.joelkanyi.presentation.model.NewsUiModel
+import io.github.joelkanyi.presentation.navigation.Destinations"
+pilot-0273,textfield_no_label,Dking08__croc-app,Dking08__croc-app/app/src/main/java/com/dking/crocapp/ui/send/SendScreen.kt,StoreConfigurationCard,OutlinedTextField with placeholder but no label,"
+@Composable
+private fun StoreConfigurationCard(
+    expiration: String,
+    downloads: Int,
+    enabled: Boolean,
+    onExpirationChange: (String) -> Unit,
+    onDownloadsChange: (Int) -> Unit
+) {
+    val presetExpirations = listOf(""30m"", ""1h"", ""1d"", ""1w"")
+    val presetDownloads = listOf(1, 2, 5, 10)
+
+    var isCustomExpiration by remember(expiration) {
+        mutableStateOf(expiration !in presetExpirations)
+    }
+    var customExpirationInput by remember(expiration) {",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/Dking08__croc-app/app/src/main/java/com/dking/crocapp/ui/send/SendScreen.kt,exact,True,1154,StoreConfigurationCard,1.0,1293.0,OutlinedTextField\s*\(,body,OutlinedTextField(,True," 1281 |                                 Icons.Rounded.Edit,
+ 1282 |                                 contentDescription = null,
+ 1283 |                                 modifier = Modifier.size(16.dp)
+ 1284 |                             )
+ 1285 |                         },
+ 1286 |                         shape = MaterialTheme.shapes.medium
+ 1287 |                     )
+ 1288 |                 }
+ 1289 | 
+ 1290 |                 // Line 2: Custom input with real-time validation (m, h, d, w)
+ 1291 |                 AnimatedVisibility(visible = isCustomExpiration) {
+ 1292 |                     val isInvalid = customExpirationInput.isNotBlank() && !customExpirationInput.matches(Regex(""^[1-9][0-9]*[mhdw]$""))
+ 1293 |                     OutlinedTextField(
+ 1294 |                         value = customExpirationInput,
+ 1295 |                         onValueChange = { input ->
+ 1296 |                             val clean = input.trim().lowercase()
+ 1297 |                             customExpirationInput = clean
+ 1298 |                             if (clean.matches(Regex(""^[1-9][0-9]*[mhdw]$""))) {
+ 1299 |                                 onExpirationChange(clean)
+ 1300 |                             }
+ 1301 |                         },
+ 1302 |                         enabled = enabled,
+ 1303 |                         singleLine = true,
+ 1304 |                         modifier = Modifier.fillMaxWidth(),
+ 1305 |                         shape = MaterialTheme.shapes.large,
+ 1306 |                         placeholder = { Text(stringResource(R.string.store_custom_expiration_hint)) },
+ 1307 |                         supportingText = {
+ 1308 |                             Text(
+ 1309 |                                 if (isInvalid) ""Invalid format. Suffix must be m, h, d, or w (e.g. 45m, 12h, 3d, 2w)""
+ 1310 |                                 else stringResource(R.string.store_custom_expiration_desc)
+ 1311 |                             )
+ 1312 |                         },
+ 1313 |                         isError = isInvalid,
+ 1314 |                         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None)
+ 1315 |                     )
+ 1316 |                 }
+ 1317 |             }
+ 1318 | 
+ 1319 |             HorizontalDivider(
+ 1320 |                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.25f)
+ 1321 |             )
+ 1322 | 
+ 1323 |             // Allowed Downloads Section (Line 1: Scrollable Numbers, Line 2: Custom Input)
+ 1324 |             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+ 1325 |                 Text(
+ 1326 |                     text = stringResource(R.string.store_downloads_title),
+ 1327 |                     style = MaterialTheme.typography.labelLarge,
+ 1328 |                     fontWeight = FontWeight.SemiBold
+ 1329 |                 )
+ 1330 | 
+ 1331 |                 // Line 1: Single scrollable row with just 1, 2, 5, 10, Custom
+ 1332 |                 Row(
+ 1333 |                     modifier = Modifier","import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
+import androidx.compose.material.icons.automirrored.rounded.Send
+import androidx.compose.material.icons.outlined.History
+import androidx.compose.material.icons.outlined.Info
+import android.widget.Toast
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.TextFields
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.AttachFile
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.CloudUpload
+import androidx.compose.material.icons.rounded.ContentCopy
+import androidx.compose.material.icons.rounded.Download
+import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.FolderOpen
+import androidx.compose.material.icons.rounded.History
+import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.InsertDriveFile
+import androidx.compose.material.icons.rounded.Link
+import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material.icons.rounded.OpenInNew
+import androidx.compose.material.icons.rounded.QrCode2
+import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.icons.rounded.RestartAlt
+import androidx.compose.material.icons.rounded.Save
+import androidx.compose.material.icons.rounded.Schedule
+import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.Share
+import androidx.compose.material.icons.rounded.SwapHoriz
+import androidx.compose.material.icons.rounded.Terminal
+import androidx.compose.material.icons.rounded.Upload
+import androidx.compose.material.icons.rounded.Visibility
+import androidx.compose.material.icons.rounded.VisibilityOff
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.PlainTooltip
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTooltipState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.dking.crocapp.R
+import com.dking.crocapp.croc.CrocEngine
+import com.dking.crocapp.croc.CrocTransferState
+import com.dking.crocapp.ui.components.EngineBadge
+import com.dking.crocapp.ui.components.QrCodeExpandedDialog
+import com.dking.crocapp.ui.components.QrCodeImage
+import com.dking.crocapp.util.QrCodeParser
+import com.dking.crocapp.ui.components.TransferProgressCard
+import com.dking.crocapp.ui.components.formatBytes
+import com.dking.crocapp.ui.components.generateQrCodeBitmap
+import com.dking.crocapp.ui.components.progressBorder
+import java.io.File
+import java.io.FileOutputStream"
+pilot-0274,textfield_no_label,44114__android-room,44114__android-room/app/src/main/java/com/chatroom/app/ui/chat/ChatScreen.kt,ChatScreen,OutlinedTextField with placeholder but no label,"@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ChatScreen(
+    chatRepo: ChatRepository,
+    fileRepo: FileRepository,
+    prefs: PreferencesManager,
+    onNavigateToAccount: () -> Unit,
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val listState = rememberLazyListState()
+
+    val username by prefs.username.collectAsState(initial = """")
+    val connected by chatRepo.connected.collectAsState(initial = false)
+
+    var messages by remember { mutableStateOf(listOf<Message>()) }",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/44114__android-room/app/src/main/java/com/chatroom/app/ui/chat/ChatScreen.kt,exact,True,34,ChatScreen,1.0,248.0,OutlinedTextField\s*\(,body,OutlinedTextField(,True,"  236 |             Row(
+  237 |                 modifier = Modifier
+  238 |                     .fillMaxWidth()
+  239 |                     .padding(8.dp),
+  240 |                 verticalAlignment = Alignment.Bottom,
+  241 |             ) {
+  242 |                 // File attach
+  243 |                 IconButton(onClick = { filePicker.launch(""*/*"") }) {
+  244 |                     Icon(Icons.Filled.AttachFile, contentDescription = stringResource(R.string.chat_send_file))
+  245 |                 }
+  246 | 
+  247 |                 // Text input
+  248 |                 OutlinedTextField(
+  249 |                     value = inputText,
+  250 |                     onValueChange = {
+  251 |                         inputText = it
+  252 |                         chatRepo.sendTypingIndicator(it.isNotEmpty())
+  253 |                     },
+  254 |                     placeholder = { Text(stringResource(R.string.chat_input_placeholder)) },
+  255 |                     modifier = Modifier.weight(1f),
+  256 |                     maxLines = 4,
+  257 |                 )
+  258 | 
+  259 |                 // Send
+  260 |                 IconButton(
+  261 |                     onClick = {
+  262 |                         if (inputText.isNotBlank()) {
+  263 |                             chatRepo.sendMessage(inputText.trim())
+  264 |                             inputText = """"
+  265 |                             chatRepo.sendTypingIndicator(false)
+  266 |                         }
+  267 |                     },
+  268 |                     enabled = inputText.isNotBlank() && connected,
+  269 |                 ) {
+  270 |                     Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.chat_send))
+  271 |                 }
+  272 |             }
+  273 |         }
+  274 |     }
+  275 | }","import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import com.chatroom.app.R
+import com.chatroom.app.data.api.SocketManager
+import com.chatroom.app.data.local.PreferencesManager
+import com.chatroom.app.data.model.Message
+import com.chatroom.app.data.model.MessageType
+import com.chatroom.app.data.repository.ChatRepository
+import com.chatroom.app.data.repository.FileRepository
+import com.chatroom.app.ui.components.FileCard
+import com.chatroom.app.ui.components.MessageBubble
+import kotlinx.coroutines.launch"
+pilot-0275,textfield_no_label,cvc953__localplayer,cvc953__localplayer/app/src/main/java/com/cvc953/localplayer/ui/components/MultiSongSelectionBar.kt,MultiSongSelectionBar,OutlinedTextField with placeholder but no label,"@Suppress(""ktlint:standard:function-naming"")
+@Composable
+fun MultiSongSelectionBar(
+    selectedSongIds: Set<Long>,
+    songs: List<Song>,
+    playlists: List<Playlist>,
+    onClearSelection: () -> Unit,
+    onCreatePlaylist: (String) -> Unit,
+    onAddSongToPlaylist: (playlistName: String, songId: Long) -> Unit,
+    onAddToQueueNextAll: (List<Song>) -> Unit,
+    onAddToQueueEndAll: (List<Song>) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    if (selectedSongIds.isEmpty()) return
+
+    val context = LocalContext.current",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/cvc953__localplayer/app/src/main/java/com/cvc953/localplayer/ui/components/MultiSongSelectionBar.kt,exact,True,57,MultiSongSelectionBar,1.0,215.0,OutlinedTextField\s*\(,body,OutlinedTextField(,True,"  203 |                             onDismissRequest = {
+  204 |                                 showCreatePlaylistDialog = false
+  205 |                                 newPlaylistName = """"
+  206 |                             },
+  207 |                             containerColor = MaterialTheme.colorScheme.surface,
+  208 |                             title = {
+  209 |                                 Text(
+  210 |                                     stringResource(R.string.dialog_create_playlist_title),
+  211 |                                     color = MaterialTheme.colorScheme.onBackground,
+  212 |                                 )
+  213 |                             },
+  214 |                             text = {
+  215 |                                 OutlinedTextField(
+  216 |                                     value = newPlaylistName,
+  217 |                                     onValueChange = { newPlaylistName = it },
+  218 |                                     singleLine = true,
+  219 |                                     placeholder = { Text(stringResource(R.string.playlist_name_placeholder)) },
+  220 |                                     colors =
+  221 |                                         TextFieldDefaults.colors(
+  222 |                                             focusedContainerColor = MaterialTheme.colorScheme.surface,
+  223 |                                             unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+  224 |                                             focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+  225 |                                             unfocusedIndicatorColor = MaterialTheme.colorScheme.surfaceVariant,
+  226 |                                             cursorColor = MaterialTheme.colorScheme.primary,
+  227 |                                             focusedTextColor = MaterialTheme.colorScheme.onBackground,
+  228 |                                             unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+  229 |                                         ),
+  230 |                                 )
+  231 |                             },
+  232 |                             confirmButton = {
+  233 |                                 TextButton(
+  234 |                                     onClick = {
+  235 |                                         if (newPlaylistName.isNotBlank()) {
+  236 |                                             onCreatePlaylist(newPlaylistName)
+  237 |                                             selectedSongIds.forEach { songId ->
+  238 |                                                 onAddSongToPlaylist(newPlaylistName, songId)
+  239 |                                             }
+  240 |                                             Toast
+  241 |                                                 .makeText(
+  242 |                                                     context,
+  243 |                                                     context.getString(R.string.playlist_created_and_added, newPlaylistName),
+  244 |                                                     Toast.LENGTH_SHORT,
+  245 |                                                 ).show()
+  246 |                                             newPlaylistName = """"
+  247 |                                             showCreatePlaylistDialog = false
+  248 |                                             showPlaylistDialog = false
+  249 |                                             onClearSelection()
+  250 |                                         }
+  251 |                                     },
+  252 |                                 ) {
+  253 |                                     Text(stringResource(R.string.action_create), color = MaterialTheme.colorScheme.primary)
+  254 |                                 }
+  255 |                             },","import android.widget.Toast
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.PlaylistAdd
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.SkipNext
+import androidx.compose.material.icons.filled.SkipPrevious
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.cvc953.localplayer.R
+import com.cvc953.localplayer.model.Playlist
+import com.cvc953.localplayer.model.Song
+import com.cvc953.localplayer.ui.extendedColors"
+pilot-0276,textfield_no_label,corphish__TextTools,corphish__TextTools/app/src/main/java/com/corphish/quicktools/activities/TextCountActivity.kt,InputSection,TextField with placeholder but no label,"
+@Composable
+fun InputSection(text: String, onValueChange: (String) -> Unit) {
+    Column {
+        Text(
+            text = stringResource(id = R.string.input),
+            style = TypographyV2.labelSmall,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(300.dp),
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.surface,",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/corphish__TextTools/app/src/main/java/com/corphish/quicktools/activities/TextCountActivity.kt,exact,True,164,InputSection,1.0,180.0,\bTextField\s*\(,body,TextField(,True,"  164 | fun InputSection(text: String, onValueChange: (String) -> Unit) {
+  165 |     Column {
+  166 |         Text(
+  167 |             text = stringResource(id = R.string.input),
+  168 |             style = TypographyV2.labelSmall,
+  169 |             color = MaterialTheme.colorScheme.primary,
+  170 |             modifier = Modifier.padding(bottom = 8.dp)
+  171 |         )
+  172 |         Surface(
+  173 |             modifier = Modifier
+  174 |                 .fillMaxWidth()
+  175 |                 .height(300.dp),
+  176 |             shape = MaterialTheme.shapes.medium,
+  177 |             color = MaterialTheme.colorScheme.surface,
+  178 |             tonalElevation = 2.dp
+  179 |         ) {
+  180 |             TextField(
+  181 |                 value = text,
+  182 |                 onValueChange = onValueChange,
+  183 |                 modifier = Modifier.fillMaxSize(),
+  184 |                 colors = TextFieldDefaults.colors(
+  185 |                     focusedContainerColor = Color.Transparent,
+  186 |                     unfocusedContainerColor = Color.Transparent,
+  187 |                     disabledContainerColor = Color.Transparent,
+  188 |                     focusedIndicatorColor = Color.Transparent,
+  189 |                     unfocusedIndicatorColor = Color.Transparent,
+  190 |                 ),
+  191 |                 placeholder = { Text(text = stringResource(R.string.input)) }
+  192 |             )
+  193 |         }
+  194 |     }
+  195 | }
+  196 | 
+  197 | @OptIn(ExperimentalLayoutApi::class)
+  198 | fun LazyListScope.statsContent(result: TextCountResult, context: Context) {
+  199 |     item {
+  200 |         Text(
+  201 |             text = stringResource(id = R.string.statistics),
+  202 |             style = TypographyV2.titleMedium,
+  203 |             color = MaterialTheme.colorScheme.primary,
+  204 |             fontFamily = BrandFontFamily
+  205 |         )
+  206 |     }
+  207 | 
+  208 |     item {
+  209 |         Surface(
+  210 |             modifier = Modifier.fillMaxWidth(),
+  211 |             shape = MaterialTheme.shapes.medium,
+  212 |             color = MaterialTheme.colorScheme.surface,
+  213 |             tonalElevation = 2.dp
+  214 |         ) {
+  215 |             FlowRow(
+  216 |                 modifier = Modifier.padding(16.dp),
+  217 |                 horizontalArrangement = Arrangement.spacedBy(16.dp),
+  218 |                 verticalArrangement = Arrangement.spacedBy(16.dp)
+  219 |             ) {
+  220 |                 StatItem(label = stringResource(R.string.characters), value = result.characterCount.toString())","import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
+import android.os.Bundle
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.material3.Badge
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.corphish.quicktools.R
+import com.corphish.quicktools.data.TextCountResult
+import com.corphish.quicktools.ui.common.CustomTopAppBar
+import com.corphish.quicktools.ui.common.PieChart
+import com.corphish.quicktools.ui.common.PieChartData
+import com.corphish.quicktools.ui.theme.BrandFontFamily
+import com.corphish.quicktools.ui.theme.QuickToolsTheme
+import com.corphish.quicktools.ui.theme.TypographyV2
+import com.corphish.quicktools.viewmodels.TextCountViewModel
+import dagger.hilt.android.AndroidEntryPoint"
+pilot-0277,textfield_no_label,BlazeCodeDev__TSViewer,BlazeCodeDev__TSViewer/app/src/main/java/com/blazecode/tsviewer/views/EditTextPreference.kt,EditTextPreference,OutlinedTextField with placeholder but no label,"@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditTextPreference(
+    modifier: Modifier = Modifier,
+    title: String,
+    text: String? = null,
+    placeholder: String? = null,
+    icon: Painter? = null,
+    showSummary: Boolean? = true,
+    isPassword: Boolean? = false,
+    isNumber: Boolean? = false,
+    singleLine: Boolean = false,
+    onTextChange: (String) -> Unit){
+
+    val isDialogVisible = remember { mutableStateOf(false) }
+    val prefilledText = text ?: """"",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/BlazeCodeDev__TSViewer/app/src/main/java/com/blazecode/tsviewer/views/EditTextPreference.kt,exact,True,37,EditTextPreference,1.0,98.0,OutlinedTextField\s*\(,body,OutlinedTextField(,True,"   86 |         val focusRequester = remember { FocusRequester() }
+   87 |         val keyboardType =
+   88 |             if (isPassword == true)
+   89 |                 KeyboardOptions(keyboardType = KeyboardType.Password)
+   90 |             else if (isNumber == true)
+   91 |                 KeyboardOptions(keyboardType = KeyboardType.Number)
+   92 |             else KeyboardOptions(keyboardType = KeyboardType.Text)
+   93 | 
+   94 |         AlertDialog(
+   95 |             onDismissRequest = { isDialogVisible.value = false },
+   96 |             title = { Text(title) },
+   97 |             text = {
+   98 |                    OutlinedTextField(
+   99 |                        value = tempTextValue.value,
+  100 |                        singleLine = singleLine,
+  101 |                        keyboardOptions = keyboardType,
+  102 |                        placeholder = { Text(placeholder ?: """") },
+  103 |                        visualTransformation = if (passwordVisible.value || isPassword == false) VisualTransformation.None else PasswordVisualTransformation(),
+  104 |                        onValueChange = { tempTextValue.value = it },
+  105 |                        modifier = Modifier.focusRequester(focusRequester),
+  106 |                        trailingIcon = {
+  107 |                            if(isPassword == true){
+  108 |                                val image = if (passwordVisible.value) painterResource(R.drawable.ic_visibility)
+  109 |                                else painterResource(R.drawable.ic_visibility_off)
+  110 | 
+  111 |                                val description = if (passwordVisible.value) ""Hide password"" else ""Show password""
+  112 | 
+  113 |                                IconButton(onClick = {passwordVisible.value = !passwordVisible.value}){
+  114 |                                    Icon(painter = image, description)
+  115 |                                }
+  116 |                            }
+  117 |                        }
+  118 |                    )
+  119 |            },
+  120 |             confirmButton = { TextButton(onClick = { isDialogVisible.value = false; tempTextValue.value.text.trim().also(onTextChange) }) { Text(stringResource(R.string.confirm)) } },
+  121 |             dismissButton = { TextButton(onClick = { isDialogVisible.value = false }) { Text(stringResource(R.string.cancel)) } },
+  122 |         )
+  123 | 
+  124 |         LaunchedEffect(Unit) {
+  125 |             focusRequester.requestFocus()
+  126 |         }
+  127 |     }
+  128 | }
+  129 | 
+  130 | @Preview
+  131 | @Composable
+  132 | private fun Preview(){
+  133 |     Column{
+  134 |         EditTextPreference(icon = painterResource(R.drawable.ic_settings), title = ""title"", showSummary = true, text = ""test""){}
+  135 |         EditTextPreference(icon = painterResource(R.drawable.ic_settings), title = ""title"", showSummary = false, text = ""test""){}
+  136 |     }
+  137 | }","import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.blazecode.tsviewer.R"
+pilot-0278,textfield_no_label,Waboodoo__HTTP-Shortcuts,Waboodoo__HTTP-Shortcuts/HTTPShortcuts/app/src/main/kotlin/ch/rmy/android/http_shortcuts/activities/documentation/DocumentationScreen.kt,SearchBar,TextField with placeholder but no label,"
+@Composable
+private fun SearchBar(
+    modifier: Modifier = Modifier,
+    query: String,
+    results: Pair<Int, Int>?,
+    onQueryChanged: (String?) -> Unit,
+    onNext: (SearchDirection) -> Unit,
+) {
+    val focusRequester = remember {
+        FocusRequester()
+    }
+    val keyboard = LocalSoftwareKeyboardController.current
+
+    Row(
+        modifier = Modifier",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/Waboodoo__HTTP-Shortcuts/HTTPShortcuts/app/src/main/kotlin/ch/rmy/android/http_shortcuts/activities/documentation/DocumentationScreen.kt,exact,True,143,SearchBar,1.0,165.0,\bTextField\s*\(,body,TextField(,True,"  143 | private fun SearchBar(
+  144 |     modifier: Modifier = Modifier,
+  145 |     query: String,
+  146 |     results: Pair<Int, Int>?,
+  147 |     onQueryChanged: (String?) -> Unit,
+  148 |     onNext: (SearchDirection) -> Unit,
+  149 | ) {
+  150 |     val focusRequester = remember {
+  151 |         FocusRequester()
+  152 |     }
+  153 |     val keyboard = LocalSoftwareKeyboardController.current
+  154 | 
+  155 |     Row(
+  156 |         modifier = Modifier
+  157 |             .fillMaxWidth()
+  158 |             .background(MaterialTheme.colorScheme.background)
+  159 |             .padding(Spacing.TINY)
+  160 |             .shadow(elevation = 1.dp)
+  161 |             .then(modifier),
+  162 |         horizontalArrangement = Arrangement.spacedBy(Spacing.TINY),
+  163 |         verticalAlignment = Alignment.CenterVertically,
+  164 |     ) {
+  165 |         TextField(
+  166 |             value = query,
+  167 |             onValueChange = onQueryChanged,
+  168 |             singleLine = true,
+  169 |             modifier = Modifier
+  170 |                 .weight(1f)
+  171 |                 .focusRequester(focusRequester),
+  172 |             placeholder = {
+  173 |                 Text(text = stringResource(R.string.placeholder_documentation_search_query))
+  174 |             },
+  175 |             colors = TextFieldDefaults.colors(
+  176 |                 focusedContainerColor = Color.Transparent,
+  177 |                 unfocusedContainerColor = Color.Transparent,
+  178 |                 focusedIndicatorColor = Color.Transparent,
+  179 |                 unfocusedIndicatorColor = Color.Transparent,
+  180 |             ),
+  181 |             keyboardActions = KeyboardActions {
+  182 |                 onQueryChanged(null)
+  183 |             },
+  184 |         )
+  185 | 
+  186 |         results?.takeIf { query.isNotEmpty() }?.let { (current, total) ->
+  187 |             Text(
+  188 |                 text = ""$current/$total"",
+  189 |                 maxLines = 1,
+  190 |                 fontSize = FontSize.SMALL,
+  191 |             )
+  192 |         }
+  193 | 
+  194 |         Row(modifier = Modifier.padding(end = Spacing.SMALL)) {
+  195 |             val enabled = results?.second?.let { it > 1 } == true
+  196 |             Icon(
+  197 |                 painterResource(R.drawable.outline_keyboard_arrow_up_24),
+  198 |                 contentDescription = stringResource(R.string.accessibility_search_go_to_previous),
+  199 |                 modifier = Modifier
+  200 |                     .clickable(
+  201 |                         interactionSource = remember { MutableInteractionSource() },
+  202 |                         indication = ripple(bounded = false),
+  203 |                         enabled = enabled,
+  204 |                         onClick = {
+  205 |                             onNext(SearchDirection.PREVIOUS)","import android.net.Uri
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.ripple
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import ch.rmy.android.framework.extensions.consume
+import ch.rmy.android.http_shortcuts.R
+import ch.rmy.android.http_shortcuts.activities.documentation.models.SearchDirection
+import ch.rmy.android.http_shortcuts.components.EventHandler
+import ch.rmy.android.http_shortcuts.components.FontSize
+import ch.rmy.android.http_shortcuts.components.SimpleScaffold
+import ch.rmy.android.http_shortcuts.components.Spacing
+import ch.rmy.android.http_shortcuts.components.ToolbarIcon
+import ch.rmy.android.http_shortcuts.components.bindViewModel
+import ch.rmy.android.http_shortcuts.extensions.openURL
+import ch.rmy.android.http_shortcuts.extensions.runIf
+import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch"
+pilot-0279,textfield_no_label,corphish__TextTools,corphish__TextTools/app/src/main/java/com/corphish/quicktools/activities/NumberAnalysisActivity.kt,InputSection,TextField with placeholder but no label,"
+@Composable
+fun InputSection(
+    text: String,
+    selectedBase: Int,
+    supportedBases: List<Int>,
+    onTextChange: (String) -> Unit,
+    onBaseChange: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    isWideScreen: Boolean = false
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Column(modifier = modifier.padding(vertical = 16.dp, horizontal = 16.dp)) {
+        Text(
+            text = stringResource(R.string.input),",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/corphish__TextTools/app/src/main/java/com/corphish/quicktools/activities/NumberAnalysisActivity.kt,exact,True,355,InputSection,1.0,390.0,\bTextField\s*\(,body,TextField(,True,"  355 | fun InputSection(
+  356 |     text: String,
+  357 |     selectedBase: Int,
+  358 |     supportedBases: List<Int>,
+  359 |     onTextChange: (String) -> Unit,
+  360 |     onBaseChange: (Int) -> Unit,
+  361 |     modifier: Modifier = Modifier,
+  362 |     isWideScreen: Boolean = false
+  363 | ) {
+  364 |     var expanded by remember { mutableStateOf(false) }
+  365 | 
+  366 |     Column(modifier = modifier.padding(vertical = 16.dp, horizontal = 16.dp)) {
+  367 |         Text(
+  368 |             text = stringResource(R.string.input),
+  369 |             style = MaterialTheme.typography.labelMedium,
+  370 |             color = MaterialTheme.colorScheme.primary,
+  371 |             fontWeight = FontWeight.Bold,
+  372 |             fontFamily = BrandFontFamily
+  373 |         )
+  374 | 
+  375 |         Spacer(modifier = Modifier.height(16.dp))
+  376 | 
+  377 |         Surface(
+  378 |             tonalElevation = 8.dp,
+  379 |             modifier = Modifier
+  380 |                 .fillMaxWidth()
+  381 |                 .then(if (isWideScreen) Modifier.weight(1f) else Modifier),
+  382 |             shape = MaterialTheme.shapes.medium
+  383 |         ) {
+  384 |             Column(
+  385 |                 modifier = Modifier
+  386 |                     .padding(8.dp)
+  387 |                     .then(if (isWideScreen) Modifier.fillMaxHeight() else Modifier)
+  388 |             ) {
+  389 |                 if (isWideScreen) {
+  390 |                     TextField(
+  391 |                         value = text,
+  392 |                         onValueChange = onTextChange,
+  393 |                         modifier = Modifier.fillMaxWidth().weight(1f),
+  394 |                         placeholder = { Text(stringResource(R.string.enter_text_here)) },
+  395 |                         singleLine = false,
+  396 |                         colors = TextFieldDefaults.colors(
+  397 |                             focusedContainerColor = Color.Transparent,
+  398 |                             unfocusedContainerColor = Color.Transparent,
+  399 |                             focusedIndicatorColor = Color.Transparent,
+  400 |                             unfocusedIndicatorColor = Color.Transparent
+  401 |                         )
+  402 |                     )
+  403 | 
+  404 |                     Box(
+  405 |                         modifier = Modifier
+  406 |                             .padding(start = 12.dp, bottom = 8.dp)
+  407 |                             .align(Alignment.End)
+  408 |                     ) {
+  409 |                         Surface(
+  410 |                             onClick = { expanded = true },
+  411 |                             color = MaterialTheme.colorScheme.secondaryContainer,
+  412 |                             shape = MaterialTheme.shapes.small
+  413 |                         ) {
+  414 |                             Text(
+  415 |                                 text = ""Base $selectedBase"",
+  416 |                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+  417 |                                 style = MaterialTheme.typography.labelLarge
+  418 |                             )
+  419 |                         }
+  420 |                         DropdownMenu(
+  421 |                             expanded = expanded,
+  422 |                             onDismissRequest = { expanded = false }
+  423 |                         ) {
+  424 |                             supportedBases.forEach { base ->
+  425 |                                 DropdownMenuItem(
+  426 |                                     text = { Text(""Base $base"") },
+  427 |                                     onClick = {
+  428 |                                         onBaseChange(base)
+  429 |                                         expanded = false
+  430 |                                     }","import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
+import android.os.Bundle
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.window.core.layout.WindowSizeClass
+import com.corphish.quicktools.R
+import com.corphish.quicktools.data.Constants
+import com.corphish.quicktools.data.NumberAnalysisResult
+import com.corphish.quicktools.ui.common.CustomTopAppBar
+import com.corphish.quicktools.ui.theme.BrandFontFamily
+import com.corphish.quicktools.ui.theme.QuickToolsTheme
+import com.corphish.quicktools.viewmodels.NumberAnalysisViewModel
+import dagger.hilt.android.AndroidEntryPoint"
+pilot-0280,textfield_no_label,maxwhipw__marmalade-tts-android,maxwhipw__marmalade-tts-android/app/src/main/java/app/marmalade/tts/ui/screen/VoicePickerScreen.kt,VoicePickerScreen,OutlinedTextField with placeholder but no label,"@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun VoicePickerScreen(
+    onBack: () -> Unit,
+    onVoiceSelected: () -> Unit,
+    viewModel: VoicePickerViewModel = hiltViewModel(),
+) {
+    val tree by viewModel.voiceTree.collectAsStateWithLifecycle()
+    val installedEngines by viewModel.installedEngines.collectAsStateWithLifecycle()
+    val selectedId by viewModel.selectedId.collectAsStateWithLifecycle()
+    val previewState by viewModel.previewState.collectAsStateWithLifecycle()
+    val pickerState by viewModel.pickerState.collectAsStateWithLifecycle()
+    val latency by viewModel.voiceLatency.collectAsStateWithLifecycle()
+    val contentReady by viewModel.contentReady.collectAsStateWithLifecycle()
+
+    val modelMissingState = previewState as? PreviewState.ModelMissing",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/maxwhipw__marmalade-tts-android/app/src/main/java/app/marmalade/tts/ui/screen/VoicePickerScreen.kt,exact,True,102,VoicePickerScreen,1.0,241.0,OutlinedTextField\s*\(,body,OutlinedTextField(,True,"  229 |                     textAlign = TextAlign.Center,
+  230 |                     modifier = Modifier
+  231 |                         .fillMaxWidth()
+  232 |                         .padding(horizontal = 24.dp, vertical = 32.dp),
+  233 |                 )
+  234 |                 return@Column
+  235 |             }
+  236 | 
+  237 |             // Placeholder text disappears the moment the user types, so it
+  238 |             // can't be the field's name — spell the name out for a screen
+  239 |             // reader without adding a visible label.
+  240 |             val searchLabel = stringResource(R.string.voices_search_placeholder)
+  241 |             OutlinedTextField(
+  242 |                 value = pickerState.query,
+  243 |                 onValueChange = viewModel::onQueryChange,
+  244 |                 placeholder = { Text(searchLabel) },
+  245 |                 leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
+  246 |                 singleLine = true,
+  247 |                 modifier = Modifier
+  248 |                     .fillMaxWidth()
+  249 |                     .padding(horizontal = ScreenGutter, vertical = 8.dp)
+  250 |                     .semantics { contentDescription = searchLabel },
+  251 |             )
+  252 | 
+  253 |             val onPick: (VoiceMeta) -> Unit = { voice ->
+  254 |                 viewModel.selectVoice(voice.id)
+  255 |                 onVoiceSelected()
+  256 |             }
+  257 |             // A ModelMissing from one engine must not grey out another
+  258 |             // engine's rows, so the check is per-voice rather than global.
+  259 |             val previewEnabled: (VoiceMeta) -> Boolean =
+  260 |                 { modelMissingState?.engineName != it.engine }
+  261 |             val playingId = (previewState as? PreviewState.Playing)?.voiceId
+  262 |             val previewPhrase = stringResource(R.string.voices_preview_phrase)
+  263 |             val onPreview: (VoiceMeta) -> Unit = { voice ->
+  264 |                 // spokenName, not displayName — espeak reads a Kokoro flag
+  265 |                 // emoji out loud (""United States Adam"").
+  266 |                 viewModel.preview(voice, previewPhrase.format(voice.spokenName))
+  267 |             }
+  268 | 
+  269 |             when {
+  270 |                 pickerState.searching -> SearchResults(
+  271 |                     hits = remember(tree, pickerState.query) {
+  272 |                         searchVoiceTree(tree, pickerState.query)
+  273 |                     },
+  274 |                     query = pickerState.query,
+  275 |                     selectedId = selectedId,
+  276 |                     playingId = playingId,
+  277 |                     latency = latency,
+  278 |                     previewEnabled = previewEnabled,
+  279 |                     onPick = onPick,
+  280 |                     onPreview = onPreview,
+  281 |                 )","import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import app.marmalade.tts.R
+import app.marmalade.tts.data.CloudApiVoiceCatalog
+import app.marmalade.tts.data.LatencyBucket
+import app.marmalade.tts.data.db.VoiceMeta
+import app.marmalade.tts.data.latencyKeyFor
+import app.marmalade.tts.install.EngineCatalog"

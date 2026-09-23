@@ -1,0 +1,13 @@
+STAGE 1 FUNNEL (numbers for the Method section)
+================================================
+Candidate repos considered      : 808
+  metadata retrieved            : 804
+  permissive license            : 317
+  maintained (<= 900d, not archived): 250
+  >= 3 files containing @Composable : 157
+ACCEPTED REPOS                  : 157
+Compose files downloaded        : 2993
+
+Star distribution of accepted repos:
+  min=1  median=94  max=21792
+  under 100 stars: 81 (51%)  <- mid-tier coverage

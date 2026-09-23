@@ -1,0 +1,2444 @@
+item_id,category,repo,file,composable,evidence,snippet,verdict,notes,abs_path,resolve_method,file_found,decl_line,decl_name,decl_confidence,anchor_line,anchor_pattern,anchor_scope,anchor_text,anchor_found,context,imports
+pilot-0141,missing_merge_descendants,christianrowlands__android-network-survey,christianrowlands__android-network-survey/networksurvey/src/main/java/com/craxiom/networksurvey/ui/nsanalytics/NsAnalyticsConnectionScreen.kt,WorkspaceStatusCard,"clickable Column with 2 Text children, no mergeDescendants","
+@Composable
+private fun WorkspaceStatusCard(
+    workspaceName: String?,
+    workspaceId: String?
+) {
+    val context = LocalContext.current
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFF1E1F24)
+        )
+    ) {
+        Row(
+            modifier = Modifier",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/christianrowlands__android-network-survey/networksurvey/src/main/java/com/craxiom/networksurvey/ui/nsanalytics/NsAnalyticsConnectionScreen.kt,exact,True,818,WorkspaceStatusCard,1.0,824.0,\bCard\s*\(,body,Card(,True,"  812 |             Toast.LENGTH_SHORT
+  813 |         ).show()
+  814 |     }
+  815 | }
+  816 | 
+  817 | @Composable
+  818 | private fun WorkspaceStatusCard(
+  819 |     workspaceName: String?,
+  820 |     workspaceId: String?
+  821 | ) {
+  822 |     val context = LocalContext.current
+  823 | 
+  824 |     Card(
+  825 |         modifier = Modifier.fillMaxWidth(),
+  826 |         colors = CardDefaults.cardColors(
+  827 |             containerColor = Color(0xFF1E1F24)
+  828 |         )
+  829 |     ) {
+  830 |         Row(
+  831 |             modifier = Modifier
+  832 |                 .fillMaxWidth()
+  833 |                 .padding(16.dp),
+  834 |             verticalAlignment = Alignment.Top
+  835 |         ) {
+  836 |             Icon(
+  837 |                 imageVector = Icons.Default.CheckCircle,
+  838 |                 contentDescription = null,
+  839 |                 tint = MaterialTheme.colorScheme.primary,
+  840 |                 modifier = Modifier
+  841 |                     .size(24.dp)
+  842 |                     .padding(top = 2.dp)
+  843 |             )
+  844 | 
+  845 |             Spacer(modifier = Modifier.width(12.dp))
+  846 | 
+  847 |             Column(
+  848 |                 modifier = Modifier.weight(1f)
+  849 |             ) {
+  850 |                 Text(
+  851 |                     text = ""Workspace Registered"",
+  852 |                     style = MaterialTheme.typography.bodySmall,
+  853 |                     color = MaterialTheme.colorScheme.primary,
+  854 |                     fontWeight = FontWeight.Medium
+  855 |                 )
+  856 | 
+  857 |                 Text(
+  858 |                     text = workspaceName ?: ""Unknown Workspace"",
+  859 |                     style = MaterialTheme.typography.titleMedium,
+  860 |                     color = Color.White,
+  861 |                     fontWeight = FontWeight.Bold,
+  862 |                     modifier = Modifier.padding(vertical = 4.dp)
+  863 |                 )
+  864 | ","import android.Manifest
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import android.os.IBinder
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.ProgressIndicatorDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.craxiom.networksurvey.NetworkSurveyActivity
+import com.craxiom.networksurvey.R
+import com.craxiom.networksurvey.services.NetworkSurveyService
+import com.craxiom.networksurvey.ui.theme.NsTheme
+import com.craxiom.networksurvey.ui.theme.onPrimaryDark
+import com.craxiom.networksurvey.ui.util.copyTextToClipboard
+import com.craxiom.networksurvey.util.NsAnalyticsUtils
+import timber.log.Timber
+import java.text.DateFormat
+import java.util.Date
+import java.util.Locale"
+pilot-0142,missing_merge_descendants,itsluminous__ClearSMS,itsluminous__ClearSMS/app/src/main/kotlin/app/clearsms/ui/components/OtpBanner.kt,OtpBanner,"clickable Column with 2 Text children, no mergeDescendants"," */
+@Composable
+fun OtpBanner(
+    code: String,
+    senderName: String,
+    onCopied: () -> Unit,
+    onDismiss: () -> Unit,
+    onOpenMessage: () -> Unit,
+    modifier: Modifier = Modifier,
+    displaySize: OtpDisplaySize = OtpDisplaySize.DEFAULT,
+) {
+    val clipboard = LocalClipboardManager.current
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+    ) {",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/itsluminous__ClearSMS/app/src/main/kotlin/app/clearsms/ui/components/OtpBanner.kt,exact,True,40,OtpBanner,1.0,50.0,\bCard\s*\(,body,Card(,True,"   38 |  */
+   39 | @Composable
+   40 | fun OtpBanner(
+   41 |     code: String,
+   42 |     senderName: String,
+   43 |     onCopied: () -> Unit,
+   44 |     onDismiss: () -> Unit,
+   45 |     onOpenMessage: () -> Unit,
+   46 |     modifier: Modifier = Modifier,
+   47 |     displaySize: OtpDisplaySize = OtpDisplaySize.DEFAULT,
+   48 | ) {
+   49 |     val clipboard = LocalClipboardManager.current
+   50 |     Card(
+   51 |         modifier = modifier.fillMaxWidth(),
+   52 |         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+   53 |     ) {
+   54 |         Row(
+   55 |             modifier =
+   56 |                 Modifier
+   57 |                     .fillMaxWidth()
+   58 |                     .clickable(
+   59 |                         onClickLabel = stringResource(R.string.otp_banner_open),
+   60 |                         onClick = onOpenMessage,
+   61 |                     ).padding(start = 20.dp, end = 8.dp, top = 12.dp, bottom = 12.dp),
+   62 |             verticalAlignment = Alignment.CenterVertically,
+   63 |         ) {
+   64 |             Column(modifier = Modifier.weight(1f)) {
+   65 |                 Text(
+   66 |                     text = stringResource(R.string.otp_banner_from, senderName),
+   67 |                     style = MaterialTheme.typography.labelMedium,
+   68 |                     color = MaterialTheme.colorScheme.onPrimaryContainer,
+   69 |                 )
+   70 |                 Text(
+   71 |                     text = code.toCharArray().joinToString("" ""),
+   72 |                     style = MaterialTheme.typography.displaySmall,
+   73 |                     fontSize = otpBannerFontSp(displaySize).sp,
+   74 |                     fontFamily = FontFamily.Monospace,
+   75 |                     color = MaterialTheme.colorScheme.onPrimaryContainer,
+   76 |                 )
+   77 |             }
+   78 |             FilledTonalIconButton(
+   79 |                 onClick = {
+   80 |                     clipboard.setText(AnnotatedString(code))
+   81 |                     onCopied()
+   82 |                 },
+   83 |             ) {
+   84 |                 Icon(
+   85 |                     imageVector = Icons.Outlined.ContentCopy,
+   86 |                     contentDescription = stringResource(R.string.otp_banner_copy),
+   87 |                 )
+   88 |             }
+   89 |             IconButton(onClick = onDismiss) {
+   90 |                 Icon(","import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.ContentCopy
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import app.clearsms.R
+import app.clearsms.domain.model.OtpDisplaySize
+import app.clearsms.ui.theme.ClearSmsTheme"
+pilot-0143,missing_merge_descendants,KaushalVasava__XPhotogram,KaushalVasava__XPhotogram/app/src/main/java/com/lahsuak/apps/instagram/ui/screen/HomeScreen.kt,HomeScreen,"clickable Row with 2 Text children, no mergeDescendants","@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@Composable
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    homeViewModel: HomeViewModel,
+    navController: NavController,
+) {
+
+    val userState = homeViewModel.users.collectAsState()
+    val storiesState =
+        homeViewModel.stories.collectAsState()
+    val postsState =
+        homeViewModel.posts.collectAsState()
+    val bottomSheet = rememberModalBottomSheetState()
+    var isBottomSheetOpened by remember {
+        mutableStateOf(false)",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/KaushalVasava__XPhotogram/app/src/main/java/com/lahsuak/apps/instagram/ui/screen/HomeScreen.kt,exact,True,76,HomeScreen,1.0,98.0,\bColumn\s*\(,body,Column(,True,"   76 | fun HomeScreen(
+   77 |     modifier: Modifier = Modifier,
+   78 |     homeViewModel: HomeViewModel,
+   79 |     navController: NavController,
+   80 | ) {
+   81 | 
+   82 |     val userState = homeViewModel.users.collectAsState()
+   83 |     val storiesState =
+   84 |         homeViewModel.stories.collectAsState()
+   85 |     val postsState =
+   86 |         homeViewModel.posts.collectAsState()
+   87 |     val bottomSheet = rememberModalBottomSheetState()
+   88 |     var isBottomSheetOpened by remember {
+   89 |         mutableStateOf(false)
+   90 |     }
+   91 |     if (isBottomSheetOpened) {
+   92 |         ModalBottomSheet(
+   93 |             sheetState = bottomSheet,
+   94 |             onDismissRequest = {
+   95 |                 isBottomSheetOpened = false
+   96 |             }
+   97 |         ) {
+   98 |             Column(
+   99 |                 modifier = Modifier
+  100 |                     .fillMaxSize()
+  101 |                     .padding(top = 24.dp)
+  102 |                     .padding(horizontal = 24.dp),
+  103 |                 horizontalAlignment = Alignment.CenterHorizontally
+  104 |             ) {
+  105 |                 Text(
+  106 |                     text = ""Options"",
+  107 |                     modifier = Modifier.fillMaxWidth(),
+  108 |                     style = MaterialTheme.typography.headlineMedium,
+  109 |                     textAlign = TextAlign.Center
+  110 |                 )
+  111 |                 Spacer(modifier = Modifier.height(16.dp))
+  112 |                 Text(
+  113 |                     text = ""Unfollow"",
+  114 |                     modifier = Modifier.fillMaxWidth(),
+  115 |                     style = MaterialTheme.typography.bodyLarge,
+  116 |                 )
+  117 |                 Spacer(modifier = Modifier.height(16.dp))
+  118 |                 Text(
+  119 |                     text = ""Go to profile"",
+  120 |                     modifier = Modifier.fillMaxWidth(),
+  121 |                     style = MaterialTheme.typography.bodyLarge,
+  122 |                 )
+  123 |                 Spacer(modifier = Modifier.height(16.dp))
+  124 |                 Row(Modifier.fillMaxWidth()) {
+  125 |                     Icon(imageVector = Icons.Default.Share, contentDescription = ""share"")
+  126 |                     Spacer(modifier = Modifier.width(8.dp))
+  127 |                     Text(
+  128 |                         text = ""Share"",
+  129 |                         modifier = Modifier.fillMaxWidth(),
+  130 |                         style = MaterialTheme.typography.bodyLarge,
+  131 |                     )
+  132 |                 }
+  133 |             }
+  134 |         }
+  135 |     }
+  136 |     when (val state = userState.value) {
+  137 |         is BaseState.Failed -> {
+  138 |             when (state.error) {","import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.BottomSheetState
+import androidx.compose.material.BottomSheetValue
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.lahsuak.apps.instagram.R
+import com.lahsuak.apps.instagram.models.ApiFailure
+import com.lahsuak.apps.instagram.models.BaseState
+import com.lahsuak.apps.instagram.ui.components.CenterCircularProgressBar
+import com.lahsuak.apps.instagram.ui.components.CircularImage
+import com.lahsuak.apps.instagram.ui.components.PostItem
+import com.lahsuak.apps.instagram.ui.navigation.NavigationItem
+import com.lahsuak.apps.instagram.ui.screen.viewmodel.HomeViewModel
+import com.lahsuak.apps.instagram.ui.theme.JetPackComposeBasicTheme
+import com.lahsuak.apps.instagram.ui.theme.LIGHT_BLUE
+import com.lahsuak.apps.instagram.util.AppConstants.MY_USER_ID
+import kotlinx.coroutines.launch"
+pilot-0144,missing_merge_descendants,norsehorse-dev__AgePonyAndroid,norsehorse-dev__AgePonyAndroid/app/src/main/java/com/agepony/app/ui/files/RecipientPicker.kt,RecipientPickerContent,"clickable Row with 3 Text children, no mergeDescendants"," */
+@Composable
+internal fun RecipientPickerContent(
+    vault: Vault,
+    selection: RecipientSelection,
+    modifier: Modifier = Modifier,
+    showTitle: Boolean = true,
+    confirmLabelSuffix: String = """",
+    /** Whether confirming a passphrase should hold it for the rest of the session. */
+    rememberPassphrase: Boolean = false,
+    onCancel: () -> Unit,
+    onConfirm: (recipients: List<AgeRecipient>, passphrase: String?) -> Unit,
+) {
+    var pasteText by remember { mutableStateOf("""") }
+    var pasteError by remember { mutableStateOf<String?>(null) }
+",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/norsehorse-dev__AgePonyAndroid/app/src/main/java/com/agepony/app/ui/files/RecipientPicker.kt,exact,True,181,RecipientPickerContent,1.0,207.0,\bColumn\s*\(,body,Column(,True,"  181 | internal fun RecipientPickerContent(
+  182 |     vault: Vault,
+  183 |     selection: RecipientSelection,
+  184 |     modifier: Modifier = Modifier,
+  185 |     showTitle: Boolean = true,
+  186 |     confirmLabelSuffix: String = """",
+  187 |     /** Whether confirming a passphrase should hold it for the rest of the session. */
+  188 |     rememberPassphrase: Boolean = false,
+  189 |     onCancel: () -> Unit,
+  190 |     onConfirm: (recipients: List<AgeRecipient>, passphrase: String?) -> Unit,
+  191 | ) {
+  192 |     var pasteText by remember { mutableStateOf("""") }
+  193 |     var pasteError by remember { mutableStateOf<String?>(null) }
+  194 | 
+  195 |     var savingKey by remember { mutableStateOf<String?>(null) }
+  196 |     var saveName by remember { mutableStateOf("""") }
+  197 |     var saveError by remember { mutableStateOf<String?>(null) }
+  198 |     var suggestion by remember { mutableStateOf<String?>(null) }
+  199 |     var suggestionWords by remember { mutableStateOf(Diceware.DEFAULT_WORD_COUNT) }
+  200 |     val context = LocalContext.current
+  201 | 
+  202 |     val selectedCount = selection.selectedCount
+  203 |     val scryptValid = selection.passphrase.isNotEmpty() &&
+  204 |         selection.passphrase == selection.passphraseConfirm
+  205 |     val canConfirm = if (selection.useScrypt) scryptValid else selectedCount > 0
+  206 | 
+  207 |     Column(
+  208 |         modifier,
+  209 |         verticalArrangement = Arrangement.spacedBy(12.dp),
+  210 |     ) {
+  211 |         if (showTitle) {
+  212 |             Text(
+  213 |                 ""Choose recipients"",
+  214 |                 style = MaterialTheme.typography.titleLarge,
+  215 |                 color = MaterialTheme.colorScheme.primary,
+  216 |             )
+  217 |         }
+  218 | 
+  219 |         Row(verticalAlignment = Alignment.CenterVertically) {
+  220 |             // Remembered: whoever always encrypts to a passphrase should not re-flip this
+  221 |             // on every file (issue #2, item 2).
+  222 |             Switch(
+  223 |                 checked = selection.useScrypt,
+  224 |                 onCheckedChange = { selection.useScrypt = it; vault.passphraseModeDefault = it },
+  225 |             )
+  226 |             Text(""Passphrase only (scrypt)"", modifier = Modifier.padding(start = 12.dp))
+  227 |         }
+  228 | 
+  229 |         if (selection.useScrypt) {
+  230 |             OutlinedTextField(
+  231 |                 value = selection.passphrase,
+  232 |                 onValueChange = { selection.passphrase = it },
+  233 |                 label = { Text(""Passphrase"") },
+  234 |                 singleLine = true,
+  235 |                 modifier = Modifier.fillMaxWidth(),
+  236 |             )
+  237 |             OutlinedTextField(
+  238 |                 value = selection.passphraseConfirm,
+  239 |                 onValueChange = { selection.passphraseConfirm = it },
+  240 |                 label = { Text(""Confirm passphrase"") },
+  241 |                 singleLine = true,
+  242 |                 modifier = Modifier.fillMaxWidth(),
+  243 |             )
+  244 |             if (selection.passphraseConfirm.isNotEmpty() &&
+  245 |                 selection.passphrase != selection.passphraseConfirm
+  246 |             ) {
+  247 |                 Text(","import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import com.agepony.app.vault.FileEncryptor
+import com.agepony.app.vault.RecipientImport
+import com.agepony.app.vault.StoredIdentityType
+import com.agepony.app.vault.StoredRecipient
+import com.agepony.app.vault.Wordlist
+import com.agepony.app.vault.StoredRecipientType
+import com.agepony.app.vault.Vault
+import com.agepony.app.vault.isSigningOnly
+import com.agepony.app.vault.toAgeRecipient
+import com.agepony.core.crypto.Diceware
+import com.agepony.core.recipients.AgeRecipient
+import com.agepony.core.recipients.HybridRecipient
+import com.agepony.core.recipients.SSHEd25519Recipient
+import com.agepony.core.recipients.SSHRSARecipient
+import com.agepony.core.recipients.X25519Recipient
+import com.agepony.core.ssh.OpenSSHPublicKey
+import java.util.UUID"
+pilot-0145,missing_merge_descendants,maxwhipw__marmalade-tts-android,maxwhipw__marmalade-tts-android/app/src/main/java/app/marmalade/tts/ui/onboarding/OnboardingScreen.kt,EnginePickStep,"clickable Row with 3 Text children, no mergeDescendants","
+@Composable
+private fun EnginePickStep(
+    padding: PaddingValues,
+    cards: List<EngineCardState>,
+    probePending: Boolean,
+    selectedIds: Set<String>,
+    onToggle: (String) -> Unit,
+    onInstall: () -> Unit,
+    onBack: () -> Unit,
+    onSkip: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/maxwhipw__marmalade-tts-android/app/src/main/java/app/marmalade/tts/ui/onboarding/OnboardingScreen.kt,exact,True,285,EnginePickStep,1.0,295.0,\bColumn\s*\(,body,Column(,True,"  283 | 
+  284 | @Composable
+  285 | private fun EnginePickStep(
+  286 |     padding: PaddingValues,
+  287 |     cards: List<EngineCardState>,
+  288 |     probePending: Boolean,
+  289 |     selectedIds: Set<String>,
+  290 |     onToggle: (String) -> Unit,
+  291 |     onInstall: () -> Unit,
+  292 |     onBack: () -> Unit,
+  293 |     onSkip: () -> Unit,
+  294 | ) {
+  295 |     Column(
+  296 |         modifier = Modifier
+  297 |             .fillMaxSize()
+  298 |             .padding(padding)
+  299 |             .padding(horizontal = 16.dp),
+  300 |     ) {
+  301 |         Spacer(Modifier.height(16.dp))
+  302 |         Text(
+  303 |             text = stringResource(R.string.onboarding_engines_title),
+  304 |             style = MaterialTheme.typography.headlineSmall,
+  305 |             modifier = Modifier.fillMaxWidth(),
+  306 |             textAlign = TextAlign.Center,
+  307 |         )
+  308 |         Spacer(Modifier.height(8.dp))
+  309 |         Text(
+  310 |             text = stringResource(R.string.onboarding_engines_body),
+  311 |             style = MaterialTheme.typography.bodySmall,
+  312 |             color = MaterialTheme.colorScheme.onSurfaceVariant,
+  313 |             textAlign = TextAlign.Center,
+  314 |             modifier = Modifier.fillMaxWidth(),
+  315 |         )
+  316 |         // While the capability probe runs, the fit labels aren't this
+  317 |         // phone's verdict yet. A spinner + line says the check is live
+  318 |         // (Max, 2026-08-08: text alone read as static copy).
+  319 |         if (probePending) {
+  320 |             Spacer(Modifier.height(8.dp))
+  321 |             Row(
+  322 |                 modifier = Modifier.fillMaxWidth(),
+  323 |                 horizontalArrangement = Arrangement.Center,
+  324 |                 verticalAlignment = Alignment.CenterVertically,
+  325 |             ) {
+  326 |                 CircularProgressIndicator(
+  327 |                     modifier = Modifier.size(14.dp),
+  328 |                     strokeWidth = 2.dp,
+  329 |                 )
+  330 |                 Spacer(Modifier.size(8.dp))
+  331 |                 Text(
+  332 |                     text = stringResource(R.string.onboarding_checking_device),
+  333 |                     style = MaterialTheme.typography.labelSmall,
+  334 |                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+  335 |                 )","import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.annotation.StringRes
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.VerticalDivider
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import app.marmalade.tts.R
+import app.marmalade.tts.audio.EffectPreset
+import app.marmalade.tts.data.KittenDirectVoiceCatalog
+import app.marmalade.tts.data.db.VoiceAlias
+import app.marmalade.tts.data.db.VoiceMeta
+import app.marmalade.tts.install.EngineCatalog
+import app.marmalade.tts.install.EngineDescriptor
+import app.marmalade.tts.install.InstallState
+import app.marmalade.tts.perf.EngineFit
+import app.marmalade.tts.ui.components.EngineSpecColumn
+import app.marmalade.tts.ui.components.JarMascot
+import app.marmalade.tts.ui.components.JarMascotState"
+pilot-0146,missing_merge_descendants,BlazeCodeDev__TSViewer,BlazeCodeDev__TSViewer/app/src/main/java/com/blazecode/tsviewer/views/GitHubUpdateCard.kt,GitHubUpdateCard,"clickable Card with 2 Text children, no mergeDescendants","
+@Composable
+fun GitHubUpdateCard(title: String, description: String, onClickDownload : () -> Unit){
+    val isCardExtended = remember { mutableStateOf(false) }
+    val expandMoreIcon = painterResource(R.drawable.ic_expand_more)
+    val expandLessIcon = painterResource(R.drawable.ic_expand_less)
+    var icon = painterResource(R.drawable.ic_expand_more)
+    Card (modifier = Modifier.fillMaxWidth().padding(dimensionResource(R.dimen.medium_padding))){
+        Column {
+            Row (verticalAlignment = Alignment.CenterVertically){
+                Text(modifier = Modifier.padding(dimensionResource(R.dimen.medium_padding)).weight(2f),
+                    text = title,
+                    softWrap = true
+                )
+
+                Box(modifier = Modifier.fillMaxWidth().padding(dimensionResource(R.dimen.medium_padding)).weight(2f), contentAlignment = Alignment.CenterEnd){",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/BlazeCodeDev__TSViewer/app/src/main/java/com/blazecode/tsviewer/views/GitHubUpdateCard.kt,exact,True,31,GitHubUpdateCard,1.0,36.0,\bCard\s*\(,body,Card (modifier = Modifier.fillMaxWidth().padding(dimensionResource(R.dimen.medium_padding))){,True,"   24 | import androidx.compose.ui.Modifier
+   25 | import androidx.compose.ui.res.dimensionResource
+   26 | import androidx.compose.ui.res.painterResource
+   27 | import androidx.compose.ui.res.stringResource
+   28 | import com.blazecode.tsviewer.R
+   29 | 
+   30 | @Composable
+   31 | fun GitHubUpdateCard(title: String, description: String, onClickDownload : () -> Unit){
+   32 |     val isCardExtended = remember { mutableStateOf(false) }
+   33 |     val expandMoreIcon = painterResource(R.drawable.ic_expand_more)
+   34 |     val expandLessIcon = painterResource(R.drawable.ic_expand_less)
+   35 |     var icon = painterResource(R.drawable.ic_expand_more)
+   36 |     Card (modifier = Modifier.fillMaxWidth().padding(dimensionResource(R.dimen.medium_padding))){
+   37 |         Column {
+   38 |             Row (verticalAlignment = Alignment.CenterVertically){
+   39 |                 Text(modifier = Modifier.padding(dimensionResource(R.dimen.medium_padding)).weight(2f),
+   40 |                     text = title,
+   41 |                     softWrap = true
+   42 |                 )
+   43 | 
+   44 |                 Box(modifier = Modifier.fillMaxWidth().padding(dimensionResource(R.dimen.medium_padding)).weight(2f), contentAlignment = Alignment.CenterEnd){
+   45 |                     Row {
+   46 |                         Button(onClick = { onClickDownload() }) { Text(stringResource(R.string.download)) }
+   47 |                         IconButton(onClick = {
+   48 |                             isCardExtended.value = !isCardExtended.value
+   49 |                             if(isCardExtended.value) icon = expandLessIcon
+   50 |                             else icon = expandMoreIcon
+   51 |                         }) { Icon(icon, ""extend"") }
+   52 |                     }
+   53 |                 }
+   54 |             }
+   55 |             AnimatedVisibility(isCardExtended.value){
+   56 |                 Text(modifier = Modifier.padding(dimensionResource(R.dimen.medium_padding)), text = description)
+   57 |             }
+   58 |         }
+   59 |     }
+   60 | }","import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import com.blazecode.tsviewer.R"
+pilot-0147,missing_merge_descendants,GetStream__whatsApp-clone-compose,GetStream__whatsApp-clone-compose/features/calls/src/main/kotlin/io/getstream/whatsappclone/calls/WhatsAppCallHistory.kt,WhatsAppCallHistory,"clickable Row with 2 Text children, no mergeDescendants","
+@Composable
+fun WhatsAppCallHistory(
+  whatsAppUser: WhatsAppUser,
+  onItemClicked: () -> Unit
+) {
+  Box {
+    Row(
+      modifier = Modifier
+        .fillMaxSize()
+        .clickable { onItemClicked() }
+        .padding(12.dp),
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      GlideImage(
+        modifier = Modifier",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/GetStream__whatsApp-clone-compose/features/calls/src/main/kotlin/io/getstream/whatsappclone/calls/WhatsAppCallHistory.kt,exact,True,44,WhatsAppCallHistory,1.0,66.0,\bColumn\s*\(,body,Column(modifier = Modifier.padding(start = 12.dp)) {,True,"   44 | fun WhatsAppCallHistory(
+   45 |   whatsAppUser: WhatsAppUser,
+   46 |   onItemClicked: () -> Unit
+   47 | ) {
+   48 |   Box {
+   49 |     Row(
+   50 |       modifier = Modifier
+   51 |         .fillMaxSize()
+   52 |         .clickable { onItemClicked() }
+   53 |         .padding(12.dp),
+   54 |       verticalAlignment = Alignment.CenterVertically
+   55 |     ) {
+   56 |       GlideImage(
+   57 |         modifier = Modifier
+   58 |           .size(56.dp)
+   59 |           .clip(CircleShape),
+   60 |         imageModel = { whatsAppUser.picture },
+   61 |         previewPlaceholder = painterResource(
+   62 |           id = io.getstream.whatsappclone.designsystem.R.drawable.placeholder
+   63 |         )
+   64 |       )
+   65 | 
+   66 |       Column(modifier = Modifier.padding(start = 12.dp)) {
+   67 |         Text(
+   68 |           text = whatsAppUser.name,
+   69 |           style = MaterialTheme.typography.titleMedium,
+   70 |           color = getTitleColor()
+   71 |         )
+   72 | 
+   73 |         Spacer(modifier = Modifier.size(6.dp))
+   74 | 
+   75 |         Text(
+   76 |           text = whatsAppUser.login,
+   77 |           style = MaterialTheme.typography.bodyMedium,
+   78 |           color = MaterialTheme.colorScheme.onTertiary
+   79 |         )
+   80 |       }
+   81 |     }
+   82 | 
+   83 |     Icon(
+   84 |       modifier = Modifier
+   85 |         .align(Alignment.CenterEnd)
+   86 |         .padding(12.dp),
+   87 |       imageVector = WhatsAppIcons.Call,
+   88 |       tint = GREEN450,
+   89 |       contentDescription = null
+   90 |     )
+   91 |   }
+   92 | }","import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import com.skydoves.landscapist.glide.GlideImage
+import io.getstream.whatsappclone.designsystem.icon.WhatsAppIcons
+import io.getstream.whatsappclone.designsystem.theme.GREEN450
+import io.getstream.whatsappclone.designsystem.theme.getTitleColor
+import io.getstream.whatsappclone.model.WhatsAppUser"
+pilot-0148,missing_merge_descendants,crome1394__point-forecast,crome1394__point-forecast/forecast-point/app/src/main/java/com/crome/forecastpoint/ui/screens/SevereWeatherSummaryScreen.kt,TropicalReportRow,"clickable Row with 3 Text children, no mergeDescendants","
+@Composable
+private fun TropicalReportRow(
+    s: SevereWeatherService.TropicalStorm,
+    onOpenUrl: (String) -> Unit,
+) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clickable(enabled = s.advisoryUrl != null) {
+                s.advisoryUrl?.let { onOpenUrl(it) }
+            }
+            .padding(vertical = 6.dp),
+        verticalAlignment = Alignment.Top,
+    ) {
+        TypeBadge(""Trop"", Color(0xFF4FC3F7))",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/crome1394__point-forecast/forecast-point/app/src/main/java/com/crome/forecastpoint/ui/screens/SevereWeatherSummaryScreen.kt,exact,True,599,TropicalReportRow,1.0,613.0,\bColumn\s*\(,body,Column(Modifier.weight(1f)) {,True,"  599 | private fun TropicalReportRow(
+  600 |     s: SevereWeatherService.TropicalStorm,
+  601 |     onOpenUrl: (String) -> Unit,
+  602 | ) {
+  603 |     Row(
+  604 |         Modifier
+  605 |             .fillMaxWidth()
+  606 |             .clickable(enabled = s.advisoryUrl != null) {
+  607 |                 s.advisoryUrl?.let { onOpenUrl(it) }
+  608 |             }
+  609 |             .padding(vertical = 6.dp),
+  610 |         verticalAlignment = Alignment.Top,
+  611 |     ) {
+  612 |         TypeBadge(""Trop"", Color(0xFF4FC3F7))
+  613 |         Column(Modifier.weight(1f)) {
+  614 |             Text(
+  615 |                 ""${s.name} · ${s.classification}"",
+  616 |                 color = Color(0xFF81D4FA),
+  617 |                 fontWeight = FontWeight.SemiBold,
+  618 |                 fontSize = 14.sp,
+  619 |             )
+  620 |             val wind = s.intensityKt?.let { ""$it kt"" } ?: ""—""
+  621 |             val mb = s.pressureMb?.let { ""$it mb"" } ?: ""—""
+  622 |             Text(
+  623 |                 ""Active tropical cyclone · Winds $wind · Pressure $mb"",
+  624 |                 color = Color.White,
+  625 |                 fontSize = 13.sp,
+  626 |             )
+  627 |             Text(
+  628 |                 ""Current center · ${String.format(Locale.US, ""%.0f"", s.distanceMiles)} mi from city"",
+  629 |                 color = OnSurfaceMuted,
+  630 |                 fontSize = 12.sp,
+  631 |             )
+  632 |             val move = buildString {
+  633 |                 s.movementDir?.let { append(""Moving $it°"") }
+  634 |                 s.movementSpeedKt?.let {
+  635 |                     if (isNotEmpty()) append("" at "")
+  636 |                     append(""$it kt"")
+  637 |                 }
+  638 |             }
+  639 |             if (move.isNotBlank()) {
+  640 |                 Text(move, color = OnSurfaceMuted, fontSize = 12.sp)
+  641 |             }
+  642 |             Text(
+  643 |                 buildString {
+  644 |                     append(""NHC"")
+  645 |                     s.lastUpdate?.let { append("" · Updated $it"") }
+  646 |                     if (s.advisoryUrl != null) append("" · tap for advisory"")
+  647 |                 },
+  648 |                 color = OnSurfaceMuted,
+  649 |                 fontSize = 11.sp,
+  650 |             )
+  651 |         }
+  652 |         Text(
+  653 |             String.format(Locale.US, ""%.0f"", s.distanceMiles),","import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Fullscreen
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Thunderstorm
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import com.crome.forecastpoint.R
+import com.crome.forecastpoint.data.PreferencesRepository
+import com.crome.forecastpoint.data.SavedLocation
+import com.crome.forecastpoint.data.SevereWeatherService
+import com.crome.forecastpoint.ui.theme.OnSurfaceMuted
+import com.crome.forecastpoint.ui.theme.PrimaryBlue
+import com.crome.forecastpoint.ui.theme.SurfaceDark
+import com.crome.forecastpoint.util.MapHelpers
+import com.crome.forecastpoint.util.MapTiles
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.CustomZoomButtonsController
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
+import java.text.SimpleDateFormat
+import java.util.Locale
+import kotlin.math.roundToInt"
+pilot-0149,missing_merge_descendants,bernaferrari__SDKMonitor,bernaferrari__SDKMonitor/shared/src/commonMain/kotlin/com/bernaferrari/sdkmonitor/ui/settings/components/SettingsComponents.kt,NotificationPermissionRequestCard,"clickable Column with 3 Text children, no mergeDescendants","
+@Composable
+fun NotificationPermissionRequestCard(
+    onRequestPermission: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val s = sdkStrings()
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f),
+    ) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(s.notificationPermissionTitle, fontWeight = FontWeight.SemiBold)
+            Text(s.notificationPermissionBody, style = MaterialTheme.typography.bodySmall)
+            androidx.compose.material3.TextButton(onClick = onRequestPermission) {",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/bernaferrari__SDKMonitor/shared/src/commonMain/kotlin/com/bernaferrari/sdkmonitor/ui/settings/components/SettingsComponents.kt,exact,True,200,NotificationPermissionRequestCard,1.0,210.0,\bColumn\s*\(,body,"Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {",True,"  198 | 
+  199 | @Composable
+  200 | fun NotificationPermissionRequestCard(
+  201 |     onRequestPermission: () -> Unit,
+  202 |     modifier: Modifier = Modifier,
+  203 | ) {
+  204 |     val s = sdkStrings()
+  205 |     Surface(
+  206 |         modifier = modifier.fillMaxWidth(),
+  207 |         shape = RoundedCornerShape(16.dp),
+  208 |         color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f),
+  209 |     ) {
+  210 |         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+  211 |             Text(s.notificationPermissionTitle, fontWeight = FontWeight.SemiBold)
+  212 |             Text(s.notificationPermissionBody, style = MaterialTheme.typography.bodySmall)
+  213 |             androidx.compose.material3.TextButton(onClick = onRequestPermission) {
+  214 |                 Text(s.allowNotifications)
+  215 |             }
+  216 |         }
+  217 |     }
+  218 | }
+  219 | 
+  220 | @Composable
+  221 | fun NotificationWarningCard(
+  222 |     onOpenSettings: () -> Unit,
+  223 |     modifier: Modifier = Modifier,
+  224 | ) {
+  225 |     val s = sdkStrings()
+  226 |     Surface(
+  227 |         modifier = modifier.fillMaxWidth(),
+  228 |         shape = RoundedCornerShape(16.dp),
+  229 |         color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.4f),
+  230 |     ) {
+  231 |         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+  232 |             Text(s.notificationWarningTitle, fontWeight = FontWeight.SemiBold)
+  233 |             Text(s.notificationWarningBody, style = MaterialTheme.typography.bodySmall)
+  234 |             androidx.compose.material3.TextButton(onClick = onOpenSettings) {
+  235 |                 Text(s.openSettings)
+  236 |             }
+  237 |         }
+  238 |     }
+  239 | }","import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.bernaferrari.sdkmonitor.ui.icons.MaterialSymbols
+import com.bernaferrari.sdkmonitor.ui.platform.sdkStrings"
+pilot-0150,missing_merge_descendants,Dev-Aditya-More__PokeVerse,Dev-Aditya-More__PokeVerse/app/src/main/java/com/aditya1875/pokeverse/feature/analysis/presentation/screens/TeamAnalysis.kt,EmptyAnalysisView,"clickable Column with 3 Text children, no mergeDescendants","
+@Composable
+fun EmptyAnalysisView(navController: NavController) {
+    Box(Modifier.fillMaxSize().background(AnalysisColors.BG), contentAlignment = Alignment.Center) {
+        Column(
+            Modifier.padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(""📋"", fontSize = 56.sp)
+            Text(stringResource(R.string.analysis_empty_title), style = MaterialTheme.typography.headlineSmall,
+                color = Color.White, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.analysis_empty_subtitle),
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White.copy(alpha = 0.6f), textAlign = TextAlign.Center)
+            Spacer(Modifier.height(8.dp))",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/Dev-Aditya-More__PokeVerse/app/src/main/java/com/aditya1875/pokeverse/feature/analysis/presentation/screens/TeamAnalysis.kt,exact,True,348,EmptyAnalysisView,1.0,350.0,\bColumn\s*\(,body,Column(,True,"  338 |                     stringResource(R.string.action_go_premium),
+  339 |                     color = Color.White,
+  340 |                     modifier = Modifier.padding(vertical = 4.dp)
+  341 |                 )
+  342 |             }
+  343 |         }
+  344 |     }
+  345 | }
+  346 | 
+  347 | @Composable
+  348 | fun EmptyAnalysisView(navController: NavController) {
+  349 |     Box(Modifier.fillMaxSize().background(AnalysisColors.BG), contentAlignment = Alignment.Center) {
+  350 |         Column(
+  351 |             Modifier.padding(32.dp),
+  352 |             horizontalAlignment = Alignment.CenterHorizontally,
+  353 |             verticalArrangement = Arrangement.spacedBy(12.dp)
+  354 |         ) {
+  355 |             Text(""📋"", fontSize = 56.sp)
+  356 |             Text(stringResource(R.string.analysis_empty_title), style = MaterialTheme.typography.headlineSmall,
+  357 |                 color = Color.White, fontWeight = FontWeight.Bold)
+  358 |             Text(stringResource(R.string.analysis_empty_subtitle),
+  359 |                 style = MaterialTheme.typography.bodyMedium,
+  360 |                 color = Color.White.copy(alpha = 0.6f), textAlign = TextAlign.Center)
+  361 |             Spacer(Modifier.height(8.dp))
+  362 |             Button(
+  363 |                 onClick = { navController.navigate(Route.BottomBar.Home.route) },
+  364 |                 shape = RoundedCornerShape(12.dp),
+  365 |                 colors = ButtonDefaults.buttonColors(containerColor = BLUE)
+  366 |             ) {
+  367 |                 Text(stringResource(R.string.action_build_team), modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp))
+  368 |             }
+  369 |         }
+  370 |     }
+  371 | }","import android.app.Activity
+import android.util.Log
+import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.aditya1875.pokeverse.R
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import com.aditya1875.pokeverse.feature.core.navigation.components.Route
+import com.aditya1875.pokeverse.feature.game.core.data.ads.IRewardedAdManager
+import com.aditya1875.pokeverse.feature.game.core.data.ads.RewardedAdState
+import com.aditya1875.pokeverse.feature.game.core.data.billing.IBillingManager
+import com.aditya1875.pokeverse.feature.game.core.data.billing.SubscriptionState
+import org.koin.compose.koinInject
+import com.aditya1875.pokeverse.feature.analysis.presentation.screens.AnalysisColors.BLUE
+import com.aditya1875.pokeverse.feature.analysis.presentation.components.AnalysisContent
+import com.aditya1875.pokeverse.feature.analysis.presentation.components.ErrorView
+import com.aditya1875.pokeverse.feature.analysis.presentation.components.LoadingView
+import com.aditya1875.pokeverse.feature.analysis.presentation.components.TeamAnalysis
+import com.aditya1875.pokeverse.feature.analysis.presentation.components.TeamAnalyzer
+import com.aditya1875.pokeverse.feature.analysis.presentation.components.TeamMemberWithTypes
+import com.aditya1875.pokeverse.feature.game.premium.components.PremiumBottomSheet
+import com.aditya1875.pokeverse.feature.pokemon.detail.presentation.viewmodels.PokemonDetailsViewModel
+import com.aditya1875.pokeverse.feature.team.presentation.viewmodels.TeamViewModel
+import com.aditya1875.pokeverse.presentation.viewmodel.BillingViewModel
+import org.koin.androidx.compose.koinViewModel"
+pilot-0151,missing_merge_descendants,gautam84__Foodike,gautam84__Foodike/app/src/main/java/com/example/foodike/presentation/history/components/HistorySection.kt,HistorySection,"clickable Row with 2 Text children, no mergeDescendants","
+@Composable
+fun HistorySection() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Card(
+            elevation = 16.dp
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(12.dp)
+            ) {
+                Row(",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/gautam84__Foodike/app/src/main/java/com/example/foodike/presentation/history/components/HistorySection.kt,exact,True,62,HistorySection,1.0,68.0,\bCard\s*\(,body,Card(,True,"   56 | import androidx.compose.ui.text.font.FontWeight
+   57 | import androidx.compose.ui.unit.dp
+   58 | import androidx.compose.ui.unit.sp
+   59 | import com.example.foodike.R
+   60 | 
+   61 | @Composable
+   62 | fun HistorySection() {
+   63 |     Column(
+   64 |         modifier = Modifier
+   65 |             .fillMaxSize()
+   66 |             .padding(16.dp)
+   67 |     ) {
+   68 |         Card(
+   69 |             elevation = 16.dp
+   70 |         ) {
+   71 |             Column(
+   72 |                 modifier = Modifier
+   73 |                     .padding(12.dp)
+   74 |             ) {
+   75 |                 Row(
+   76 |                     modifier = Modifier.fillMaxWidth(),
+   77 |                     horizontalArrangement = Arrangement.SpaceBetween
+   78 |                 ) {
+   79 |                     Column() {
+   80 |                         Text(text = ""Fish n Rolls"", fontWeight = FontWeight.Bold)
+   81 |                         Text(
+   82 |                             text = ""Tezpur"",
+   83 |                             modifier = Modifier.alpha(0.5f),
+   84 |                         )
+   85 | 
+   86 |                         Text(
+   87 |                             text = ""13 Aug 2022, 11:12 PM"",
+   88 |                             modifier = Modifier.alpha(0.5f),
+   89 |                         )
+   90 | 
+   91 |                     }
+   92 |                     Column(
+   93 |                         horizontalAlignment = Alignment.End,
+   94 |                     ) {
+   95 |                         Text(
+   96 |                             text = ""$7.90"",
+   97 |                         )
+   98 |                     }
+   99 |                 }
+  100 |                 Divider(
+  101 |                     modifier = Modifier
+  102 |                         .fillMaxWidth()
+  103 |                         .padding(0.dp, 8.dp),
+  104 |                 )
+  105 |                 Row(
+  106 |                     modifier = Modifier.fillMaxWidth(),
+  107 |                     horizontalArrangement = Arrangement.SpaceBetween,
+  108 |                     verticalAlignment = Alignment.CenterVertically","import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.Button
+import androidx.compose.material.Card
+import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Circle
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.foodike.R"
+pilot-0152,missing_merge_descendants,KaushalVasava__XPhotogram,KaushalVasava__XPhotogram/app/src/main/java/com/lahsuak/apps/instagram/ui/components/PostItem.kt,PostItem,"clickable Row with 2 Text children, no mergeDescendants","
+@Composable
+fun PostItem(
+    post: Post,
+    user: User,
+    onImageClick: () -> Unit,
+    onMoreClick: () -> Unit,
+) {
+    var likes by remember {
+        mutableIntStateOf(post.likeCount)
+    }
+    var isExpanded by remember {
+        mutableStateOf(false)
+    }
+    Column(Modifier.padding(vertical = 4.dp)) {
+        Row(",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/KaushalVasava__XPhotogram/app/src/main/java/com/lahsuak/apps/instagram/ui/components/PostItem.kt,exact,True,52,PostItem,1.0,64.0,\bColumn\s*\(,body,Column(Modifier.padding(vertical = 4.dp)) {,True,"   52 | fun PostItem(
+   53 |     post: Post,
+   54 |     user: User,
+   55 |     onImageClick: () -> Unit,
+   56 |     onMoreClick: () -> Unit,
+   57 | ) {
+   58 |     var likes by remember {
+   59 |         mutableIntStateOf(post.likeCount)
+   60 |     }
+   61 |     var isExpanded by remember {
+   62 |         mutableStateOf(false)
+   63 |     }
+   64 |     Column(Modifier.padding(vertical = 4.dp)) {
+   65 |         Row(
+   66 |             modifier = Modifier.fillMaxWidth(),
+   67 |             verticalAlignment = Alignment.CenterVertically
+   68 |         ) {
+   69 |             CircularImage(
+   70 |                 imageUrl = user.profileImage,
+   71 |                 imageSize = 40.dp,
+   72 |                 modifier = Modifier
+   73 |                     .padding(vertical = 8.dp, horizontal = 16.dp)
+   74 |                     .clickable {
+   75 |                         onImageClick()
+   76 |                     }
+   77 |             )
+   78 |             Column(
+   79 |                 modifier = Modifier
+   80 |                     .weight(1f)
+   81 |                     .padding(vertical = 4.dp)
+   82 |             ) {
+   83 |                 Text(user.name)
+   84 |                 Spacer(modifier = Modifier.height(4.dp))
+   85 |                 Text(
+   86 |                     ""location"",
+   87 |                     fontSize = 12.sp,
+   88 |                     color = Color.Gray,
+   89 |                     maxLines = 1,
+   90 |                     overflow = TextOverflow.Ellipsis
+   91 |                 )
+   92 |             }
+   93 |             Spacer(modifier = Modifier.width(8.dp))
+   94 |             IconButton(onClick = {
+   95 |                 onMoreClick()
+   96 |             }) {
+   97 |                 Icon(
+   98 |                     imageVector = Icons.Default.MoreVert,
+   99 |                     contentDescription = null,
+  100 |                     Modifier.padding(8.dp)
+  101 |                 )
+  102 |             }
+  103 |         }
+  104 |         PostImage(imageUrl = post.postImage)","import android.content.res.Configuration
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Send
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.lahsuak.apps.instagram.R
+import com.lahsuak.apps.instagram.models.Post
+import com.lahsuak.apps.instagram.models.User
+import com.lahsuak.apps.instagram.ui.theme.JetPackComposeBasicTheme
+import com.lahsuak.apps.instagram.util.AppConstants"
+pilot-0153,missing_merge_descendants,zhishengplus__ZhishengWeather,zhishengplus__ZhishengWeather/app/src/main/kotlin/com/zhisheng/weather/ui/WhatsNewDialog.kt,WhatsNewDialog,"clickable Row with 2 Text children, no mergeDescendants","
+@Composable
+fun WhatsNewDialog(onClose: () -> Unit) {
+    var page by rememberSaveable { mutableIntStateOf(0) }
+    val pageCount = 5
+
+    Dialog(
+        onDismissRequest = onClose,
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+    ) {
+        BoxWithConstraints(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(ZhishengBg.copy(alpha = 0.90f))
+                .safeDrawingPadding()
+                .padding(12.dp),",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/zhishengplus__ZhishengWeather/app/src/main/kotlin/com/zhisheng/weather/ui/WhatsNewDialog.kt,exact,True,63,WhatsNewDialog,1.0,80.0,\bColumn\s*\(,body,Column(,True,"   63 | fun WhatsNewDialog(onClose: () -> Unit) {
+   64 |     var page by rememberSaveable { mutableIntStateOf(0) }
+   65 |     val pageCount = 5
+   66 | 
+   67 |     Dialog(
+   68 |         onDismissRequest = onClose,
+   69 |         properties = DialogProperties(usePlatformDefaultWidth = false),
+   70 |     ) {
+   71 |         BoxWithConstraints(
+   72 |             modifier = Modifier
+   73 |                 .fillMaxSize()
+   74 |                 .background(ZhishengBg.copy(alpha = 0.90f))
+   75 |                 .safeDrawingPadding()
+   76 |                 .padding(12.dp),
+   77 |             contentAlignment = Alignment.Center,
+   78 |         ) {
+   79 |             val panelHeight = minOf(maxHeight - 24.dp, 700.dp)
+   80 |             Column(
+   81 |                 modifier = Modifier
+   82 |                     .fillMaxWidth()
+   83 |                     .widthIn(max = 520.dp)
+   84 |                     .heightIn(max = panelHeight)
+   85 |                     .background(ZhishengSurface, RectangleShape)
+   86 |                     .border(1.dp, ZhishengCyan.copy(alpha = 0.54f), RectangleShape),
+   87 |             ) {
+   88 |                 Row(
+   89 |                     modifier = Modifier.fillMaxWidth().padding(start = 16.dp),
+   90 |                     verticalAlignment = Alignment.CenterVertically,
+   91 |                 ) {
+   92 |                     Column(modifier = Modifier.weight(1f).padding(vertical = 14.dp)) {
+   93 |                         Text(
+   94 |                             ""ZHISHENG WEATHER / WHAT'S NEW"",
+   95 |                             style = MaterialTheme.typography.labelSmall,
+   96 |                             color = ZhishengCyan,
+   97 |                             letterSpacing = 1.3.sp,
+   98 |                         )
+   99 |                         Text(
+  100 |                             ""这次更新了什么"",
+  101 |                             style = MaterialTheme.typography.titleLarge,
+  102 |                             color = ZhishengText,
+  103 |                             fontWeight = FontWeight.Bold,
+  104 |                         )
+  105 |                     }
+  106 |                     Box(
+  107 |                         modifier = Modifier.size(52.dp).clickable(role = Role.Button, onClick = onClose),
+  108 |                         contentAlignment = Alignment.Center,
+  109 |                     ) {
+  110 |                         Text(""×"", style = MaterialTheme.typography.headlineSmall, color = ZhishengTextSecondary)
+  111 |                     }
+  112 |                 }
+  113 | 
+  114 |                 Row(
+  115 |                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+  116 |                     horizontalArrangement = Arrangement.spacedBy(5.dp),
+  117 |                 ) {
+  118 |                     repeat(pageCount) { index ->
+  119 |                         Box(
+  120 |                             Modifier","import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import com.zhisheng.weather.ui.theme.ZhishengBg
+import com.zhisheng.weather.ui.theme.ZhishengCard
+import com.zhisheng.weather.ui.theme.ZhishengCardBorder
+import com.zhisheng.weather.ui.theme.ZhishengCyan
+import com.zhisheng.weather.ui.theme.ZhishengMint
+import com.zhisheng.weather.ui.theme.ZhishengOrange
+import com.zhisheng.weather.ui.theme.ZhishengSurface
+import com.zhisheng.weather.ui.theme.ZhishengText
+import com.zhisheng.weather.ui.theme.ZhishengTextSecondary
+import com.zhisheng.weather.ui.theme.ZhishengTextTertiary"
+pilot-0154,missing_merge_descendants,jordond__MaterialKolor,jordond__MaterialKolor/builder/shared/src/commonMain/kotlin/com/materialkolor/builder/ui/components/ColorPicker.kt,ColorPickerDialog,"clickable Row with 2 Text children, no mergeDescendants","
+@Composable
+fun ColorPickerDialog(
+    state: ColorPickerState?,
+    onColorChanged: (Color) -> Unit,
+    onDismiss: () -> Unit,
+    toggleMode: () -> Unit,
+    selectImage: () -> Unit,
+    modifier: Modifier = Modifier,
+    controller: ColorPickerController = rememberColorPickerController(),
+) {
+    if (state != null) {
+        ColorPickerDialog(
+            state = state,
+            onColorChanged = onColorChanged,
+            onConfirm = onDismiss,",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/jordond__MaterialKolor/builder/shared/src/commonMain/kotlin/com/materialkolor/builder/ui/components/ColorPicker.kt,exact,True,66,ColorPickerDialog,1.0,115.0,\bCard\s*\(,file,Card(,True,"  103 |     val scope = rememberCoroutineScope()
+  104 |     val clipboard = LocalClipboardManager.current
+  105 |     val snackbar = LocalSnackbarHostState.current
+  106 | 
+  107 |     var selectedColor by remember { mutableStateOf(state.initial) }
+  108 |     var selectedHex by remember { mutableStateOf(state.initial.toHex(includePrefix = false)) }
+  109 |     var userHex by remember { mutableStateOf("""") }
+  110 |     var hasEdited by remember(selectedColor) { mutableStateOf(false) }
+  111 | 
+  112 |     Dialog(
+  113 |         onDismissRequest = onDismiss,
+  114 |         content = {
+  115 |             Card(
+  116 |                 modifier = modifier
+  117 |                     .requiredWidthIn(min = 300.dp, max = 400.dp)
+  118 |                     .requiredHeightIn(min = 500.dp, max = 700.dp),
+  119 |             ) {
+  120 |                 Column(
+  121 |                     verticalArrangement = Arrangement.spacedBy(16.dp),
+  122 |                     horizontalAlignment = Alignment.CenterHorizontally,
+  123 |                     modifier = Modifier
+  124 |                         .padding(horizontal = 32.dp)
+  125 |                         .padding(top = 32.dp, bottom = 16.dp),
+  126 |                 ) {
+  127 |                     Icon(
+  128 |                         imageVector = Icons.Outlined.Palette,
+  129 |                         contentDescription = ""Hero icon"",
+  130 |                         tint = MaterialTheme.colorScheme.primary,
+  131 |                     )
+  132 | 
+  133 |                     Text(
+  134 |                         text = ""Color Picker"",
+  135 |                         style = MaterialTheme.typography.headlineLarge.copy(
+  136 |                             fontWeight = FontWeight.Normal,
+  137 |                         ),
+  138 |                     )
+  139 | 
+  140 |                     Text(
+  141 |                         text = ""Select a color to use as the ${state.keyColor.name()} color"",
+  142 |                         style = MaterialTheme.typography.bodyMedium.copy(
+  143 |                             fontWeight = FontWeight.Normal,
+  144 |                             textAlign = TextAlign.Center,
+  145 |                         ),
+  146 |                     )
+  147 | 
+  148 |                     Row(
+  149 |                         verticalAlignment = Alignment.CenterVertically,
+  150 |                         horizontalArrangement = Arrangement.SpaceBetween,
+  151 |                         modifier = Modifier.fillMaxWidth(),
+  152 |                     ) {
+  153 |                         Text(
+  154 |                             text = state.keyColor.name(),
+  155 |                             style = MaterialTheme.typography.bodyLarge.copy(","import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeightIn
+import androidx.compose.foundation.layout.requiredWidthIn
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Colorize
+import androidx.compose.material.icons.outlined.ContentCopy
+import androidx.compose.material.icons.outlined.ContentPaste
+import androidx.compose.material.icons.outlined.Image
+import androidx.compose.material.icons.outlined.Palette
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import com.github.skydoves.colorpicker.compose.ColorEnvelope
+import com.github.skydoves.colorpicker.compose.ColorPickerController
+import com.github.skydoves.colorpicker.compose.HsvColorPicker
+import com.github.skydoves.colorpicker.compose.ImageColorPicker
+import com.github.skydoves.colorpicker.compose.PaletteContentScale
+import com.github.skydoves.colorpicker.compose.drawColorIndicator
+import com.github.skydoves.colorpicker.compose.rememberColorPickerController
+import com.materialkolor.builder.ktx.parseHexToColor
+import com.materialkolor.builder.settings.model.name
+import com.materialkolor.builder.ui.home.LocalSnackbarHostState
+import com.materialkolor.builder.ui.ktx.launch
+import com.materialkolor.builder.ui.theme.AppIcons
+import com.materialkolor.builder.ui.theme.icons.ResetImage
+import com.materialkolor.ktx.toHex"
+pilot-0155,missing_merge_descendants,maxwhipw__marmalade-tts-android,maxwhipw__marmalade-tts-android/app/src/main/java/app/marmalade/tts/ui/screen/AdvancedSettingsScreen.kt,BenchmarkSection,"clickable ListItem with 2 Text children, no mergeDescendants"," */
+@Composable
+private fun BenchmarkSection(onClick: () -> Unit) {
+    SectionHeader(stringResource(R.string.settings_debug))
+
+    ListItem(
+        modifier = Modifier.clickable(onClick = onClick),
+        headlineContent = { Text(stringResource(R.string.settings_benchmark)) },
+        supportingContent = {
+            Text(text = stringResource(R.string.settings_benchmark_desc))
+        },
+        trailingContent = {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+            )",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/maxwhipw__marmalade-tts-android/app/src/main/java/app/marmalade/tts/ui/screen/AdvancedSettingsScreen.kt,exact,True,209,BenchmarkSection,1.0,212.0,ListItem\s*\(,body,ListItem(,True,"  200 |     )
+  201 | }
+  202 | 
+  203 | /**
+  204 |  * Debug-only entry point to the benchmark surface. Only shown when
+  205 |  * `BuildConfig.DEBUG` (gated by AppRoot passing a non-null lambda).
+  206 |  * Release builds never render this section.
+  207 |  */
+  208 | @Composable
+  209 | private fun BenchmarkSection(onClick: () -> Unit) {
+  210 |     SectionHeader(stringResource(R.string.settings_debug))
+  211 | 
+  212 |     ListItem(
+  213 |         modifier = Modifier.clickable(onClick = onClick),
+  214 |         headlineContent = { Text(stringResource(R.string.settings_benchmark)) },
+  215 |         supportingContent = {
+  216 |             Text(text = stringResource(R.string.settings_benchmark_desc))
+  217 |         },
+  218 |         trailingContent = {
+  219 |             Icon(
+  220 |                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+  221 |                 contentDescription = null,
+  222 |             )
+  223 |         },
+  224 |         colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surface),
+  225 |     )
+  226 | }
+  227 | 
+  228 | // Same local copy LicensesScreen keeps — SectionHeader is file-private
+  229 | // per screen rather than shared, so screens stay self-contained.
+  230 | @Composable
+  231 | private fun SectionHeader(label: String) {
+  232 |     Text(
+  233 |         text = label,
+  234 |         style = MaterialTheme.typography.titleSmall,
+  235 |         color = MaterialTheme.colorScheme.primary,
+  236 |         modifier = Modifier
+  237 |             .semantics { heading() }
+  238 |             .padding(
+  239 |                 start = 16.dp,
+  240 |                 end = 16.dp,
+  241 |                 top = 16.dp,
+  242 |                 bottom = 4.dp,
+  243 |             ),
+  244 |     )
+  245 | }","import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import app.marmalade.tts.R
+import app.marmalade.tts.ui.MarmaladeFilterChip"
+pilot-0156,missing_merge_descendants,MohamadOday__iris-gallery,MohamadOday__iris-gallery/app/src/main/java/com/iris/gallery/ui/EditChoiceSheet.kt,EditChoiceBottomSheet,"clickable Column with 2 Text children, no mergeDescendants","@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+fun EditChoiceBottomSheet(
+    onDismiss: () -> Unit,
+    onChooseBuiltIn: (rememberChoice: Boolean) -> Unit,
+    onChooseExternal: (rememberChoice: Boolean) -> Unit,
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var rememberChoice by remember { mutableStateOf(false) }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+    ) {",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/MohamadOday__iris-gallery/app/src/main/java/com/iris/gallery/ui/EditChoiceSheet.kt,exact,True,170,EditChoiceBottomSheet,1.0,198.0,\bCard\s*\(,body,Card(,True,"  170 | fun EditChoiceBottomSheet(
+  171 |     onDismiss: () -> Unit,
+  172 |     onChooseBuiltIn: (rememberChoice: Boolean) -> Unit,
+  173 |     onChooseExternal: (rememberChoice: Boolean) -> Unit,
+  174 | ) {
+  175 |     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+  176 |     var rememberChoice by remember { mutableStateOf(false) }
+  177 | 
+  178 |     ModalBottomSheet(
+  179 |         onDismissRequest = onDismiss,
+  180 |         sheetState = sheetState,
+  181 |         containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+  182 |         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+  183 |     ) {
+  184 |         Column(
+  185 |             modifier = Modifier
+  186 |                 .fillMaxWidth()
+  187 |                 .navigationBarsPadding()
+  188 |                 .padding(horizontal = 24.dp, vertical = 12.dp),
+  189 |             verticalArrangement = Arrangement.spacedBy(16.dp),
+  190 |         ) {
+  191 |             Text(
+  192 |                 text = stringResource(R.string.editor_choice_title),
+  193 |                 style = MaterialTheme.typography.headlineSmall,
+  194 |                 fontWeight = FontWeight.Bold,
+  195 |             )
+  196 | 
+  197 |             // Built-in Iris Editor Option
+  198 |             Card(
+  199 |                 modifier = Modifier
+  200 |                     .fillMaxWidth()
+  201 |                     .clip(RoundedCornerShape(18.dp))
+  202 |                     .clickable { onChooseBuiltIn(rememberChoice) },
+  203 |                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+  204 |                 shape = RoundedCornerShape(18.dp),
+  205 |             ) {
+  206 |                 Row(
+  207 |                     modifier = Modifier
+  208 |                         .fillMaxWidth()
+  209 |                         .padding(16.dp),
+  210 |                     verticalAlignment = Alignment.CenterVertically,
+  211 |                     horizontalArrangement = Arrangement.spacedBy(16.dp),
+  212 |                 ) {
+  213 |                     Box(
+  214 |                         modifier = Modifier
+  215 |                             .size(48.dp)
+  216 |                             .clip(CircleShape)
+  217 |                             .background(
+  218 |                                 Brush.linearGradient(
+  219 |                                     colors = listOf(Color(0xFF9D34F5), Color(0xFF4F16D8))
+  220 |                                 )
+  221 |                             ),
+  222 |                         contentAlignment = Alignment.Center
+  223 |                     ) {
+  224 |                         Icon(
+  225 |                             imageVector = Icons.Outlined.AutoFixHigh,
+  226 |                             contentDescription = null,
+  227 |                             tint = Color.White,
+  228 |                             modifier = Modifier.size(24.dp)
+  229 |                         )
+  230 |                     }
+  231 |                     Column(modifier = Modifier.weight(1f)) {
+  232 |                         Text(
+  233 |                             text = stringResource(R.string.editor_builtin_title),
+  234 |                             style = MaterialTheme.typography.titleMedium,
+  235 |                             fontWeight = FontWeight.SemiBold
+  236 |                         )
+  237 |                         Text(
+  238 |                             text = stringResource(R.string.editor_builtin_desc),","import android.content.Context
+import android.content.Intent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.OpenInNew
+import androidx.compose.material.icons.outlined.AutoFixHigh
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.iris.gallery.R
+import com.iris.gallery.data.MediaImage"
+pilot-0157,missing_merge_descendants,crome1394__point-forecast,crome1394__point-forecast/forecast-point/app/src/main/java/com/crome/forecastpoint/ui/screens/HazardExploreControls.kt,HazardScreenSettingsSection,"clickable Row with 2 Text children, no mergeDescendants"," */
+@Composable
+fun HazardScreenSettingsSection(
+    accent: Color,
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    summary: String,
+    onReset: (() -> Unit)? = null,
+    content: @Composable () -> Unit,
+) {
+    Surface(
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 6.dp),
+        color = SurfaceDark,
+        shape = RoundedCornerShape(18.dp),",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/crome1394__point-forecast/forecast-point/app/src/main/java/com/crome/forecastpoint/ui/screens/HazardExploreControls.kt,exact,True,89,HazardScreenSettingsSection,1.0,104.0,\bColumn\s*\(,body,Column(,True,"   89 | fun HazardScreenSettingsSection(
+   90 |     accent: Color,
+   91 |     expanded: Boolean,
+   92 |     onExpandedChange: (Boolean) -> Unit,
+   93 |     summary: String,
+   94 |     onReset: (() -> Unit)? = null,
+   95 |     content: @Composable () -> Unit,
+   96 | ) {
+   97 |     Surface(
+   98 |         Modifier
+   99 |             .fillMaxWidth()
+  100 |             .padding(horizontal = 16.dp, vertical = 6.dp),
+  101 |         color = SurfaceDark,
+  102 |         shape = RoundedCornerShape(18.dp),
+  103 |     ) {
+  104 |         Column(
+  105 |             Modifier
+  106 |                 .background(
+  107 |                     Brush.horizontalGradient(
+  108 |                         listOf(accent.copy(alpha = 0.14f), Color.Transparent),
+  109 |                     ),
+  110 |                 ),
+  111 |         ) {
+  112 |             Row(
+  113 |                 Modifier
+  114 |                     .fillMaxWidth()
+  115 |                     .clickable { onExpandedChange(!expanded) }
+  116 |                     .padding(16.dp),
+  117 |                 verticalAlignment = Alignment.CenterVertically,
+  118 |             ) {
+  119 |                 Icon(
+  120 |                     Icons.Filled.Settings,
+  121 |                     contentDescription = null,
+  122 |                     tint = accent,
+  123 |                     modifier = Modifier.size(22.dp),
+  124 |                 )
+  125 |                 Spacer(Modifier.width(10.dp))
+  126 |                 Column(Modifier.weight(1f)) {
+  127 |                     Text(
+  128 |                         ""Settings"",
+  129 |                         color = Color.White,
+  130 |                         fontWeight = FontWeight.SemiBold,
+  131 |                         fontSize = 15.sp,
+  132 |                     )
+  133 |                     Text(
+  134 |                         if (expanded) {
+  135 |                             ""Ad-hoc only — does not change app Settings defaults""
+  136 |                         } else {
+  137 |                             summary
+  138 |                         },
+  139 |                         color = OnSurfaceMuted,
+  140 |                         fontSize = 11.sp,
+  141 |                         maxLines = 2,
+  142 |                     )
+  143 |                 }
+  144 |                 Icon(","import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.RestartAlt
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.filled.LocationCity
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DateRangePicker
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberDateRangePickerState
+import com.crome.forecastpoint.data.SavedLocation
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.crome.forecastpoint.data.PreferencesRepository
+import com.crome.forecastpoint.ui.theme.OnSurfaceMuted
+import com.crome.forecastpoint.ui.theme.SurfaceDark
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
+import kotlin.math.roundToInt"
+pilot-0158,missing_merge_descendants,iOrchid__android-jetpack-demo,iOrchid__android-jetpack-demo/compose/src/main/java/org/zhiwei/compose/screen/basic/material3/ButtonScreen.kt,Button_Screen,"clickable Row with 3 Text children, no mergeDescendants"," */
+@Composable
+internal fun Button_Screen(modifier: Modifier = Modifier) {
+
+    LazyColumn(modifier.fillMaxSize()) {
+
+        item {
+            Title_Text(title = ""Button"")
+            //1、普通的常规属性
+            Title_Desc_Text(desc = ""1、button 常用属性如圆角，禁用，图标，背景色阴影边框等"")
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(5.dp), horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Button(onClick = {/*点击事件是在这里处理*/ }) {",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/iOrchid__android-jetpack-demo/compose/src/main/java/org/zhiwei/compose/screen/basic/material3/ButtonScreen.kt,exact,True,73,Button_Screen,1.0,81.0,\bRow\s*\(,body,Row(,True,"   69 | /**
+   70 |  * 演示compose的Material3的Button按钮的使用，compose自身UI的库里面的button也是类似的
+   71 |  */
+   72 | @Composable
+   73 | internal fun Button_Screen(modifier: Modifier = Modifier) {
+   74 | 
+   75 |     LazyColumn(modifier.fillMaxSize()) {
+   76 | 
+   77 |         item {
+   78 |             Title_Text(title = ""Button"")
+   79 |             //1、普通的常规属性
+   80 |             Title_Desc_Text(desc = ""1、button 常用属性如圆角，禁用，图标，背景色阴影边框等"")
+   81 |             Row(
+   82 |                 Modifier
+   83 |                     .fillMaxWidth()
+   84 |                     .padding(5.dp), horizontalArrangement = Arrangement.SpaceEvenly
+   85 |             ) {
+   86 |                 Button(onClick = {/*点击事件是在这里处理*/ }) {
+   87 |                     //Compose中Button也是个容器内部可以是文本，icon或者image都行，或者其他compose的
+   88 |                     Text(text = ""Button"")
+   89 |                 }
+   90 |                 TextButton(onClick = { }) {
+   91 |                     Text(text = ""TextButton"")
+   92 |                 }
+   93 |                 OutlinedButton(onClick = { }) {
+   94 |                     Text(text = ""OutlinedButton"")
+   95 |                 }
+   96 |             }
+   97 |             //按钮被禁用，enable=false的时候，默认的效果样式
+   98 |             Row(
+   99 |                 Modifier
+  100 |                     .fillMaxWidth()
+  101 |                     .padding(5.dp), horizontalArrangement = Arrangement.SpaceEvenly
+  102 |             ) {
+  103 |                 Button(onClick = {}, enabled = false) {
+  104 |                     //Compose中Button也是个容器内部可以是文本，icon或者image都行，或者其他compose的
+  105 |                     Text(text = ""Button"")
+  106 |                 }
+  107 |                 TextButton(onClick = { }, enabled = false) {
+  108 |                     Text(text = ""TextButton"")
+  109 |                 }
+  110 |                 OutlinedButton(onClick = { }, enabled = false) {
+  111 |                     Text(text = ""OutlinedButton"")
+  112 |                 }
+  113 |             }
+  114 |             //shape属性
+  115 |             Row(
+  116 |                 Modifier
+  117 |                     .fillMaxWidth()
+  118 |                     .padding(5.dp), horizontalArrangement = Arrangement.SpaceEvenly
+  119 |             ) {
+  120 |                 Button(onClick = {}, shape = RectangleShape) {
+  121 |                     //Compose中Button也是个容器内部可以是文本，icon或者image都行，或者其他compose的","import android.widget.Toast
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.CutCornerShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CrueltyFree
+import androidx.compose.material.icons.filled.DeviceHub
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Hub
+import androidx.compose.material.icons.rounded.ColorLens
+import androidx.compose.material.icons.sharp.BluetoothAudio
+import androidx.compose.material.icons.twotone.DeviceHub
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ElevatedAssistChip
+import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.ElevatedFilterChip
+import androidx.compose.material3.ElevatedSuggestionChip
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FilledIconToggleButton
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconToggleButton
+import androidx.compose.material3.InputChip
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedIconButton
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import org.zhiwei.compose.ui.widget.Title_Desc_Text
+import org.zhiwei.compose.ui.widget.Title_Text"
+pilot-0159,missing_merge_descendants,MohamadOday__iris-gallery,MohamadOday__iris-gallery/app/src/main/java/com/iris/gallery/ui/ExifEditorSheet.kt,ExifEditorSheet,"clickable Column with 2 Text children, no mergeDescendants","@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ExifEditorSheet(
+    image: MediaImage,
+    exif: ExifMetadata?,
+    onDismiss: () -> Unit,
+    onSave: (ExifEditRequest) -> Unit,
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val dateFormat = remember { SimpleDateFormat(""yyyy-MM-dd HH:mm"", Locale.getDefault()) }
+
+    var selectedTab by remember { mutableIntStateOf(0) }
+    var showStripDialog by remember { mutableStateOf(false) }
+
+    // File & MediaStore State
+    var fileName by remember(image.id) { mutableStateOf(image.name) }",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/MohamadOday__iris-gallery/app/src/main/java/com/iris/gallery/ui/ExifEditorSheet.kt,exact,True,80,ExifEditorSheet,1.0,485.0,\bCard\s*\(,body,Card(,True,"  473 |                                 FilterChip(
+  474 |                                     selected = whiteBalance == 1,
+  475 |                                     onClick = { whiteBalance = if (whiteBalance == 1) null else 1 },
+  476 |                                     label = { Text(stringResource(R.string.details_white_balance_manual)) },
+  477 |                                 )
+  478 |                             }
+  479 |                         }
+  480 |                     }
+  481 |                 }
+  482 |                 2 -> {
+  483 |                     // Location (GPS)
+  484 |                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+  485 |                         Card(
+  486 |                             modifier = Modifier.fillMaxWidth(),
+  487 |                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+  488 |                             shape = RoundedCornerShape(16.dp),
+  489 |                         ) {
+  490 |                             Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+  491 |                                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+  492 |                                     Icon(Icons.Outlined.LocationOn, null, tint = MaterialTheme.colorScheme.primary)
+  493 |                                     Text(stringResource(R.string.details_location), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+  494 |                                 }
+  495 |                                 Text(
+  496 |                                     stringResource(R.string.exif_remove_gps_desc),
+  497 |                                     style = MaterialTheme.typography.bodySmall,
+  498 |                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+  499 |                                 )
+  500 |                             }
+  501 |                         }
+  502 | 
+  503 |                         OutlinedTextField(
+  504 |                             value = latitudeStr,
+  505 |                             onValueChange = {
+  506 |                                 latitudeStr = it.filter { c -> c.isDigit() || c == '.' || c == '-' }
+  507 |                                 if (latitudeStr.isNotBlank()) removeGps = false
+  508 |                             },
+  509 |                             label = { Text(stringResource(R.string.exif_latitude_label)) },
+  510 |                             placeholder = { Text(""37.774929"") },
+  511 |                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+  512 |                             modifier = Modifier.fillMaxWidth(),
+  513 |                             singleLine = true,
+  514 |                             shape = RoundedCornerShape(12.dp),
+  515 |                         )
+  516 | 
+  517 |                         OutlinedTextField(
+  518 |                             value = longitudeStr,
+  519 |                             onValueChange = {
+  520 |                                 longitudeStr = it.filter { c -> c.isDigit() || c == '.' || c == '-' }
+  521 |                                 if (longitudeStr.isNotBlank()) removeGps = false
+  522 |                             },
+  523 |                             label = { Text(stringResource(R.string.exif_longitude_label)) },
+  524 |                             placeholder = { Text(""-122.419416"") },
+  525 |                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),","import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Comment
+import androidx.compose.material.icons.outlined.AccessTime
+import androidx.compose.material.icons.outlined.CameraAlt
+import androidx.compose.material.icons.outlined.Comment
+import androidx.compose.material.icons.outlined.DeleteSweep
+import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material.icons.outlined.LocationOff
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.RotateRight
+import androidx.compose.material.icons.outlined.Save
+import androidx.compose.material.icons.outlined.Security
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.iris.gallery.R
+import com.iris.gallery.data.ExifEditRequest
+import com.iris.gallery.data.ExifMetadata
+import com.iris.gallery.data.MediaImage
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale"
+pilot-0160,missing_merge_descendants,zhishengplus__ZhishengWeather,zhishengplus__ZhishengWeather/app/src/main/kotlin/com/zhisheng/weather/ui/ContributorsDialog.kt,ContributorsDialog,"clickable Row with 2 Text children, no mergeDescendants","
+@Composable
+fun ContributorsDialog(onClose: () -> Unit) {
+    Dialog(
+        onDismissRequest = onClose,
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+    ) {
+        BoxWithConstraints(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(ZhishengBg.copy(alpha = 0.82f))
+                .safeDrawingPadding()
+                .padding(12.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            val panelMaxHeight = minOf(maxHeight - 24.dp, 620.dp)",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/zhishengplus__ZhishengWeather/app/src/main/kotlin/com/zhisheng/weather/ui/ContributorsDialog.kt,exact,True,56,ContributorsDialog,1.0,93.0,\bColumn\s*\(,body,Column(,True,"   56 | fun ContributorsDialog(onClose: () -> Unit) {
+   57 |     Dialog(
+   58 |         onDismissRequest = onClose,
+   59 |         properties = DialogProperties(usePlatformDefaultWidth = false),
+   60 |     ) {
+   61 |         BoxWithConstraints(
+   62 |             modifier = Modifier
+   63 |                 .fillMaxSize()
+   64 |                 .background(ZhishengBg.copy(alpha = 0.82f))
+   65 |                 .safeDrawingPadding()
+   66 |                 .padding(12.dp),
+   67 |             contentAlignment = Alignment.Center,
+   68 |         ) {
+   69 |             val panelMaxHeight = minOf(maxHeight - 24.dp, 620.dp)
+   70 |             val columnCount = when {
+   71 |                 maxWidth >= 760.dp -> 4
+   72 |                 maxWidth >= 540.dp -> 3
+   73 |                 else -> 2
+   74 |             }
+   75 |             var query by remember { mutableStateOf("""") }
+   76 |             val visibleSections = remember(query) {
+   77 |                 val needle = query.trim()
+   78 |                 if (needle.isBlank()) {
+   79 |                     CommunityContributorSections
+   80 |                 } else {
+   81 |                     CommunityContributorSections.mapNotNull { section ->
+   82 |                         val matches = section.contributors.filter { contributor ->
+   83 |                             contributor.contains(needle, ignoreCase = true)
+   84 |                         }
+   85 |                         section.copy(contributors = matches).takeIf { matches.isNotEmpty() }
+   86 |                     }
+   87 |                 }
+   88 |             }
+   89 |             val visibleCount = visibleSections.sumOf { it.contributors.size }
+   90 |             val sequenceById = remember {
+   91 |                 CommunityContributors.withIndex().associate { (index, contributor) -> contributor to index + 1 }
+   92 |             }
+   93 |             Column(
+   94 |                 modifier = Modifier
+   95 |                     .fillMaxWidth()
+   96 |                     .widthIn(max = 520.dp)
+   97 |                     .heightIn(max = panelMaxHeight)
+   98 |                     .background(ZhishengSurface, RectangleShape)
+   99 |                     .border(1.dp, ZhishengCardBorder, RectangleShape),
+  100 |             ) {
+  101 |                 Row(
+  102 |                     modifier = Modifier.fillMaxWidth().padding(start = 16.dp),
+  103 |                     verticalAlignment = Alignment.CenterVertically,
+  104 |                 ) {
+  105 |                     Column(modifier = Modifier.weight(1f).padding(vertical = 14.dp)) {
+  106 |                         Text(
+  107 |                             ""COMMUNITY / ${CommunityContributors.size}"",
+  108 |                             style = MaterialTheme.typography.labelSmall,
+  109 |                             color = ZhishengCyan,
+  110 |                             letterSpacing = 1.4.sp,
+  111 |                         )
+  112 |                         Text(
+  113 |                             ""社区贡献者"",
+  114 |                             style = MaterialTheme.typography.titleLarge,
+  115 |                             color = ZhishengText,
+  116 |                             fontWeight = FontWeight.Bold,
+  117 |                         )
+  118 |                     }
+  119 |                     Box(
+  120 |                         modifier = Modifier
+  121 |                             .size(52.dp)
+  122 |                             .clickable(role = Role.Button, onClick = onClose),
+  123 |                         contentAlignment = Alignment.Center,
+  124 |                     ) {
+  125 |                         Text(""×"", style = MaterialTheme.typography.headlineSmall, color = ZhishengTextSecondary)
+  126 |                     }
+  127 |                 }
+  128 | 
+  129 |                 HorizontalDivider(thickness = 1.dp, color = ZhishengCardBorder)
+  130 |                 Text(
+  131 |                     ""感谢每一次认真试用、具体反馈与真诚支持。名单按参与方式整理，也可以直接搜索自己的酷安 ID。"",
+  132 |                     style = MaterialTheme.typography.bodyMedium,
+  133 |                     color = ZhishengTextSecondary,","import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import com.zhisheng.weather.ui.theme.ZhishengBg
+import com.zhisheng.weather.ui.theme.ZhishengCardBorder
+import com.zhisheng.weather.ui.theme.ZhishengCyan
+import com.zhisheng.weather.ui.theme.ZhishengMint
+import com.zhisheng.weather.ui.theme.ZhishengOrange
+import com.zhisheng.weather.ui.theme.ZhishengSurface
+import com.zhisheng.weather.ui.theme.ZhishengText
+import com.zhisheng.weather.ui.theme.ZhishengTextSecondary
+import com.zhisheng.weather.ui.theme.ZhishengTextTertiary"

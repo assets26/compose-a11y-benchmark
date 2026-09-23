@@ -1,0 +1,301 @@
+rater_row_id,verdict,issue_category,confidence,other_issues,notes
+r0001,ISSUE,pointerinput_no_semantics,high,,Tap-to-focus (detectTapGestures) and pinch-zoom (transformable) on the viewfinder with no semantics block; the actions are undiscoverable to TalkBack and there is no alternative control.
+r0002,ISSUE,textfield_no_label,high,,"Material3 TextField (per imports) with placeholder only and no label; placeholder disappears on input, leaving no accessible name."
+r0003,NO_ISSUE,none,medium,missing_heading_semantics,"Anchor Column is the dialog panel wrapping a close button (role=Button) and pager dots; merging descendants here would be harmful. Separately, titleLarge text at ~line 100 lacks heading()."
+r0004,ISSUE,missing_semantics_role,medium,touch_target_size,Row is .clickable with no role=Role.Button. Naming is fine (decorative Icon + Text label). Height depends on dimen list_options_icon_size + tiny padding; likely under 48dp but unresolved from source.
+r0005,HANDLED,progress_no_semantics,high,,LinearProgressIndicator already has .semantics { stateDescription = percentText }; both Downloading and Extracting branches do this.
+r0006,ISSUE,progress_no_semantics,low,,Indeterminate CircularProgressIndicator with no semantics. Sibling Text 'Loading' partially mitigates but is not programmatically associated; reasonable rater could call HANDLED.
+r0007,ISSUE,missing_merge_descendants,medium,,"Switch and OptionLabel('show icon') are unassociated siblings in an unmerged Row. Switch announces role/state natively, so stateDescription is not the gap; the label association is."
+r0008,ISSUE,missing_heading_semantics,high,,App name in headlineMedium + Bold acts as a visual heading with no semantics { heading() }.
+r0009,ISSUE,missing_semantics_role,medium,,"Anchor is .clickable on a ListItem container with no role=Role.Button. The leading Icon is decorative (contentDescription=null) and is not the click target, so this is not a clickable-icon problem."
+r0010,ISSUE,missing_semantics_role,medium,touch_target_size,"Clickable Text refresh control with no role. Modifier order (.clickable before .padding) is correct; labelMedium + 8dp padding is roughly 36dp, under 48dp minimum."
+r0011,ISSUE,progress_no_semantics,high,,Loading composable: 24dp CircularProgressIndicator with no semantics and no accompanying text; TalkBack gets nothing during the loading state.
+r0012,NO_ISSUE,none,high,,"Image with contentDescription 'Non-Vegetarian' conveys dietary meaning; description is appropriate, not decorative. 16dp is non-interactive so touch target does not apply. Hardcoded strings are an i18n concern, not one of the 15."
+r0013,ISSUE,pointerinput_no_semantics,medium,touch_target_size,"Custom switch drawn on Canvas and driven by detectTapGestures with no semantics/toggleable in the visible window; also 28x46dp. A semantics modifier could exist on an outer wrapper above the window, hence medium."
+r0014,NO_ISSUE,none,medium,,"App logo Image with contentDescription 'Iris Gallery Logo' inside a clickable easter-egg Box; the description is the only accessible name for that tappable area, so it is appropriate rather than decorative noise."
+r0015,NO_ISSUE,none,high,,"Canonical correct pattern: Row.toggleable(value, role=Role.Switch) with Switch(onCheckedChange=null). toggleable merges descendants so label+hint form the name and role/state are announced. Nothing missing."
+r0016,ISSUE,progress_no_semantics,high,,Bare CircularProgressIndicator() in a Box with no semantics and no accompanying text.
+r0017,NO_ISSUE,none,medium,,"28dp Icon with contentDescription=null beside a 'Point Forecast' Text in a drawer header; icon is decorative and the header is not visibly interactive, so neither description nor touch target applies."
+r0018,UNSURE,none,low,,"Anchor resolved to an import line; the window contains only the license header and imports. The scrollbar gesture code is not visible, so no judgement possible. Extraction artifact."
+r0019,NO_ISSUE,none,high,,"Column holds a title, body, and a TextButton; merging descendants would swallow the button. Correct as written."
+r0020,ISSUE,missing_semantics_role,medium,missing_interaction_semantics,App-name Text made clickable (opens welcome dialog) with no role and no onClickLabel; the hidden action is undiscoverable. Same pattern on the version Text at line 74.
+r0021,HANDLED,error_state_no_semantics,medium,textfield_no_label,"Material3 OutlinedTextField with isError applies default error semantics and the supportingText sits in the merged subtree, so the error is announced. Separately: placeholder with no label."
+r0022,ISSUE,missing_heading_semantics,medium,,TopAppBar title in headlineSmall with no semantics { heading() }; M3 TopAppBar does not add heading semantics itself.
+r0023,ISSUE,text_truncation_scaling,low,,"Account label with maxLines=1 + Ellipsis carries unique information and has no alternative access; truncates at large font scale. Common deliberate design, so low confidence."
+r0024,NO_ISSUE,none,medium,,TextField label 'Code' is a single short resource string; visual ellipsis is unlikely and does not affect the accessible label TalkBack reads.
+r0025,ISSUE,text_truncation_scaling,medium,,"Coordinate Text with maxLines=1 and softWrap=false but no overflow handling; clips silently at large font scale. Status metadata, so impact is moderate."
+r0026,ISSUE,decorative_mislabeled,medium,,"Full-screen AsyncImage backdrop with a gradient overlay, described as 'Product Banner'; the string conveys nothing useful and the image is a background. Should be null."
+r0027,HANDLED,touch_target_size,medium,missing_content_description,"FloatingActionButton with explicit .size(40.dp). M3 FAB wraps a clickable Surface which applies minimumInteractiveComponentSize, so the touch target is padded to 48dp unless disabled. Separately the FAB's only content is a '+' Text, giving a poor accessible name."
+r0028,NO_ISSUE,none,medium,missing_content_description,40dp Box is a non-interactive tinted icon container inside a card row; touch target does not apply. The direction Icon inside has contentDescription=null but conveys send/receive/stored meaning that may not be in the card text.
+r0029,NO_ISSUE,none,high,,Row of three Buttons in a demo screen; merging descendants would collapse independent controls.
+r0030,ISSUE,progress_no_semantics,medium,,CircularProgressIndicator() with no semantics replaces the search button while searching; neither the progress nor the state change is announced.
+r0031,ISSUE,clickable_icon_not_iconbutton,high,"touch_target_size,missing_semantics_role","Icon with .clickable directly (unbounded ripple) instead of IconButton. contentDescription is present, but no role, and 24dp icon + small padding is well under 48dp. Same pattern on the next-arrow Icon."
+r0032,ISSUE,missing_semantics_role,medium,missing_content_description,Clickable GlideImage named by person.name but no role=Role.Button. The fallback branch (Box + Icon with null) is clickable with no accessible name at all.
+r0033,UNSURE,color_contrast,low,,"Axis tick labels in Color(0xFF90A4AE) at 10sp over a chart background not resolvable from source. Fails 4.5:1 on white, passes on dark; cannot decide."
+r0034,ISSUE,color_contrast,high,,"Button with containerColor #D2D97A and contentColor #FFFFFF: computed contrast roughly 1.5:1, far below 4.5:1. Both literals are in the anchor so this is decidable from source."
+r0035,ISSUE,pointerinput_no_semantics,medium,,Long-press drag-to-reorder via detectDragGesturesAfterLongPress with no semantics or customActions offering move-up/move-down; reordering is gesture-only.
+r0036,NO_ISSUE,none,medium,color_contrast,"Anchor is body copy (movie overview) styled headlineSmall; it is not a heading, so heading() would be wrong. Separately Color.White is hardcoded over a backdrop image, unresolvable."
+r0037,ISSUE,missing_content_description,high,"touch_target_size,missing_semantics_role","32dp clickable Box whose only content is an Icon with null description and no semantics on the Box: the control has no accessible name, no role, and is under 48dp."
+r0038,NO_ISSUE,none,high,missing_semantics_role,Anchor Icon is decorative (null) inside a clickable Row whose Text children supply the name via merged semantics. Correct. The Row itself lacks role=Role.Button.
+r0039,NO_ISSUE,none,high,,"IconButton wrapping an Icon with contentDescription 'Back'. Correct pattern; hardcoded string is i18n, not one of the 15."
+r0040,HANDLED,error_state_no_semantics,medium,,TextField with isError and a supportingText slot that switches to error color; Material default error semantics plus merged supportingText announce the error state and message.
+r0041,NO_ISSUE,none,high,,IconButton with a descriptive contentDescription on the Icon. Correct.
+r0042,UNSURE,error_state_no_semantics,low,,isError is passed into a custom NameSection composable whose TextField is not in the window; cannot tell whether error semantics are applied inside.
+r0043,NO_ISSUE,none,high,,"Anchor is a Spacer with .size(16.dp); not interactive, so touch target does not apply. Detector misfire on .size()."
+r0044,HANDLED,error_state_no_semantics,medium,,"Material (M2, body1) TextField with isError applies default 'Error' semantics. The AnimatedValidatorMessage is a sibling, not merged, so the specific message is not tied to the field."
+r0045,HANDLED,error_state_no_semantics,low,,"OutlinedTextField with label and isError; framework announces generic 'Error'. The message text lives in a separate ResultsDisplay composable and is not associated with the field, so mitigation is partial."
+r0046,HANDLED,error_state_no_semantics,medium,,TextField with isError and supportingText carrying the error string; default error semantics plus merged supportingText cover it.
+r0047,ISSUE,progress_no_semantics,high,,Overlay CircularProgressIndicator shown while isLoading with no semantics; loading state is silent to TalkBack.
+r0048,HANDLED,progress_no_semantics,high,,"Duplicate of r0005 (same file, same anchor line 365). LinearProgressIndicator already has semantics { stateDescription }."
+r0049,NO_ISSUE,none,medium,text_truncation_scaling,"Book title in a grid card borrows headlineMedium fontStyle at 18sp; a card label is not a page heading, so heading() is not expected. Title and author both maxLines=1 + Ellipsis, truncating unique text at large scale."
+r0050,ISSUE,progress_no_semantics,high,color_contrast,Bare CircularProgressIndicator with no semantics and no text. Color.Black hardcoded over an unknown background.
+r0051,NO_ISSUE,none,high,,Canonical Row.toggleable(role=Role.Switch) with Switch(onCheckedChange=null); label merges into the toggle. Correct.
+r0052,NO_ISSUE,none,high,missing_heading_semantics,"Column is the whole onboarding step (title, body, cards, buttons); merging is inappropriate. The headlineSmall title at ~302 has no heading()."
+r0053,ISSUE,progress_no_semantics,low,,Indeterminate CircularProgressIndicator with no semantics; sibling 'Exporting...' Text partially mitigates but is not associated. Same pattern as r0006.
+r0054,HANDLED,error_state_no_semantics,medium,,OutlinedTextField with isError and supportingText showing errorMessage; default error semantics plus merged supportingText.
+r0055,ISSUE,clickable_icon_not_iconbutton,high,"missing_content_description,touch_target_size,missing_semantics_role","Icon with .clickable directly, contentDescription=null, 40dp: an unnamed, roleless, undersized control. Same on the line-weight Icon below."
+r0056,ISSUE,textfield_no_label,high,,"Material3 TextField with placeholder only, no label; placeholder vanishes once text is entered."
+r0057,NO_ISSUE,none,medium,missing_content_description,44dp Box is a non-interactive icon container in a header row; touch target does not apply. The Icon is null and may carry transfer-direction meaning not present in the text.
+r0058,NO_ISSUE,none,high,,IconButton wrapping an Icon with a resource-string contentDescription. Correct.
+r0059,ISSUE,missing_merge_descendants,medium,,"Switch in ListItem trailingContent with its own onCheckedChange; ListItem does not merge, so the Switch is a separate node with no name tied to the headline text. Switch state itself is announced natively."
+r0060,UNSURE,color_contrast,low,,Container color is a 34%-alpha dark literal composited over a backdrop; resulting text contrast depends on runtime layering and cannot be computed from source.
+r0061,ISSUE,progress_no_semantics,medium,,"24dp CircularProgressIndicator shown while a thumbnail loads, no semantics. Low-stakes inline loader inside a thumbnail, hence medium."
+r0062,ISSUE,decorative_mislabeled,medium,,"Icon described as 'Folder Icon' beside a Text of the folder name; the description adds nothing and is read as noise. Color-coded folder icon might carry meaning, but the string does not convey the color."
+r0063,NO_ISSUE,none,high,,"Box.clickable with role=Role.Button and onClickLabel=description, inner Icon null. Correct icon-button pattern; 44dp is under 48 but this is a deliberate compact control with full semantics."
+r0064,ISSUE,missing_merge_descendants,medium,,Label Text and Switch are unassociated siblings in an unmerged Row with a weight Spacer between; Switch focuses as a nameless node. State is announced natively.
+r0065,ISSUE,missing_semantics_role,medium,touch_target_size,"Row.clickable with no role; decorative Icon + Text supply the name via merge. Padding is applied before clickable, so the touch area excludes the padding and is only icon/text height."
+r0066,UNSURE,color_contrast,low,,Strength color literals (#EF4444/#F59E0B/#10B981) used for a strength indicator; the background they render against is not in the window. #F59E0B on white is roughly 2.2:1 and would fail if used for text.
+r0067,UNSURE,color_contrast,low,,32%-alpha container over a backdrop; text contrast depends on runtime compositing. Same pattern as r0060.
+r0068,ISSUE,text_truncation_scaling,low,,"Article title headlineSmall with maxLines=1 + Ellipsis. Mitigated by horizontalScroll on the same Text, which a screen reader does not need and sighted users can pan; borderline."
+r0069,NO_ISSUE,none,high,,WikipediaLinkButton given a meaningful contentDescription 'Open source article'. Appropriate for an icon-only action.
+r0070,ISSUE,missing_merge_descendants,medium,,Switch and its descriptive Text are siblings in an unmerged Row; the Switch node has no name. State announced natively.
+r0071,ISSUE,missing_heading_semantics,medium,,Screen-level status title in headlineSmall with no heading().
+r0072,ISSUE,missing_semantics_role,medium,missing_state_description,"Calendar day cell Box.clickable with no role; name is the day number via merged Text. Selected/today state is conveyed only by color and weight, not semantics. Cell size depends on parent grid so target size is unknown."
+r0073,HANDLED,progress_no_semantics,high,,"Determinate M3 LinearProgressIndicator with a progress lambda; the framework applies progressSemantics(progress) internally, so the value is announced."
+r0074,ISSUE,missing_semantics_role,medium,,"Row.selectable without role=Role.RadioButton, and the inner RadioButton keeps its own onClick, producing two focusable targets for one choice. Correct form is RadioButton(onClick=null) inside selectable(role=RadioButton)."
+r0075,ISSUE,missing_semantics_role,medium,"touch_target_size,missing_state_description",42dp Box.clickable with no role; name comes from the Icon's contentDescription. Selected state is expressed only by enabled=!isSelected and colors.
+r0076,ISSUE,missing_content_description,high,"missing_semantics_role,missing_state_description,touch_target_size","44dp Box.clickable whose only child is a Canvas: no accessible name, no role, selection drawn only as a ring. Color swatch picker is unusable with TalkBack."
+r0077,NO_ISSUE,none,high,missing_state_description,IconButton with Icon 'Back'. Correct. The favorite IconButton in the same bar toggles state but keeps a static 'Favorite' description; IconToggleButton or stateDescription would fix it.
+r0078,NO_ISSUE,none,high,,FilledIconButton with a resource-string contentDescription on the Icon. Correct.
+r0079,UNSURE,error_state_no_semantics,low,,isError only drives colors and a Tone passed into custom SectionRow; the text input itself is not in the window.
+r0080,ISSUE,clickable_icon_not_iconbutton,high,"missing_content_description,touch_target_size,missing_semantics_role","TopAppBar back Icon with .clickable directly, contentDescription=null, 26dp: nameless, roleless, undersized. Same on the video-call Icon."
+r0081,ISSUE,missing_semantics_role,medium,,"Preference Column.clickable with minimumInteractiveComponentSize (target size handled) and merged Text name, but no role=Role.Button."
+r0082,NO_ISSUE,none,medium,missing_semantics_role,"ListItem with Modifier.clickable; clickable merges descendants, so headline and supporting text form one node. Merge is not missing. No role on the clickable."
+r0083,ISSUE,clickable_icon_not_iconbutton,high,"missing_content_description,touch_target_size,missing_semantics_role","Duplicate of r0080 (same file, anchor 56 vs 55). Clickable back Icon with null description and 26dp size."
+r0084,ISSUE,missing_semantics_role,medium,,"Card container with .clickable and no role; name comes from merged repo text. Custom GSYCardItem may add semantics internally, hence medium."
+r0085,HANDLED,error_state_no_semantics,low,,"OutlinedTextField with label and isError; framework announces generic 'Error'. The message is a sibling Text, not supportingText, so it is not associated with the field. Partial."
+r0086,ISSUE,missing_heading_semantics,medium,,"Room name in headlineSmall acting as a section heading above a list of toggle options, no heading()."
+r0087,ISSUE,missing_heading_semantics,medium,,Dialog title in titleLarge + Bold with no heading(); dialog has no other heading semantics visible.
+r0088,HANDLED,error_state_no_semantics,low,,"OutlinedTextField with label and isError; generic 'Error' announced by framework. 'They don't match.' is a sibling Text, not supportingText. Partial."
+r0089,ISSUE,missing_semantics_role,medium,,"Row.clickable with no role. Name comes from the merged warning Icon description and text children, which is adequate."
+r0090,ISSUE,missing_state_description,medium,missing_semantics_role,"SelectableRow with a checked parameter uses plain .clickable(onToggle): no toggleable, no role, no state exposed. TalkBack cannot tell whether the row is checked."
+r0091,ISSUE,missing_merge_descendants,medium,,Label Text and Switch are unassociated siblings in an unmerged Row; Switch focuses without a name. State announced natively.
+r0092,ISSUE,missing_heading_semantics,medium,,Onboarding section title in headlineMedium with no heading(); titleSmall sub-headings below have none either.
+r0093,HANDLED,error_state_no_semantics,medium,,OutlinedTextField with isError and supportingText carrying the error message; default error semantics plus merged supportingText.
+r0094,ISSUE,progress_no_semantics,medium,,"Demo composable with bare CircularProgressIndicator() and LinearProgressIndicator() indeterminate, no labels; determinate ones below are handled by framework progressSemantics. Anchor is the function declaration, so scope is the whole function."
+r0095,NO_ISSUE,none,medium,,"Dark gradient background (#393444 to #2A2633) with Color.White and Color.LightGray text; white on #393444 is roughly 11:1 and LightGray roughly 7:1, both pass. Hardcoded but adequate."
+r0096,ISSUE,clickable_icon_not_iconbutton,high,"touch_target_size,missing_semantics_role",Skip-previous Icon with .clickable directly; padding is applied before clickable so the target is only 24dp. contentDescription is present. Play/pause next to it correctly uses FilledTonalIconButton at 48dp.
+r0097,ISSUE,missing_semantics_role,medium,missing_state_description,"Row.clickable toggles a checkbox but is not toggleable: no role, no checked state on the row, and the inner Checkbox keeps its own onCheckedChange, giving two focus targets. Also Checkbox forced to 24dp."
+r0098,NO_ISSUE,none,medium,missing_semantics_role,"Anchor Column sits inside a Row that is .clickable; clickable merges descendants, so the texts already form one node. Merge not missing. Row lacks role and Color(0xFF81D4FA) is hardcoded."
+r0099,ISSUE,textfield_no_label,high,,OutlinedTextField in a dialog with placeholder only and no label; dialog title is not associated with the field.
+r0100,NO_ISSUE,none,high,,"Anchor is a local var named isError tracking image-load state, not a TextField isError parameter. Detector misfire on the identifier."
+r0101,ISSUE,progress_no_semantics,medium,,Bare indeterminate CircularProgressIndicator with no label or text; focusable as a nameless progress bar.
+r0102,UNSURE,error_state_no_semantics,low,,"isError and an errorLabel slot are passed into a custom EmailField; the TextField is not in the window. The errorLabel slot suggests the message is rendered, but association is unknown."
+r0103,UNSURE,color_contrast,low,,Card background is a navy gradient (#001F3F); text colors inside are not in the window.
+r0104,ISSUE,missing_semantics_role,low,missing_merge_descendants,"Demo RadioButtons with no labels; each is announced only as 'radio button, selected'. Demo code, so intent is illustrative; RadioButton itself supplies role and state."
+r0105,ISSUE,textfield_no_label,high,,OutlinedTextField with placeholder 'Untitled' and no label; the h3 Text above is not associated.
+r0106,ISSUE,progress_no_semantics,low,,Indeterminate CircularProgressIndicator with a sibling 'scanning songs' Text not programmatically associated. Same pattern as r0006.
+r0107,NO_ISSUE,none,medium,missing_content_description,"Static status Card with an icon and text; not interactive, and merging is optional for a non-interactive card. The CheckCircle Icon is null but conveys 'ok' status not obviously repeated in text."
+r0108,ISSUE,missing_semantics_role,medium,touch_target_size,LinkButton Row.clickable with no role; name from merged Text. 18dp icon + text with 4dp padding likely under 48dp tall.
+r0109,ISSUE,missing_merge_descendants,medium,,Switch with its own onCheckedChange beside a Column of title/description text in an unmerged Row; the Switch node has no name. Same pattern on the periodic-updates row below.
+r0110,NO_ISSUE,none,high,missing_semantics_role,Anchor Icon is decorative (null) inside a clickable Row whose Text provides the name via merge. Correct. The Row lacks a role.
+r0111,ISSUE,missing_semantics_role,medium,touch_target_size,"Duplicate of r0108 (same file, same anchor 199). LinkButton Row.clickable with no role and a small target."
+r0112,ISSUE,textfield_no_label,high,,TextField with placeholder (a default URL) and no label; the SectionPanel header is not associated with the field. Error text below is a sibling.
+r0113,NO_ISSUE,none,high,,Decorative Icon (null) in a 40dp Box beside a text label in a settings row. Correct decorative treatment.
+r0114,ISSUE,text_truncation_scaling,low,,"Chapter name in a dropdown trigger with maxLines=1 + Ellipsis; the name is unique content. Common dropdown pattern, so low."
+r0115,NO_ISSUE,none,medium,,TopAppBar title with maxLines=1 + Ellipsis. App bar titles are conventionally single-line and TalkBack still reads the full text; visual truncation is expected here.
+r0116,NO_ISSUE,none,high,,"Anchor is textStyle=headlineSmall on an editable text field (task name input). It is user input, not a heading, so heading() does not apply. Detector misfire on the typography token."
+r0117,ISSUE,missing_merge_descendants,medium,,Name and login Texts in a Column beside an avatar with no merge and no visible clickable in the window; each Text is announced separately. If the parent row is clickable above the window this would be handled.
+r0118,ISSUE,clickable_icon_not_iconbutton,high,"missing_content_description,touch_target_size,missing_semantics_role","Icon with .clickable directly, contentDescription=null, inside a 32dp Box: nameless, roleless, undersized video-call action."
+r0119,ISSUE,missing_merge_descendants,medium,,Switch and label Text are unassociated siblings in an unmerged Row; the Switch focuses without a name. Same on the second row.
+r0120,ISSUE,pointerinput_no_semantics,medium,,"Test area driven by detectTapGestures with no semantics or role; TalkBack users cannot activate it. Arguably a gesture-testing surface by design, hence medium."
+r0121,ISSUE,decorative_mislabeled,medium,missing_content_description,"Blurred, faded album art used as a backdrop is described 'Album Image', which is noise. Separately, the back Button's Icon is described 'Settings', a wrong name for a back action."
+r0122,ISSUE,missing_semantics_role,medium,,"Column made .clickable when onClick is non-null, no role; label and value Texts merge into the name via clickable."
+r0123,NO_ISSUE,none,high,,Canonical Row.selectable(role=Role.RadioButton) with RadioButton(onClick=null) and merged label. Correct.
+r0124,NO_ISSUE,none,medium,,"Full-screen scrim Box.clickable with an empty onClick and no indication, used to block touches behind a dialog. Not a control; TalkBack will still see a nameless clickable, which is a minor annoyance rather than a defect."
+r0125,ISSUE,missing_semantics_role,medium,,Surface with Modifier.clickable (not Surface(onClick)) and no role; 56dp tall so target is fine; name comes from merged Text.
+r0126,ISSUE,text_truncation_scaling,low,,"Service name and notes both maxLines=1 + Ellipsis in a list card; notes in particular are free text that gets cut. Common list pattern, low."
+r0127,ISSUE,color_contrast,high,,"Disabled state sets disabledBackgroundColor and disabledContentColor to the same #979797, and the inner Text hardcodes Color.White: white on #979797 is roughly 2.9:1, failing 4.5:1. Disabled text is exempt under WCAG, but the enabled state also forces white regardless of theme."
+r0128,ISSUE,missing_semantics_role,medium,,AnnotationRow Row.clickable with no role; name from merged excerpt/note text.
+r0129,UNSURE,none,low,,No anchor line resolved for this row (anchor_text is empty); the window shows a sample section built from a SettingsCheckbox library composable whose internals are not visible. Extraction artifact.
+r0130,ISSUE,clickable_icon_not_iconbutton,high,"missing_content_description,touch_target_size,missing_semantics_role","Third copy of the WhatsAppMessageTopBar back Icon (see r0080, r0083). Clickable Icon, null description, 26dp."
+r0131,ISSUE,missing_semantics_role,medium,touch_target_size,"Duplicate of r0065 (same file, same anchor 20). Row.clickable with no role; padding applied before clickable so the target excludes it."
+r0132,ISSUE,missing_heading_semantics,medium,,Bottom-sheet title in titleLarge with no heading().
+r0133,ISSUE,clickable_icon_not_iconbutton,high,"touch_target_size,missing_semantics_role","Duplicate of r0031 (same file, anchor 200). Icon with .clickable directly; described, but roleless and under 48dp."
+r0134,ISSUE,missing_heading_semantics,medium,,App name in headlineMedium as the screen header with no heading().
+r0135,ISSUE,textfield_no_label,high,,"Search TextField with placeholder only, no label, and indicator colors made transparent; no accessible name persists once a query is typed."
+r0136,ISSUE,textfield_no_label,high,,"Search TextField with placeholder only, no label."
+r0137,NO_ISSUE,none,high,missing_semantics_role,Card with Modifier.clickable; clickable merges descendants so the option's icon and text form one node. Merge is not missing. No role on the clickable.
+r0138,NO_ISSUE,none,medium,missing_semantics_role,"Duplicate of r0082 (same file, anchor 213 vs 212). Clickable ListItem, merge provided by clickable, role missing."
+r0139,ISSUE,missing_state_description,medium,"missing_semantics_role,decorative_mislabeled","Settings switch row implemented with plain .clickable that flips checked: no toggleable, no role, no checked state exposed on the row. Also the leading Icon is described as 'Icon', which is noise."
+r0140,ISSUE,missing_semantics_role,medium,,"'Go up' Row.clickable with no role; name from merged Icon description and '..' text, which is adequate."
+r0141,ISSUE,missing_heading_semantics,medium,,Reusable DialogHeader renders the header in headlineSmall with no heading(); every dialog using it inherits the gap.
+r0142,NO_ISSUE,none,high,"missing_heading_semantics,missing_merge_descendants",Anchor Column is the whole recipient picker containing a Switch and other controls; merging is inappropriate. Separately the titleLarge 'Choose recipients' has no heading() and the Switch row is unmerged.
+r0143,ISSUE,missing_content_description,high,"touch_target_size,missing_semantics_role","24dp Box.clickable remove button whose only content is an Icon with null description: nameless, roleless, undersized. Same on the rename button."
+r0144,NO_ISSUE,none,high,,ListItem.clickable(role = Role.Button); clickable merges descendants and role is set. Correct.
+r0145,ISSUE,pointerinput_no_semantics,medium,,"Time-picker dial driven entirely by drag and tap gestures with no semantics or alternative input in the window; a screen-reader user cannot set the value on the dial. A library may pair it with a keyboard mode elsewhere, hence medium."
+r0146,ISSUE,textfield_no_label,high,error_state_no_semantics,"OutlinedTextField with placeholder '1-N' only, no label. Also sets isError with no supportingText, so only the generic 'Error' is announced."
+r0147,ISSUE,missing_semantics_role,medium,,'View online' Text made clickable with no role or onClickLabel; looks like body text. 8dp vertical padding inside clickable gives roughly 36dp height.
+r0148,HANDLED,error_state_no_semantics,medium,,"Duplicate of r0093 (same file, anchor 367). isError with supportingText carrying the message."
+r0149,NO_ISSUE,none,medium,,"Anchor is a #F1EDFF circular background behind a tinted icon; no text is drawn on it, so text contrast does not apply. Icon tint vs. background is a non-text contrast question outside the 15 categories."
+r0150,ISSUE,clickable_icon_not_iconbutton,high,"missing_content_description,missing_semantics_role","Back-arrow Image with .clickable directly and contentDescription=null in the app bar: nameless, roleless. fillMaxHeight x 50dp keeps the target size adequate."
+r0151,NO_ISSUE,none,high,,OutlinedTextField with a label. Correct; hardcoded strings are i18n only.
+r0152,ISSUE,missing_heading_semantics,low,,AlertDialog title slot in titleLarge with no heading(). M3 AlertDialog does not add heading semantics to the title; low because dialog titles are read on open.
+r0153,ISSUE,progress_no_semantics,medium,,"Bare CircularProgressIndicator() while an app list loads, no label."
+r0154,NO_ISSUE,none,medium,missing_heading_semantics,"Static informational Card (icon, titleMedium label, description), not interactive. Merging is optional here. The titleMedium label has no heading()."
+r0155,ISSUE,clickable_icon_not_iconbutton,high,"missing_content_description,missing_semantics_role","Back Image with .clickable and contentDescription=null; nameless, roleless. Padding sits inside clickable so the target is 52dp, which is fine."
+r0156,ISSUE,text_truncation_scaling,low,,"Display name titleLarge with maxLines=1 + Ellipsis in a profile card; user name is unique content. Common pattern, low."
+r0157,HANDLED,progress_no_semantics,medium,,"Two stacked determinate CircularProgressIndicators (value + full track). Determinate indicators carry progressSemantics from the framework, though the decorative 1f track ring will also announce as 100%, which is noise."
+r0158,UNSURE,error_state_no_semantics,low,,"Duplicate of r0102 (same repo pattern, different app). isError and errorLabel passed into a custom EmailField not in the window."
+r0159,ISSUE,missing_semantics_role,medium,missing_merge_descendants,"RadioButton with onClick beside a MediumBody label in a plain Row; the Row is not selectable, so the label is not tied to the radio and only the 24dp radio is tappable. Correct form is Row.selectable(role=RadioButton) with RadioButton(onClick=null)."
+r0160,ISSUE,missing_content_description,medium,,"Check Icon in a green circle signalling success/completion with contentDescription=null; the status is not conveyed by nearby text, which shows only an amount."
+r0161,ISSUE,pointerinput_no_semantics,high,,"Custom seek bar driven by tap and horizontal drag gestures with no semantics, no progressSemantics, no setProgress action; unusable with TalkBack."
+r0162,NO_ISSUE,none,high,missing_heading_semantics,"Anchor Column is a dialog panel containing a header row, list and controls; merging is inappropriate. Title text has no heading()."
+r0163,ISSUE,missing_semantics_role,medium,,Third copy of the Do-It SettingsScreenContent clickable ListItem (see r0009). No role on the clickable; leading Icon is correctly decorative.
+r0164,NO_ISSUE,none,medium,,"Anchor is a 0.5dp border color on a header cell, not text. Border contrast is a non-text concern outside the 15 categories."
+r0165,UNSURE,color_contrast,low,,Button background is #1F1F1F or #E0E0E0 by theme; the text color drawn on it is not in the window.
+r0166,NO_ISSUE,none,high,"missing_heading_semantics,missing_semantics_role",Anchor Column is a bottom-sheet options list where each Text is an action; merging would collapse the options. Separately 'Options' headlineMedium has no heading() and the option Texts have no visible click semantics in the window.
+r0167,NO_ISSUE,none,high,decorative_mislabeled,"Anchor is a 2dp Spacer; not interactive. The error Image above is described 'error', which duplicates the adjacent text."
+r0168,ISSUE,text_truncation_scaling,low,,"Result title with maxLines=1 + Ellipsis; synopsis at maxLines=3. Title is unique content. Common list pattern, low."
+r0169,ISSUE,missing_state_description,medium,missing_semantics_role,Selectable menu Row uses plain .clickable; selection is shown only by a checkmark Icon whose contentDescription repeats the item text. No selectable/role and no selected state exposed. Height 48dp is fine.
+r0170,ISSUE,decorative_mislabeled,low,,App icon Image in a hero header described 'croc-app icon' next to the app name Text; the description is redundant. Minor.
+r0171,NO_ISSUE,none,high,progress_no_semantics,"Send Icon with null description inside a Button whose Text supplies the name; correctly decorative. The 18dp loading spinner swapped in during upload has no label, but the button Text still reads."
+r0172,ISSUE,pointerinput_no_semantics,high,,"Home-screen app item handles tap, long-press and drag entirely through pointerInput with no semantics; the item cannot be activated or moved with TalkBack."
+r0173,NO_ISSUE,none,medium,,"Status label with weight(1f) + maxLines=1 + Ellipsis so the percentage stays visible; a deliberate layout choice noted in a comment, and the full string is still read by TalkBack. Visual truncation of a short status label is acceptable."
+r0174,NO_ISSUE,none,high,,"Duplicate of r0039 (same file, anchor 106). IconButton with described Icon. Correct."
+r0175,NO_ISSUE,none,high,,Leading Icon inside a text button with contentDescription=null; the button's Text provides the name. Correct decorative treatment.
+r0176,ISSUE,text_truncation_scaling,low,,"Server URL in titleMedium with maxLines=1 + Ellipsis; the URL is unique content that gets cut. Low, since URLs are commonly truncated."
+r0177,ISSUE,missing_semantics_role,medium,decorative_mislabeled,"Attention Image made clickable (opens sync error) with no role; its description 'coin icon' misnames an error indicator. Bounded=false ripple at 20dp suggests a small target, size unknown."
+r0178,NO_ISSUE,none,medium,,"Anchor is a status color assignment (#4CAF50, Color.Red) inside a coroutine, not a composable; where it is rendered is not in the window. #4CAF50 on white is roughly 2.8:1 and would fail if used for body text."
+r0179,NO_ISSUE,none,high,,18dp search Icon with null description inside a BasicTextField decoration box; decorative alongside the placeholder text. Not interactive.
+r0180,NO_ISSUE,none,high,,Row inside the Card is .clickable with onClickLabel; clickable merges descendants so sender and code Texts form one node. Merge not missing and the click is labeled. Correct.
+r0181,ISSUE,pointerinput_no_semantics,high,,Dialer key implemented with detectTapGestures for press/release with no semantics or role; the digit Text gives a name but the key cannot be activated via TalkBack. Custom press handling could have kept .clickable semantics alongside it.
+r0182,ISSUE,missing_semantics_role,medium,,"Fourth copy of the Do-It SettingsScreenContent clickable ListItem (see r0009, r0163). No role on the clickable."
+r0183,ISSUE,textfield_no_label,high,,"OutlinedTextField in an AlertDialog with placeholder only, no label."
+r0184,ISSUE,textfield_no_label,medium,,OutlinedTextField with placeholder and supportingText but no label. isError with supportingText is handled; the missing persistent name is the gap.
+r0185,NO_ISSUE,none,medium,color_contrast,"Error message body text styled headlineSmall for emphasis; a single centered status message, not a heading. Color.Red is hardcoded over an unknown background."
+r0186,NO_ISSUE,none,medium,,Toggle-button label with maxLines=1 + Ellipsis; short button labels are conventionally single-line and TalkBack reads the full text.
+r0187,ISSUE,text_truncation_scaling,low,,Source file name / summary with maxLines=1 + Ellipsis; the file name is unique content and there is no other place it appears. Low.
+r0188,ISSUE,missing_semantics_role,medium,,ListItem with Modifier.clickable and no role; clickable merges headline/supporting so the name is fine.
+r0189,ISSUE,decorative_mislabeled,medium,,"Icon(icon, '') passes an empty string rather than null; an empty description is announced as nothing but still marks the node as non-decorative, and is the wrong idiom. Card is clickable so the icon should be null."
+r0190,NO_ISSUE,none,medium,,"Badge with #388E3C text on a 16%-alpha #4CAF50 tint over a surface; on white the effective background stays near-white and #388E3C gives roughly 4.6:1, passing AA for labelMedium. Cannot verify dark theme."
+r0191,HANDLED,error_state_no_semantics,medium,,"AppTextField (custom wrapper) with label, isError and supportingText; assuming it forwards to Material, error semantics and message are provided."
+r0192,NO_ISSUE,none,medium,missing_semantics_role,Static history Card with several Text rows and a Reorder Button; merging the whole card would collapse the button. Not interactive at the card level in the window.
+r0193,ISSUE,progress_no_semantics,low,color_contrast,"Loading spinner with a sibling 'loading' Text that is not associated. Also that Text is white at 50% alpha, which is unlikely to reach 4.5:1."
+r0194,ISSUE,pointerinput_no_semantics,high,,Color wheel driven by tap and drag with no semantics and no alternative input in the window; unusable with TalkBack. Sliders for H/S/V would be the standard alternative.
+r0195,ISSUE,text_truncation_scaling,low,,"Chat box name in the app bar with maxLines=1 + Ellipsis and weight(fill=false) so the message count stays visible; name is unique content. Low, app-bar convention."
+r0196,ISSUE,missing_semantics_role,medium,missing_content_description,"Duplicate of r0032 (same file, anchor 254). Clickable GlideImage with a name but no role; fallback branch is nameless."
+r0197,NO_ISSUE,none,high,,Anchor is an 8dp Spacer between two buttons; not interactive. Detector misfire on .size().
+r0198,ISSUE,textfield_no_label,high,,Message TextField with placeholder only and no label.
+r0199,ISSUE,color_contrast,medium,,"Dark #0B0D0F background with Color.White text passes, but the 11sp label uses LinePurple at 80% alpha over #1A1D24; purple-on-dark at that size is likely under 4.5:1. Anchor color itself is fine; the derived text color is the risk."
+r0200,ISSUE,pointerinput_no_semantics,high,,"Duplicate of r0194 (same file, anchor 186). Gesture-only color wheel."
+r0201,ISSUE,missing_semantics_role,medium,,"Custom back button: Box.clickable with no role, Icon described 'back' gives a name. Size from dimen icon_button_size, unresolved."
+r0202,ISSUE,missing_semantics_role,medium,,Column.clickable (edit action) with no role; name from merged food name and quantity text.
+r0203,UNSURE,color_contrast,low,,Text color #95A6C5 on primaryContainer from the theme; the container color is theme-resolved so contrast cannot be computed from source. Light grey-blue text is a plausible failure on light containers.
+r0204,ISSUE,pointerinput_no_semantics,medium,,"Radar chart data points selectable only by tap hit-testing with no semantics; point values are not exposed. Charts often accept this, but no alternative is visible."
+r0205,ISSUE,missing_semantics_role,medium,decorative_mislabeled,"Avatar image made clickable (navigates to profile) with no role; the description 'Avatar' is generic and does not name the person, which is the useful name for a link."
+r0206,ISSUE,pointerinput_no_semantics,medium,,Long-press drag reorder of nav items with no semantics or custom actions; reordering is gesture-only. The drawer hint text tells sighted users only.
+r0207,NO_ISSUE,none,high,,"Static 24dp favorite Icon with contentDescription 'Favorite' conveying state; not interactive, so size does not apply and the description is meaningful."
+r0208,ISSUE,missing_semantics_role,medium,,"CircularImage 'Your story' made clickable with no role; the name comes from the component if it exposes it. The AddCircle Icon overlay is null and not itself clickable, which is fine."
+r0209,HANDLED,error_state_no_semantics,high,,"OutlinedTextField with label, isError and supportingText carrying the error; the sibling section title even uses semantics { heading() }. Well-formed."
+r0210,NO_ISSUE,none,high,,"Rail item with clickable(role=Role.Tab), semantics { selected = active }, heightIn(min=48dp) and merged label text. Correct."
+r0211,ISSUE,clickable_icon_not_iconbutton,high,"missing_content_description,missing_semantics_role","Duplicate of r0155 (same file, anchor 56 vs 60). Back Image with .clickable and null description."
+r0212,ISSUE,missing_content_description,high,"touch_target_size,missing_semantics_role,missing_state_description","20dp color swatch Box.clickable with no content, no semantics, selection shown only by a border. Nameless, roleless, stateless and far under 48dp."
+r0213,ISSUE,clickable_icon_not_iconbutton,high,"missing_content_description,touch_target_size,missing_semantics_role","Duplicate of r0055 (same file, anchor 66 vs 73). Clickable Icon with null description at 40dp."
+r0214,UNSURE,error_state_no_semantics,low,,isError and errorMessage are passed into a custom BakingTextField not in the window; likely rendered as supportingText but cannot confirm.
+r0215,ISSUE,textfield_no_label,high,,"Search OutlinedTextField with placeholder only, no label."
+r0216,HANDLED,error_state_no_semantics,medium,,"Text field (BasicTextField-style state API) with isError and supportingText carrying the message; assuming a Material wrapper, error semantics and message are provided."
+r0217,ISSUE,decorative_mislabeled,medium,,"Fastfood Icon described '92%', duplicating the adjacent Text '92%' so TalkBack reads the value twice; the icon should be null or describe the category ('food rating')."
+r0218,HANDLED,textfield_no_label,high,,"OutlinedTextField with placeholder only, but the developer adds .semantics { contentDescription = searchLabel } and explains why in a comment; the field has a persistent accessible name."
+r0219,NO_ISSUE,none,high,missing_semantics_role,Anchor Column is an expandable settings section whose header Row is separately clickable; merging the Column would swallow the header control. The header Row lacks a role and expanded state.
+r0220,NO_ISSUE,none,high,missing_state_description,IconButton with Icon 'Back'. Correct. Favorite toggle keeps a static description (same pattern as r0077).
+r0221,ISSUE,missing_semantics_role,medium,,AboutRow with Modifier.clickable passed in and no role; leading icons are correctly null. Name comes from the row's label if AboutRow merges (likely via clickable).
+r0222,ISSUE,textfield_no_label,high,,"Large input TextField with placeholder only, no label, indicators transparent."
+r0223,ISSUE,pointerinput_no_semantics,high,,Radar frame scrubber driven by tap and horizontal drag on a Canvas with no semantics; frame selection is unavailable to TalkBack. progressSemantics with setProgress would be the fix.
+r0224,NO_ISSUE,none,high,"decorative_mislabeled,missing_heading_semantics",Anchor Card is a whole dialog with inputs and buttons; merging is inappropriate. The palette Icon is described 'Hero icon' (noise) and the headlineLarge title has no heading().
+r0225,NO_ISSUE,none,medium,,"Anchor is a bar fill color in a Canvas chart, not text; chart data is drawn without semantics but that is outside the 15 categories. Non-text contrast of #4CAF50 bars on the card is not the anchor's question."
+r0226,ISSUE,textfield_no_label,high,,"Search TextField with placeholder 'Search' only, no label. Leading Icon uses a custom wrapper with no description, which is fine as decorative."
+r0227,ISSUE,missing_heading_semantics,low,,App name in headlineSmall under a logo in an about block; acts as the page title with no heading(). Low because an about screen has little to navigate.
+r0228,NO_ISSUE,none,high,,IconButton with Icon described 'Browser commands'. Correct.
+r0229,ISSUE,pointerinput_no_semantics,medium,,Category item opens a context menu only via long-press in detectTapGestures with no semantics or customActions; the menu is unreachable with TalkBack. Tap handling may exist above the window.
+r0230,NO_ISSUE,none,medium,,"ElasticPressContainer uses detectTapGestures(onPress) only for a scale animation and passes content through; it does not consume taps, so any clickable child keeps its semantics. Wrapper, not a control."
+r0231,ISSUE,color_contrast,high,,"Difficulty badge with Color.White labelMedium on #4CAF50 (about 2.8:1), #FFC107 (about 1.6:1) and #FF5722 (about 3.1:1); all three fail 4.5:1 and the two lighter ones fail 3:1 as well."
+r0232,NO_ISSUE,none,medium,,Short labelSmall tile caption with maxLines=1 + Ellipsis; the value below is the content and is unconstrained. Caption truncation is acceptable.
+r0233,NO_ISSUE,none,high,,Anchor is a 12dp Spacer; not interactive. Detector misfire on .size().
+r0234,NO_ISSUE,none,medium,missing_heading_semantics,"Section title with maxLines=1 + Ellipsis; titles are short resource strings and TalkBack reads the full text. It is a reusable SectionTitle with no heading(), which is the real gap."
+r0235,ISSUE,missing_semantics_role,medium,,"Row.selectable without role=Role.RadioButton, and the inner RadioButton keeps its own onClick, so two focus targets exist. Label merges via selectable."
+r0236,ISSUE,clickable_icon_not_iconbutton,high,"missing_content_description,touch_target_size,missing_semantics_role","Close Icon with .clickable directly, contentDescription=null, 24dp: nameless, roleless, half the minimum target."
+r0237,NO_ISSUE,none,medium,touch_target_size,"Clear-text action Icon with contentDescription 'Clear Text' via a custom wrapper that takes an onClick; naming is fine. 26dp visual size, and whether the wrapper pads the target is unknown."
+r0238,NO_ISSUE,none,high,missing_heading_semantics,Decorative MenuBook Icon (null) beside a 'Contents' header Text. Correct. The header has no heading().
+r0239,ISSUE,textfield_no_label,high,,"Search OutlinedTextField with placeholder only and no label, borders transparent."
+r0240,ISSUE,progress_no_semantics,low,,14dp spinner with a sibling 'loading' Text that is not programmatically associated. Same pattern as r0006.
+r0241,ISSUE,textfield_no_label,high,,"Chat input OutlinedTextField with placeholder only, no label."
+r0242,UNSURE,none,low,,"Anchor resolved to an import line; only the import block is in the window. Extraction artifact, same as r0018."
+r0243,NO_ISSUE,none,high,,"44dp theme swatch Box.clickable with an explicit semantics block: role=RadioButton, selected state, contentDescription from the palette name. Well-formed; 44dp is close to minimum."
+r0244,NO_ISSUE,none,high,,IconButton wrapping an Image with contentDescription 'Add new todo'. Correct; explicit 34dp size on an IconButton is padded to 48dp by the framework.
+r0245,NO_ISSUE,none,medium,,"Full-screen scrim Box with detectTapGestures(onTap = onDismiss) behind a dialog; a tap-outside-to-dismiss surface, not a control. TalkBack users still have back navigation."
+r0246,NO_ISSUE,none,high,decorative_mislabeled,"Card holds a title, a Download Button and an expand IconButton; merging would collapse the controls. The expand Icon is described 'extend', a poor name."
+r0247,ISSUE,missing_semantics_role,medium,,"Row.clickable(role=Role.RadioButton) is not selectable, so no selected state is exposed on the row, and the inner RadioButton keeps its own onClick giving two targets. selectable(selected, role) with RadioButton(onClick=null) is the correct form."
+r0248,HANDLED,progress_no_semantics,high,,"Determinate LinearProgressIndicator with a progress lambda (framework progressSemantics) and an indeterminate fallback, both under a descriptive banner Text."
+r0249,ISSUE,text_truncation_scaling,low,,"Book title and metadata each maxLines=1 + Ellipsis in a list row; the title is unique content. Common list pattern, low."
+r0250,ISSUE,missing_semantics_role,medium,"touch_target_size,missing_state_description","Duplicate of r0075 (same file, anchor 85). 42dp Box.clickable with no role; selected state only via enabled and color."
+r0251,NO_ISSUE,none,medium,,"Empty-state title in titleLarge with subtitle and a button; it is the only content on screen, so heading navigation adds little. Adding heading() would be harmless but its absence is not a defect here."
+r0252,ISSUE,decorative_mislabeled,low,,"Large illustrative Icon described 'Install commands', duplicating the button label below it; better as null. Low impact."
+r0253,ISSUE,missing_content_description,medium,"missing_semantics_role,missing_interaction_semantics","Invisible Box overlaid on a date field (matchParentSize, indication=null) with .clickable to open a date picker; the Box has no name, role or label, so TalkBack finds an anonymous clickable covering the field."
+r0254,ISSUE,missing_content_description,high,"missing_state_description,missing_semantics_role","44dp color swatch Box.clickable with no name (no text, check Icon null) and selection shown only by a border. Nameless, roleless, stateless."
+r0255,ISSUE,missing_semantics_role,medium,,Merge-candidate Column.clickable with no role; name comes from merged GlideImage description and text.
+r0256,ISSUE,missing_heading_semantics,medium,,Section header in titleLarge + SemiBold with no heading().
+r0257,ISSUE,decorative_mislabeled,medium,color_contrast,Poster AsyncImage described 'Movie Image' beside the movie title Text; the description is redundant noise. Also Color(0xFF4AAEC0) 12sp overview text on an unknown dark background.
+r0258,NO_ISSUE,none,high,,Help IconButton with Icon described 'Help'. Correct; explicit 40dp on IconButton is padded to 48dp by the framework.
+r0259,ISSUE,pointerinput_no_semantics,high,,"Duplicate pattern of r0172 (same file, vertical variant, anchor 200). App item with tap, long-press and drag via pointerInput and no semantics."
+r0260,UNSURE,color_contrast,low,,Search input text #7D8597 on primaryContainer from the theme; container is theme-resolved so contrast cannot be computed. Mid-grey text is a plausible failure.
+r0261,NO_ISSUE,none,high,,IconButton with Icon described by a resource string. Correct.
+r0262,NO_ISSUE,none,medium,color_contrast,"Glance widget refresh Image with contentDescription 'refresh' and GlanceModifier.clickable; named and actionable. Glance has no role API. Day text #787878 on #001F3F is roughly 2.4:1, failing."
+r0263,ISSUE,text_truncation_scaling,low,,"File name and saved location each maxLines=1 + Ellipsis; the name is unique content. Common list pattern, low."
+r0264,ISSUE,missing_semantics_role,medium,,"ListItem with Modifier.clickable and no role; clickable merges headline and the selected check Icon description. Selected state is conveyed via that description rather than semantics, which works but is fragile."
+r0265,NO_ISSUE,none,medium,color_contrast,Product placeholder Image with contentDescription=null beside brand and product name Texts; the image is illustrative and the text carries the information. Color.Gray brand text on an unknown background.
+r0266,ISSUE,clickable_icon_not_iconbutton,high,"missing_content_description,missing_semantics_role","Duplicate of r0150 (same file, anchor 47 vs 41). Back Image with .clickable and null description."
+r0267,NO_ISSUE,none,high,,18dp leading Icon with null description inside a FilterChip whose label Text supplies the name and whose selected state is native. Correct.
+r0268,ISSUE,missing_semantics_role,medium,,Settings Row.clickable with no role; label and value Texts merge into the name via clickable.
+r0269,NO_ISSUE,none,high,,Anchor is an 8dp Spacer list item; not interactive. Detector misfire on .size().
+r0270,NO_ISSUE,none,medium,,Selected-status label in a dropdown trigger with maxLines=1 + Ellipsis; short resource strings and TalkBack reads the full text.
+r0271,ISSUE,decorative_mislabeled,medium,,"Duplicate of r0217 (same file, anchor 278). Icon described '92%' next to Text '92%'."
+r0272,ISSUE,decorative_mislabeled,high,,Leading Icon described 'Icon' and the trailing IconButton's Icon described 'Button Icon'; both are noise and the trailing one is an unnamed action. The row itself is not clickable.
+r0273,ISSUE,missing_semantics_role,medium,pointerinput_no_semantics,Nav row .clickable with no role; drag handle Icon is described 'Drag to reorder' but the drag itself is gesture-only (see r0206).
+r0274,NO_ISSUE,none,high,,"Row.toggleable(role=Role.Switch) with minimumInteractiveComponentSize, merged PreferenceText, and a Switch rendered without its own ripple. Textbook implementation."
+r0275,ISSUE,missing_content_description,medium,missing_semantics_role,"ColorSwatch (32dp) inside a clickable expander Row; the swatch has no description so the current color is not announced, and the Row has no role or expanded state. The expand Icon is described, which partly names the row."
+r0276,NO_ISSUE,none,high,,ListItem.toggleable(role=Role.Switch) with Switch(onCheckedChange=null); toggleable merges headline and supporting text. Correct.
+r0277,ISSUE,missing_content_description,low,missing_semantics_role,"Demo: outer Box.clickable and nested Surface.clickable, neither with a name or role; the outer Box has no text child so it is an anonymous clickable. Illustrative sample code, low."
+r0278,ISSUE,decorative_mislabeled,medium,,IconButton navigating to detail has its Icon described 'next icon'; the word 'icon' is noise and the name does not say what it opens. Should be 'View details' or similar.
+r0279,ISSUE,decorative_mislabeled,low,,"Menu IconButton with a no-op onClick and Icon described 'menu'; the description is fine as a name, but a named action that does nothing misleads TalkBack users. Borderline; the naming itself is acceptable."
+r0280,ISSUE,progress_no_semantics,medium,,"Indeterminate LinearProgressIndicator shown while fetching, no label; progress bar announces without context."
+r0281,ISSUE,text_truncation_scaling,low,,"Duplicate of r0195 (same file, anchor 360). Chat box name truncated in the app bar."
+r0282,NO_ISSUE,none,high,,"Preview data: #272727 text on #FDFDFD background is roughly 13:1, white CTA text on #0A3D2E roughly 11:1. Both pass comfortably. Preview-only code."
+r0283,ISSUE,missing_semantics_role,medium,touch_target_size,Copy-ID Row.clickable with no role; name from merged text and 'Copy ID' Icon description. bodySmall text plus a 14dp icon with no padding inside the clickable gives a target well under 48dp.
+r0284,ISSUE,textfield_no_label,medium,,OutlinedTextField in an AlertDialog with placeholder only; the dialog title names the setting but is not associated with the field. Password visibility toggle is correctly described.
+r0285,NO_ISSUE,none,high,,"Duplicate of r0274 (fork of the same project, anchor 39). Row.toggleable(role=Switch) with minimumInteractiveComponentSize. Correct."
+r0286,ISSUE,text_truncation_scaling,low,,Version name and update time each maxLines=1 + Ellipsis; the version name is unique content. Low.
+r0287,NO_ISSUE,none,high,,"Empty-state Column with an emoji Text, title, subtitle and a Button; merging would swallow the button. The emoji Text will be read as its Unicode name, which is harmless."
+r0288,ISSUE,missing_semantics_role,medium,touch_target_size,City result Text.clickable with no role; bodyMedium plus 8dp vertical padding inside the clickable gives roughly 36dp. Name is the city text.
+r0289,NO_ISSUE,none,high,missing_semantics_role,"Anchor Column is a whole post item with a clickable avatar, text and actions; merging would collapse the controls. The avatar's .clickable has no role, and padding is applied before clickable so its target excludes the padding."
+r0290,NO_ISSUE,none,high,,Leading lock Icon with null description inside a labeled password field; decorative. The visibility toggle is an IconButton with a state-aware description. Correct.
+r0291,NO_ISSUE,none,high,,IconButton with Icon 'Back'. Correct.
+r0292,ISSUE,pointerinput_no_semantics,medium,,Interactive line chart selects points via tap and drag with no semantics; selection and values are unavailable to TalkBack. Charts often accept this; no alternative visible.
+r0293,ISSUE,missing_content_description,medium,"missing_semantics_role,missing_interaction_semantics","Amount display Text made clickable (indication=null) to focus a hidden 1dp text field; the visible element has no role or label saying it edits the amount, and the real input is alpha 0 and 1dp, which is a hidden-control pattern TalkBack handles poorly."
+r0294,NO_ISSUE,none,high,,18dp Icon with null description beside a label Text in a non-interactive meta row; decorative. The action is a separate TextButton.
+r0295,NO_ISSUE,none,medium,,"Anchor is a 2dp border color (#4CAF50 vs outline) used as a success flash, not text. Success is also shown by an Icon + Text row, so color is not the only cue."
+r0296,ISSUE,missing_merge_descendants,medium,,Checkbox and its label Text are unassociated siblings in an unmerged Row; the Checkbox focuses without a name. State announced natively.
+r0297,UNSURE,error_state_no_semantics,low,,isError and errorText passed into a custom EmailTextField not in the window; likely rendered via supportingText but cannot confirm.
+r0298,ISSUE,missing_heading_semantics,medium,,Screen title 'age X25519' in titleLarge with no heading().
+r0299,ISSUE,textfield_no_label,high,,"Compose-post TextField with placeholder only and no label, filling the screen."
+r0300,ISSUE,missing_heading_semantics,medium,,Movie title in headlineSmall + Bold as the detail-screen header with no heading().

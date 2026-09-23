@@ -1,0 +1,899 @@
+package com.cvc953.localplayer.ui.screens
+
+import android.app.Activity
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.media.MediaMetadataRetriever
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Sort
+import androidx.compose.material.icons.filled.LibraryMusic
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Shuffle
+import androidx.compose.material.icons.filled.ViewList
+import androidx.compose.material.icons.filled.ViewModule
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cvc953.localplayer.R
+import com.cvc953.localplayer.model.Album
+import com.cvc953.localplayer.model.Song
+import com.cvc953.localplayer.ui.components.AlphabetScrollerContent
+import com.cvc953.localplayer.ui.components.NativeSearchBar
+import com.cvc953.localplayer.ui.components.ScrollLetterDisplay
+import com.cvc953.localplayer.ui.extendedColors
+import com.cvc953.localplayer.ui.theme.md_textSecondary
+import com.cvc953.localplayer.util.ArtworkLoader
+import com.cvc953.localplayer.viewmodel.AlbumViewModel
+import com.cvc953.localplayer.viewmodel.PlaybackViewModel
+import com.cvc953.localplayer.viewmodel.PlayerViewModel
+import com.cvc953.localplayer.viewmodel.SongViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+
+@Suppress("ktlint:standard:function-naming")
+@Composable
+fun AlbumsScreen(
+    albumViewModel: AlbumViewModel,
+    playbackViewModel: PlaybackViewModel,
+    playerViewModel: PlayerViewModel,
+    onAlbumClick: (albumName: String, artistName: String) -> Unit,
+    onEditAlbum: (albumName: String, artistName: String) -> Unit = { _, _ -> },
+) {
+    val songViewModel: SongViewModel =
+        viewModel()
+    val songs by songViewModel.songs.collectAsState()
+    val albums by albumViewModel.albums.collectAsState()
+    val isScanning by albumViewModel.isScanning
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+    var showSearchBar by rememberSaveable { mutableStateOf(false) }
+    var sortMenuExpanded by remember { mutableStateOf(false) }
+    var sortMode by rememberSaveable { mutableStateOf(AlbumSortMode.TITLE_ASC) }
+    var viewAsGrid by rememberSaveable { mutableStateOf(albumViewModel.isGridViewPreferred()) }
+    val context = LocalContext.current
+    val activity = context as? Activity
+    var lastBackPressTime by remember { mutableStateOf(0L) }
+
+    // Refrescar álbumes desde caché cada vez que la pantalla se muestra
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    LaunchedEffect(lifecycle) {
+        lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            albumViewModel.loadAlbums()
+        }
+    }
+
+    BackHandler {
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastBackPressTime < 1000) {
+            activity?.finish()
+        } else {
+            lastBackPressTime = currentTime
+            Toast.makeText(context, context.getString(R.string.toast_press_back_again), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // Agrupar álbumes por artista usando normalización
+    data class AlbumKey(
+        val name: String,
+        val artist: String,
+    )
+    val expandedAlbums =
+        remember(albums) {
+            val seen = mutableSetOf<AlbumKey>()
+            val result = mutableListOf<Album>()
+            for (album in albums) {
+                val artistNames = normalizeArtistName(album.artist)
+                val mainArtist = artistNames.firstOrNull()?.trim() ?: album.artist.trim()
+                for (albumName in normalizeAlbumName(album.name)) {
+                    val normAlbum = albumName.trim()
+                    val normArtist = mainArtist
+                    val key = AlbumKey(normAlbum, normArtist)
+                    if (normAlbum.isNotEmpty() && normArtist.isNotEmpty() && seen.add(key)) {
+                        result.add(album.copy(name = normAlbum, artist = normArtist))
+                    }
+                }
+            }
+            result
+        }
+
+    val filteredAlbums =
+        remember(expandedAlbums, searchQuery) {
+            val q = searchQuery.trim().lowercase()
+            if (q.isEmpty()) {
+                expandedAlbums
+            } else {
+                expandedAlbums.filter {
+                    it.name.lowercase().contains(q)
+                }
+            }
+        }
+
+    val sortedAlbums =
+        remember(filteredAlbums, sortMode) {
+            when (sortMode) {
+                AlbumSortMode.TITLE_ASC -> filteredAlbums.sortedBy { it.name.lowercase() }
+                AlbumSortMode.TITLE_DESC -> filteredAlbums.sortedByDescending { it.name.lowercase() }
+            }
+        }
+    val listState = rememberLazyListState()
+    val gridState = rememberLazyGridState()
+    val scope = rememberCoroutineScope()
+    var currentScrollLetter by remember { mutableStateOf<String?>(null) }
+
+    if (isScanning) {
+        Column(
+            modifier = Modifier.Companion.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.Companion.CenterHorizontally,
+        ) {
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+            Spacer(modifier = Modifier.Companion.height(16.dp))
+            Text(stringResource(R.string.scanning_songs), color = MaterialTheme.colorScheme.onBackground)
+        }
+        return
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(R.string.albums_title),
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    maxLines = 1,
+                    modifier = Modifier.weight(1f),
+                )
+
+                Box {
+                    IconButton(onClick = { sortMenuExpanded = true }) {
+                        Icon(
+                            Icons.Default.Sort,
+                            contentDescription = stringResource(R.string.action_sort),
+                            tint = MaterialTheme.colorScheme.onBackground,
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = sortMenuExpanded,
+                        onDismissRequest = { sortMenuExpanded = false },
+                        containerColor = MaterialTheme.extendedColors.surfaceSheet,
+                    ) {
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    stringResource(R.string.sort_title_asc),
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                )
+                            },
+                            onClick = {
+                                sortMode = AlbumSortMode.TITLE_ASC
+                                sortMenuExpanded = false
+                            },
+                        )
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    stringResource(R.string.sort_title_desc),
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                )
+                            },
+                            onClick = {
+                                sortMode = AlbumSortMode.TITLE_DESC
+                                sortMenuExpanded = false
+                            },
+                        )
+                    }
+                }
+
+                IconButton(
+                    onClick = {
+                        showSearchBar = !showSearchBar
+                        if (!showSearchBar) searchQuery = ""
+                    },
+                ) {
+                    Icon(
+                        Icons.Default.Search,
+                        contentDescription = stringResource(R.string.action_search),
+                        tint = MaterialTheme.colorScheme.onBackground,
+                    )
+                }
+                IconButton(onClick = {
+                    viewAsGrid = !viewAsGrid
+                    albumViewModel.setGridViewPreferred(viewAsGrid)
+                }) {
+                    Icon(
+                        imageVector = if (viewAsGrid) Icons.Default.ViewList else Icons.Default.ViewModule,
+                        contentDescription = stringResource(R.string.action_toggle_view),
+                        tint = MaterialTheme.colorScheme.onBackground,
+                    )
+                }
+
+                var moreMenuExpanded by remember { mutableStateOf(false) }
+                Box {
+                    IconButton(onClick = { moreMenuExpanded = true }) {
+                        Icon(
+                            Icons.Default.MoreVert,
+                            contentDescription = stringResource(R.string.action_more_options),
+                            tint = MaterialTheme.colorScheme.onBackground,
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = moreMenuExpanded,
+                        onDismissRequest = { moreMenuExpanded = false },
+                        containerColor = MaterialTheme.extendedColors.surfaceSheet,
+                    ) {
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    stringResource(R.string.settings_title),
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                )
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.Settings,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurface,
+                                )
+                            },
+                            onClick = {
+                                moreMenuExpanded = false
+                                playerViewModel.showSettings(true)
+                            },
+                        )
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    stringResource(R.string.action_about),
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                )
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.Info,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurface,
+                                )
+                            },
+                            onClick = {
+                                moreMenuExpanded = false
+                                playerViewModel.showAbout(true)
+                            },
+                        )
+                    }
+                }
+            }
+
+            if (showSearchBar) {
+                NativeSearchBar(
+                    query = searchQuery,
+                    onQueryChange = { searchQuery = it },
+                    placeholder = stringResource(R.string.search_albums_placeholder),
+                )
+            }
+
+            @Composable
+            fun AlbumsHeaderCard(sortedAlbums: List<Album>) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                    shape = RoundedCornerShape(12.dp),
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            Icons.Default.LibraryMusic,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(20.dp),
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.albums_count, sortedAlbums.size),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 13.sp,
+                            modifier = Modifier.weight(1f),
+                        )
+                        IconButton(
+                            onClick = {
+                                if (sortedAlbums.isNotEmpty()) {
+                                    val album = sortedAlbums.random()
+                                    val albumSongs = songs.filter { song ->
+                                        song.album.trim().equals(album.name.trim(), ignoreCase = true) &&
+                                            song.artist.trim().equals(album.artist.trim(), ignoreCase = true)
+                                    }.sortedWith(compareBy<Song>({ it.discNumber }, { it.trackNumber }))
+                                    if (albumSongs.isNotEmpty()) {
+                                        playbackViewModel.setShuffle(false)
+                                        playbackViewModel.updateDisplayOrder(albumSongs)
+                                        playbackViewModel.play(albumSongs.first())
+                                    }
+                                }
+                            },
+                        ) {
+                            Icon(
+                                Icons.Default.Shuffle,
+                                contentDescription = stringResource(R.string.action_shuffle),
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                        IconButton(
+                            onClick = {
+                                if (sortedAlbums.isNotEmpty()) {
+                                    val album = sortedAlbums.first()
+                                    val albumSongs = songs.filter { song ->
+                                        song.album.trim().equals(album.name.trim(), ignoreCase = true) &&
+                                            song.artist.trim().equals(album.artist.trim(), ignoreCase = true)
+                                    }.sortedWith(compareBy<Song>({ it.discNumber }, { it.trackNumber }))
+                                    if (albumSongs.isNotEmpty()) {
+                                        playbackViewModel.setShuffle(false)
+                                        playbackViewModel.updateDisplayOrder(albumSongs)
+                                        playbackViewModel.play(albumSongs.first())
+                                    }
+                                }
+                            },
+                        ) {
+                            Icon(
+                                Icons.Default.PlayArrow,
+                                contentDescription = stringResource(R.string.action_play_all),
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                    }
+                }
+            }
+
+            Box(modifier = Modifier.fillMaxSize()) {
+                if (viewAsGrid) {
+                    LazyVerticalGrid(
+                        modifier = Modifier.fillMaxSize(),
+                        columns = GridCells.Adaptive(140.dp),
+                        state = gridState,
+                        contentPadding = PaddingValues(12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        item(span = { GridItemSpan(this.maxLineSpan) }) {
+                            AlbumsHeaderCard(sortedAlbums = sortedAlbums)
+                        }
+                        items(sortedAlbums) { album ->
+                            val context = LocalContext.current
+                            // Buscar la primera canción usando normalización para coincidencia real
+                            val firstSong =
+                                songs.firstOrNull { song ->
+                                    normalizeAlbumName(song.album).any {
+                                        it.equals(
+                                            album.name.trim(),
+                                            ignoreCase = true,
+                                        )
+                                    } &&
+                                        normalizeArtistName(song.artist).any {
+                                            it.equals(
+                                                album.artist.trim(),
+                                                ignoreCase = true,
+                                            )
+                                        }
+                                }
+                            var albumArt by remember(firstSong?.uri) { mutableStateOf<Bitmap?>(null) }
+
+                            LaunchedEffect(firstSong?.uri, firstSong?.filePath) {
+                                albumArt = ArtworkLoader.loadThumbnail(context, firstSong?.uri, firstSong?.filePath, 256)
+                            }
+
+                            Column(
+                                modifier =
+                                    Modifier.Companion
+                                        .fillMaxWidth()
+                                        .clickable { onAlbumClick(album.name, album.artist) }
+                                        .padding(6.dp),
+                                horizontalAlignment = Alignment.Companion.CenterHorizontally,
+                            ) {
+                                Box(modifier = Modifier.Companion.size(120.dp)) {
+                                    Image(
+                                        painter =
+                                            albumArt?.let { BitmapPainter(it.asImageBitmap()) }
+                                                ?: painterResource(R.drawable.ic_default_album),
+                                        contentDescription = null,
+                                        modifier =
+                                            Modifier.Companion
+                                                .matchParentSize()
+                                                .clip(RoundedCornerShape(8.dp)),
+                                        contentScale = ContentScale.Companion.Crop,
+                                    )
+                                    var menuExpanded by remember { mutableStateOf(false) }
+                                    Box(modifier = Modifier.Companion.align(Alignment.Companion.TopEnd)) {
+                                        IconButton(onClick = { menuExpanded = true }) {
+                                            Icon(
+                                                Icons.Default.MoreVert,
+contentDescription = stringResource(R.string.action_more_options),
+                                                tint = MaterialTheme.colorScheme.onSurface,
+                                            )
+                                        }
+                                        DropdownMenu(
+                                            expanded = menuExpanded,
+                                            onDismissRequest = { menuExpanded = false },
+                                            containerColor = MaterialTheme.extendedColors.surfaceSheet,
+                                            modifier = Modifier.Companion.background(MaterialTheme.extendedColors.surfaceSheet),
+                                        ) {
+                                            // Solo usar las canciones del álbum actual para el dropdown (más rápido)
+                                            val albumSongs =
+                                                songs
+                                                    .filter { song ->
+                                                        normalizeAlbumName(
+                                                            song.album,
+                                                        ).any {
+                                                            it.equals(
+                                                                album.name.trim(),
+                                                                ignoreCase = true,
+                                                            )
+                                                        } &&
+                                                            normalizeArtistName(
+                                                                song.artist,
+                                                            ).any {
+                                                                it.equals(
+                                                                    album.artist.trim(),
+                                                                    ignoreCase = true,
+                                                                )
+                                                            }
+                                                    }.sortedWith(
+                                                        compareBy<Song>(
+                                                            { it.discNumber },
+                                                            { it.trackNumber },
+                                                        ),
+                                                    )
+                                            val firstSongOfAlbum = albumSongs.firstOrNull()
+
+                                            DropdownMenuItem(
+                                                text = {
+                                                    Text(
+                                                        stringResource(R.string.action_play_now),
+                                                        color = MaterialTheme.colorScheme.onSurface,
+                                                    )
+                                                },
+                                                onClick = {
+                                                    menuExpanded = false
+                                                    if (albumSongs.isNotEmpty()) {
+                                                        playbackViewModel.setShuffle(false)
+                                                        playbackViewModel.playAlbum(
+                                                            album.name,
+                                                            album.artist,
+                                                            albumSongs,
+                                                            songs,
+                                                        )
+                                                        playbackViewModel.updateDisplayOrder(
+                                                            albumSongs,
+                                                        )
+                                                        playbackViewModel.play(albumSongs[0])
+                                                    }
+                                                },
+                                            )
+                                            DropdownMenuItem(
+                                                text = {
+                                                    Text(
+                                                        stringResource(R.string.action_add_next),
+                                                        color = MaterialTheme.colorScheme.onSurface,
+                                                    )
+                                                },
+                                                onClick = {
+                                                    menuExpanded = false
+                                                    val currentQueue = playbackViewModel.queue.value
+                                                    // NO filter duplicates when adding full album - user expects ALL songs added
+                                                    val toAdd = albumSongs
+                                                    playbackViewModel.addToQueueNextAll(toAdd)
+                                                    Toast
+                                                        .makeText(
+                                                            context,
+                                                            context.getString(R.string.toast_added_next_count, toAdd.size),
+                                                            Toast.LENGTH_SHORT,
+                                                        ).show()
+                                                },
+                                            )
+                                            DropdownMenuItem(
+                                                text = {
+                                                    Text(
+                                                        stringResource(R.string.action_add_to_queue_end),
+                                                        color = MaterialTheme.colorScheme.onSurface,
+                                                    )
+                                                },
+                                                onClick = {
+                                                    menuExpanded = false
+                                                    val currentQueue = playbackViewModel.queue.value
+                                                    // NO filter duplicates when adding full album
+                                                    val toAdd = albumSongs
+                                                    playbackViewModel.addToQueueEndAll(toAdd)
+                                                    Toast
+                                                        .makeText(
+                                                            context,
+                                                            context.getString(R.string.toast_added_queue_end_count, toAdd.size),
+                                                            Toast.LENGTH_SHORT,
+                                                        ).show()
+                                                },
+                                            )
+                                            DropdownMenuItem(
+                                                text = {
+                                                    Text(
+                                                        stringResource(R.string.action_edit),
+                                                        color = MaterialTheme.colorScheme.onSurface,
+                                                    )
+                                                },
+                                                onClick = {
+                                                    menuExpanded = false
+                                                    onEditAlbum(album.name, album.artist)
+                                                },
+                                            )
+                                        }
+                                    }
+                                }
+                                Spacer(Modifier.Companion.height(6.dp))
+                                Text(
+                                    text = album.name,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    fontSize = 14.sp,
+                                    maxLines = 1,
+                                    textAlign = TextAlign.Companion.Center,
+                                    overflow = TextOverflow.Companion.Ellipsis,
+                                )
+                                // Contar canciones igual que en AlbumDetailScreen (solo primer artista normalizado)
+                                val mainArtist =
+                                    normalizeArtistName(album.artist).firstOrNull() ?: album.artist
+                                val songCount =
+                                    songs.count { song ->
+                                        normalizeAlbumName(song.album).any {
+                                            it.equals(
+                                                album.name.trim(),
+                                                ignoreCase = true,
+                                            )
+                                        } &&
+                                            normalizeArtistName(song.artist)
+                                                .firstOrNull()
+                                                ?.equals(mainArtist, ignoreCase = true) == true
+                                    }
+                                Text(
+                                    text = stringResource(R.string.songs_count, songCount),
+                                    color = MaterialTheme.extendedColors.textSecondary,
+                                    fontSize = 12.sp,
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.Companion.fillMaxSize(),
+                        state = listState,
+                        contentPadding =
+                            PaddingValues(
+                                start = 16.dp,
+                                top = 16.dp,
+                                bottom = 16.dp,
+                                end = 16.dp,
+                            ),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        item {
+                            AlbumsHeaderCard(sortedAlbums = sortedAlbums)
+                        }
+                        items(sortedAlbums) { album ->
+                            val context = LocalContext.current
+                            val firstSong =
+                                songs.firstOrNull {
+                                    it.album.trim().equals(album.name.trim(), ignoreCase = true) &&
+                                        it.artist
+                                            .trim()
+                                            .equals(album.artist.trim(), ignoreCase = true)
+                                }
+                            var albumArt by remember(firstSong?.uri) { mutableStateOf<Bitmap?>(null) }
+
+                            LaunchedEffect(firstSong?.uri, firstSong?.filePath) {
+                                albumArt = ArtworkLoader.loadThumbnail(context, firstSong?.uri, firstSong?.filePath, 256)
+                            }
+
+                            Row(
+                                modifier =
+                                    Modifier.Companion.fillMaxWidth().padding(8.dp).clickable {
+                                        onAlbumClick(album.name, album.artist)
+                                    },
+                                verticalAlignment = Alignment.Companion.CenterVertically,
+                            ) {
+                                Image(
+                                    painter =
+                                        albumArt?.let {
+                                            androidx.compose.ui.graphics.painter.BitmapPainter(
+                                                it.asImageBitmap(),
+                                            )
+                                        }
+                                            ?: painterResource(R.drawable.ic_default_album),
+                                    contentDescription = null,
+                                    modifier =
+                                        Modifier.Companion
+                                            .size(60.dp)
+                                            .clip(
+                                                androidx.compose.foundation.shape
+                                                    .RoundedCornerShape(8.dp),
+                                            ),
+                                    contentScale = ContentScale.Companion.Crop,
+                                )
+
+                                Spacer(modifier = Modifier.Companion.width(12.dp))
+
+                                Column(modifier = Modifier.Companion.weight(1f)) {
+                                    Text(
+                                        text = album.name,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        fontSize = 16.sp,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Companion.Ellipsis,
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.songs_count, album.songCount),
+                                        color = md_textSecondary,
+                                        fontSize = 12.sp,
+                                        maxLines = 1,
+                                    )
+                                }
+
+                                var menuExpanded by remember { mutableStateOf(false) }
+                                var showPlaylistDialog by remember { mutableStateOf(false) }
+
+                                Box {
+                                    IconButton(onClick = { menuExpanded = true }) {
+                                        Icon(
+                                            Icons.Default.MoreVert,
+                                            contentDescription = stringResource(R.string.action_more_options),
+                                            tint = MaterialTheme.colorScheme.onSurface,
+                                        )
+                                    }
+                                    DropdownMenu(
+                                        expanded = menuExpanded,
+                                        onDismissRequest = { menuExpanded = false },
+                                        containerColor = MaterialTheme.extendedColors.surfaceSheet,
+                                        modifier = Modifier.Companion.background(MaterialTheme.extendedColors.surfaceSheet),
+                                    ) {
+                                        DropdownMenuItem(
+                                            text = {
+                                                Text(
+                                                    stringResource(R.string.action_play_now),
+                                                    color = MaterialTheme.colorScheme.onSurface,
+                                                )
+                                            },
+                                            onClick = {
+                                                menuExpanded = false
+                                                // Obtener canciones del álbum
+                                                val albumSongs =
+                                                    songs
+                                                        .filter {
+                                                            it.album.trim().equals(
+                                                                album.name.trim(),
+                                                                ignoreCase = true,
+                                                            ) &&
+                                                                it.artist.trim().equals(
+                                                                    album.artist.trim(),
+                                                                    ignoreCase = true,
+                                                                )
+                                                        }.sortedWith(
+                                                            compareBy<Song>(
+                                                                { it.discNumber },
+                                                                { it.trackNumber },
+                                                            ),
+                                                        )
+                                                if (albumSongs.isNotEmpty()) {
+                                                    playbackViewModel.setShuffle(false)
+                                                    playbackViewModel.playAlbum(
+                                                        album.name,
+                                                        album.artist,
+                                                        albumSongs,
+                                                        songs,
+                                                    )
+                                                    playbackViewModel.updateDisplayOrder(albumSongs)
+                                                    playbackViewModel.play(albumSongs.first())
+                                                }
+                                            },
+                                        )
+                                        DropdownMenuItem(
+                                            text = {
+                                                Text(
+                                                    stringResource(R.string.action_add_next),
+                                                    color = MaterialTheme.colorScheme.onSurface,
+                                                )
+                                            },
+                                            onClick = {
+                                                menuExpanded = false
+                                                // Añadir todas las canciones del álbum como siguientes (sin duplicar)
+                                                val albumSongs =
+                                                    songs
+                                                        .filter {
+                                                            it.album.trim().equals(
+                                                                album.name.trim(),
+                                                                ignoreCase = true,
+                                                            ) &&
+                                                                it.artist.trim().equals(
+                                                                    album.artist.trim(),
+                                                                    ignoreCase = true,
+                                                                )
+                                                        }.sortedWith(
+                                                            compareBy<Song>(
+                                                                { it.discNumber },
+                                                                { it.trackNumber },
+                                                            ),
+                                                        )
+                                                val currentQueue = playbackViewModel.queue.value
+                                                val toAdd =
+                                                    albumSongs.filter { song -> currentQueue.none { it.id == song.id } }
+                                                toAdd
+                                                    .reversed()
+                                                    .forEach { playbackViewModel.addToQueueNext(it) }
+                                                Toast
+                                                    .makeText(
+                                                        context,
+                                                        context.getString(R.string.toast_added_next_count, toAdd.size),
+                                                        Toast.LENGTH_SHORT,
+                                                    ).show()
+                                            },
+                                        )
+                                        DropdownMenuItem(
+                                            text = {
+                                                Text(
+                                                    stringResource(R.string.action_add_to_queue_end),
+                                                    color = MaterialTheme.colorScheme.onSurface,
+                                                )
+                                            },
+                                            onClick = {
+                                                menuExpanded = false
+                                                // Añadir todas las canciones del álbum al final (sin duplicar)
+                                                val albumSongs =
+                                                    songs
+                                                        .filter {
+                                                            it.album.trim().equals(
+                                                                album.name.trim(),
+                                                                ignoreCase = true,
+                                                            ) &&
+                                                                it.artist.trim().equals(
+                                                                    album.artist.trim(),
+                                                                    ignoreCase = true,
+                                                                )
+                                                        }.sortedWith(
+                                                            compareBy<Song>(
+                                                                { it.discNumber },
+                                                                { it.trackNumber },
+                                                            ),
+                                                        )
+                                                val currentQueue = playbackViewModel.queue.value
+                                                val toAdd =
+                                                    albumSongs.filter { song -> currentQueue.none { it.id == song.id } }
+                                                playbackViewModel.addToQueueEndAll(toAdd)
+                                                Toast
+                                                    .makeText(
+                                                        context,
+                                                        context.getString(R.string.toast_added_queue_end_count, toAdd.size),
+                                                        Toast.LENGTH_SHORT,
+                                                    ).show()
+                                            },
+                                        )
+                                        DropdownMenuItem(
+                                            text = {
+                                                Text(
+                                                    stringResource(R.string.action_edit),
+                                                    color = MaterialTheme.colorScheme.onSurface,
+                                                )
+                                            },
+                                            onClick = {
+                                                menuExpanded = false
+                                                onEditAlbum(album.name, album.artist)
+                                            },
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (sortedAlbums.isNotEmpty()) {
+                    AlphabetScrollerContent(
+                        items = sortedAlbums,
+                        getItemName = { it.name },
+                        currentScrollLetter = currentScrollLetter,
+                        onLetterSelected = { letter ->
+                            currentScrollLetter = letter
+                        },
+                        onScrollToIndex = { index, isGrid ->
+                            scope.launch {
+                                if (isGrid) {
+                                    gridState.scrollToItem(index)
+                                } else {
+                                    listState.scrollToItem(index)
+                                }
+                            }
+                        },
+                        viewAsGrid = viewAsGrid,
+                        scope = scope,
+                    )
+                }
+
+                currentScrollLetter?.let { letter ->
+                    ScrollLetterDisplay(letter = letter)
+                }
+            }
+        }
+    }
+}
+
+private enum class AlbumSortMode {
+    TITLE_ASC,
+    TITLE_DESC,
+}
+
+// Normaliza nombres de álbumes, separando por ',' y '/' (puedes ajustar si hay excepciones)
+fun normalizeAlbumName(albumName: String): List<String> {
+    // Los álbumes NO deben dividirse por comas, solo trimear
+    val trimmed = albumName.trim()
+    return if (trimmed.isNotEmpty()) listOf(trimmed) else emptyList()
+}

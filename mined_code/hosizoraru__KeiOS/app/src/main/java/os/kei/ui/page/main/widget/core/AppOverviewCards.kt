@@ -1,0 +1,389 @@
+@file:Suppress("FunctionName")
+
+package os.kei.ui.page.main.widget.core
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.kyant.backdrop.Backdrop
+import com.kyant.shapes.RoundedRectangle
+import os.kei.ui.page.main.widget.glass.GlassVariant
+import os.kei.ui.page.main.widget.glass.LiquidSurface
+import os.kei.ui.page.main.widget.glass.LocalLiquidParentBackdrop
+import os.kei.ui.page.main.widget.glass.UiPerformanceBudget
+import os.kei.ui.page.main.widget.glass.resolvedGlassBlurDp
+import os.kei.ui.page.main.widget.glass.resolvedGlassLensDp
+import os.kei.ui.page.main.widget.isAppInDarkTheme
+import os.kei.ui.page.main.widget.shape.appSquircleBackground
+import os.kei.ui.page.main.widget.shape.appSquircleBorder
+import os.kei.ui.page.main.widget.status.AppStatusColors
+import os.kei.ui.page.main.widget.status.StatusPill
+import os.kei.ui.page.main.widget.support.LocalTextCopyExpandedOverride
+import top.yukonga.miuix.kmp.theme.ColorSchemeMode
+import top.yukonga.miuix.kmp.theme.MiuixTheme
+import top.yukonga.miuix.kmp.theme.ThemeController
+
+@Composable
+fun AppOverviewCard(
+    title: String,
+    modifier: Modifier = Modifier,
+    backdrop: Backdrop? = null,
+    subtitle: String = "",
+    titleColor: Color = MiuixTheme.colorScheme.onBackground,
+    subtitleColor: Color = MiuixTheme.colorScheme.onBackgroundVariant,
+    containerColor: Color = MiuixTheme.colorScheme.surfaceContainer.copy(alpha = 0.68f),
+    borderColor: Color = MiuixTheme.colorScheme.onBackgroundVariant.copy(alpha = 0.18f),
+    contentColor: Color = MiuixTheme.colorScheme.onBackground,
+    contentVerticalSpacing: Dp = CardLayoutRhythm.overviewSectionGap,
+    showIndication: Boolean = true,
+    onClick: (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null,
+    startAction: (@Composable () -> Unit)? = null,
+    titleContent: (@Composable RowScope.() -> Unit)? = null,
+    titleAccessory: (@Composable RowScope.() -> Unit)? = null,
+    headerEndActions: (@Composable RowScope.() -> Unit)? = null,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val blurRadius = resolvedGlassBlurDp(UiPerformanceBudget.backdropBlur, GlassVariant.Content)
+    val lensRadius = resolvedGlassLensDp(UiPerformanceBudget.backdropLens, GlassVariant.Content)
+    AppSurfaceCard(
+        modifier = modifier,
+        backdrop = backdrop,
+        containerColor = containerColor,
+        shape = RoundedRectangle(CardLayoutRhythm.cardCornerRadius),
+        borderColor = borderColor,
+        borderWidth = 1.dp,
+        contentColor = contentColor,
+        showIndication = showIndication,
+        exportBackdropToContent = true,
+        pressSafePadding = 0.dp,
+        blurRadius = blurRadius,
+        lensRadius = lensRadius,
+        onClick = onClick,
+        onLongClick = onLongClick,
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(CardLayoutRhythm.overviewHeaderBodyGap),
+        ) {
+            AppCardHeader(
+                title = title,
+                subtitle = subtitle,
+                titleColor = titleColor,
+                subtitleColor = subtitleColor,
+                minHeight = 44.dp,
+                contentPadding =
+                    PaddingValues(
+                        horizontal = CardLayoutRhythm.overviewHeaderHorizontalPadding,
+                        vertical = CardLayoutRhythm.overviewHeaderVerticalPadding,
+                    ),
+                titleTypography = AppTypographyTokens.CompactTitle,
+                startAction = startAction,
+                titleContent = titleContent,
+                titleAccessory = titleAccessory,
+                endActions = headerEndActions,
+            )
+            AppCardBodyColumn(
+                contentPadding =
+                    PaddingValues(
+                        start = CardLayoutRhythm.cardHorizontalPadding,
+                        end = CardLayoutRhythm.cardHorizontalPadding,
+                        bottom = CardLayoutRhythm.overviewBodyBottomPadding,
+                    ),
+                verticalSpacing = contentVerticalSpacing,
+                content = content,
+            )
+        }
+    }
+}
+
+@Composable
+fun AppOverviewMetricTile(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+    labelColor: Color = MiuixTheme.colorScheme.onBackgroundVariant,
+    valueColor: Color = MiuixTheme.colorScheme.onBackground,
+    containerColor: Color? = null,
+    borderColor: Color? = null,
+    backdrop: Backdrop? = null,
+    valueMaxLines: Int = 2,
+    emphasizedValue: Boolean = true,
+) {
+    val isDark = isAppInDarkTheme()
+    val resolvedContainerColor =
+        containerColor ?: if (isDark) {
+            Color(0xFF0F1115).copy(alpha = 0.34f)
+        } else {
+            Color.White.copy(alpha = 0.62f)
+        }
+    val resolvedOverlayColor =
+        if (containerColor != null) {
+            Color.Transparent
+        } else if (isDark) {
+            Color.White.copy(alpha = 0.05f)
+        } else {
+            Color(0xFFDCEBFF).copy(alpha = 0.24f)
+        }
+    val resolvedBorderColor =
+        borderColor ?: if (isDark) {
+            Color.White.copy(alpha = 0.18f)
+        } else {
+            Color.White.copy(alpha = 0.86f)
+        }
+    val cornerRadius = 12.dp
+    val parentBackdrop = LocalLiquidParentBackdrop.current
+    val effectiveBackdrop = backdrop ?: parentBackdrop
+    val tileModifier =
+        modifier
+            .then(
+                if (effectiveBackdrop == null) {
+                    Modifier
+                        .appSquircleBackground(resolvedContainerColor, cornerRadius)
+                        .appSquircleBackground(resolvedOverlayColor, cornerRadius)
+                } else {
+                    Modifier
+                },
+            ).appSquircleBorder(width = 1.dp, color = resolvedBorderColor, cornerRadius = cornerRadius)
+    val content: @Composable () -> Unit = {
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = CardLayoutRhythm.metricCardHorizontalPadding,
+                        vertical = CardLayoutRhythm.metricCardVerticalPadding,
+                    ),
+            verticalArrangement = Arrangement.spacedBy(CardLayoutRhythm.metricCardTextGap),
+        ) {
+            top.yukonga.miuix.kmp.basic.Text(
+                text = label,
+                color = labelColor,
+                fontSize = AppTypographyTokens.Supporting.fontSize,
+                lineHeight = AppTypographyTokens.Supporting.lineHeight,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+            top.yukonga.miuix.kmp.basic.Text(
+                text = value.ifBlank { "N/A" },
+                color = valueColor,
+                fontSize = AppTypographyTokens.Body.fontSize,
+                lineHeight = AppTypographyTokens.Body.lineHeight,
+                fontWeight = if (emphasizedValue) AppTypographyTokens.BodyEmphasis.fontWeight else AppTypographyTokens.Body.fontWeight,
+                maxLines = valueMaxLines,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+    if (effectiveBackdrop != null) {
+        LiquidSurface(
+            backdrop = effectiveBackdrop,
+            modifier = tileModifier,
+            shape = RoundedRectangle(12.dp),
+            isInteractive = false,
+            surfaceColor = resolvedContainerColor,
+            blurRadius = resolvedGlassBlurDp(UiPerformanceBudget.backdropBlur, GlassVariant.Compact),
+            lensRadius = resolvedGlassLensDp(UiPerformanceBudget.backdropLens, GlassVariant.Compact),
+            shadow = false,
+        ) {
+            Box(
+                modifier =
+                    Modifier
+                        .matchParentSize()
+                        .appSquircleBackground(resolvedOverlayColor, cornerRadius),
+            )
+            content()
+        }
+    } else {
+        Box(modifier = tileModifier) {
+            content()
+        }
+    }
+}
+
+@Composable
+fun AppOverviewInlineMetricTile(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+    labelColor: Color = MiuixTheme.colorScheme.onBackgroundVariant,
+    valueColor: Color = MiuixTheme.colorScheme.onBackground,
+    containerColor: Color? = null,
+    borderColor: Color? = null,
+    labelMaxLines: Int = 2,
+    valueMaxLines: Int = 2,
+    labelWeight: Float = 0.58f,
+    valueWeight: Float = 0.42f,
+    showLabel: Boolean = true,
+    valueTextAlign: TextAlign = TextAlign.End,
+    backdrop: Backdrop? = null,
+    emphasizedValue: Boolean = true,
+) {
+    val isDark = isAppInDarkTheme()
+    val resolvedContainerColor =
+        containerColor ?: if (isDark) {
+            Color(0xFF0F1115).copy(alpha = 0.32f)
+        } else {
+            Color.White.copy(alpha = 0.58f)
+        }
+    val resolvedOverlayColor =
+        if (containerColor != null) {
+            Color.Transparent
+        } else if (isDark) {
+            Color.White.copy(alpha = 0.05f)
+        } else {
+            Color(0xFFDCEBFF).copy(alpha = 0.22f)
+        }
+    val resolvedBorderColor =
+        borderColor ?: if (isDark) {
+            Color.White.copy(alpha = 0.17f)
+        } else {
+            Color.White.copy(alpha = 0.84f)
+        }
+    val cornerRadius = 12.dp
+    val parentBackdrop = LocalLiquidParentBackdrop.current
+    val effectiveBackdrop = backdrop ?: parentBackdrop
+    val tileModifier =
+        modifier
+            .then(
+                if (effectiveBackdrop == null) {
+                    Modifier
+                        .appSquircleBackground(resolvedContainerColor, cornerRadius)
+                        .appSquircleBackground(resolvedOverlayColor, cornerRadius)
+                } else {
+                    Modifier
+                },
+            ).appSquircleBorder(width = 1.dp, color = resolvedBorderColor, cornerRadius = cornerRadius)
+    val content: @Composable () -> Unit = {
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = CardLayoutRhythm.metricCardHorizontalPadding,
+                        vertical = CardLayoutRhythm.metricCardVerticalPadding,
+                    ),
+            horizontalArrangement = Arrangement.spacedBy(CardLayoutRhythm.infoRowGap),
+            verticalAlignment = androidx.compose.ui.Alignment.Top,
+        ) {
+            if (showLabel) {
+                top.yukonga.miuix.kmp.basic.Text(
+                    text = label,
+                    color = labelColor,
+                    fontSize = AppTypographyTokens.Caption.fontSize,
+                    lineHeight = AppTypographyTokens.Caption.lineHeight,
+                    modifier = Modifier.weight(labelWeight),
+                    maxLines = labelMaxLines,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            top.yukonga.miuix.kmp.basic.Text(
+                text = value.ifBlank { "N/A" },
+                color = valueColor,
+                fontSize = AppTypographyTokens.Body.fontSize,
+                lineHeight = AppTypographyTokens.Body.lineHeight,
+                fontWeight = if (emphasizedValue) FontWeight.Medium else FontWeight.Normal,
+                textAlign = valueTextAlign,
+                modifier = Modifier.weight(if (showLabel) valueWeight else 1f),
+                maxLines = valueMaxLines,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+    if (effectiveBackdrop != null) {
+        LiquidSurface(
+            backdrop = effectiveBackdrop,
+            modifier = tileModifier,
+            shape = RoundedRectangle(12.dp),
+            isInteractive = false,
+            surfaceColor = resolvedContainerColor,
+            blurRadius = resolvedGlassBlurDp(UiPerformanceBudget.backdropBlur, GlassVariant.Compact),
+            lensRadius = resolvedGlassLensDp(UiPerformanceBudget.backdropLens, GlassVariant.Compact),
+            shadow = false,
+        ) {
+            Box(
+                modifier =
+                    Modifier
+                        .matchParentSize()
+                        .appSquircleBackground(resolvedOverlayColor, cornerRadius),
+            )
+            content()
+        }
+    } else {
+        Box(modifier = tileModifier) {
+            content()
+        }
+    }
+}
+
+@Preview(name = "Overview Light", showBackground = true, backgroundColor = 0xFFF3F4F6)
+@Composable
+private fun AppOverviewCardPreviewLight() {
+    CompositionLocalProvider(LocalTextCopyExpandedOverride provides false) {
+        MiuixTheme(controller = ThemeController(ColorSchemeMode.Light)) {
+            AppOverviewCard(
+                title = "GitHub Tracking",
+                subtitle = "Tap to refresh, long-press to add",
+                containerColor = Color(0xFFEFF6FF),
+                borderColor = Color(0xFF93C5FD),
+                headerEndActions = {
+                    StatusPill(
+                        label = "3m ago",
+                        color = Color(0xFF2563EB),
+                    )
+                    StatusPill(
+                        label = "Checked",
+                        color = Color(0xFF22C55E),
+                    )
+                },
+            ) {
+                AppInfoRow(label = "Tracked", value = "18")
+                AppInfoRow(label = "Updates", value = "4", valueColor = Color(0xFF2563EB))
+                AppInfoRow(label = "Pre-release", value = "2", valueColor = AppStatusColors.Cached)
+            }
+        }
+    }
+}
+
+@Preview(name = "Overview Dark", showBackground = true, backgroundColor = 0xFF111827)
+@Composable
+private fun AppOverviewCardPreviewDark() {
+    CompositionLocalProvider(LocalTextCopyExpandedOverride provides false) {
+        MiuixTheme(controller = ThemeController(ColorSchemeMode.Dark)) {
+            AppOverviewCard(
+                title = "System Properties",
+                subtitle = "Tap to refresh system tables",
+                containerColor = Color(0xFF1F2937),
+                borderColor = Color(0xFF334155),
+                titleColor = Color.White,
+                subtitleColor = Color(0xFFCBD5E1),
+                headerEndActions = {
+                    StatusPill(
+                        label = "Cached",
+                        color = AppStatusColors.Cached,
+                    )
+                },
+            ) {
+                AppInfoRow(label = "System", value = "82 items", labelColor = Color(0xFFCBD5E1), valueColor = Color.White)
+                AppInfoRow(label = "Android", value = "31 items", labelColor = Color(0xFFCBD5E1), valueColor = Color.White)
+                AppInfoRow(label = "Java", value = "16 items", labelColor = Color(0xFFCBD5E1), valueColor = Color.White)
+            }
+        }
+    }
+}

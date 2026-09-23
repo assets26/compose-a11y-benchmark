@@ -1,0 +1,104 @@
+VERIFICATION CODEBOOK — Compose accessibility candidates (v2, 2026-09-17)
+==========================================================================
+Supersedes v1 (TP / FP_DETECTOR / FP_HANDLED / DUP). Both raters labeled under
+this scheme. TP / FP_DETECTOR are now DERIVED at analysis time by comparing the
+rater's category to the detector's category (see compare_raters.py).
+
+Unit of judgment
+----------------
+Judge ONLY the construct at anchor_line, using the surrounding context window
+and the imports. Do not range beyond the window to find other problems; note
+those in other_issues only if they are visible in the window.
+
+verdict (exactly one)
+---------------------
+ISSUE      A real accessibility defect exists at the anchor.
+NO_ISSUE   The code at the anchor is fine; the detector's pattern matched
+           something that is not a defect.
+HANDLED    The pattern would be a defect, but the code or the framework already
+           mitigates it (parent semantics{}, clearAndSetSemantics, Material
+           default behavior, correctly decorative contentDescription = null).
+UNSURE     Cannot be determined from source: theme-resolved colors, custom
+           wrapper internals not shown, runtime layout. NOT for "did not check".
+
+issue_category
+--------------
+One of the 15 names below, or none. Never invent a name.
+  clickable_icon_not_iconbutton   color_contrast
+  decorative_mislabeled           error_state_no_semantics
+  missing_content_description     missing_heading_semantics
+  missing_interaction_semantics   missing_merge_descendants
+  missing_semantics_role          missing_state_description
+  pointerinput_no_semantics       progress_no_semantics
+  text_truncation_scaling         textfield_no_label
+  touch_target_size
+
+other_issues   Comma-separated additional categories visible in the window.
+confidence     high / medium / low — certainty in the verdict.
+notes          One sentence of justification.
+
+Framework conventions (applied by both raters)
+----------------------------------------------
+C1  Material Switch / Checkbox / RadioButton announce role and state natively.
+    Modifier.clickable merges descendants; toggleable / selectable add role
+    and state.
+C2  Material3 IconButton, FloatingActionButton and Surface(onClick) apply
+    minimumInteractiveComponentSize; an explicit small .size() on them is
+    HANDLED. A raw .clickable on Box / Icon / Text gets no padding.
+C3  A determinate progress indicator (progress lambda) carries
+    progressSemantics(value). An indeterminate one carries progressSemantics()
+    with no value.
+C4  isError on a Material text field announces a generic error → HANDLED;
+    lower confidence when the message is a sibling Text, not supportingText.
+C5  Spacer with .size() is not interactive.
+
+Adjudication rulings (added after inter-rater comparison; adjudicator: K. Patel)
+--------------------------------------------------------------------------------
+Raw rater labels are frozen; kappa is computed on them. These rulings decide
+the gold label where raters split systematically. Each is applied uniformly.
+
+R1  Indeterminate progress indicator with no label
+    Rater A: ISSUE (nameless). Rater B: NO_ISSUE (has progress-bar role, C3).
+    RULING: HANDLED for progress_no_semantics. The framework supplies the
+    role; absence of a label is recorded in other_issues as
+    missing_content_description. [change to ISSUE if you disagree]
+
+R2  Clickable container (Row / Column / Box / ListItem) with no role
+    Rater A: ISSUE (missing_semantics_role). Rater B: NO_ISSUE.
+    RULING: ISSUE, missing_semantics_role. TalkBack announces the element
+    without a control type; this is the dominant real-world defect in the
+    sample and is what Role.Button exists for.
+
+R3  Icon / Image with .clickable that HAS a contentDescription
+    Rater A: ISSUE (clickable_icon_not_iconbutton). Rater B: NO_ISSUE.
+    RULING: ISSUE only if the element also lacks a role OR is under 48dp.
+    If named, has a role, and meets 48dp, NO_ISSUE. In practice raw
+    .clickable never adds a role, so nearly all cases remain ISSUE.
+
+R4  Text with maxLines = 1 and TextOverflow.Ellipsis
+    Rater A: NO_ISSUE (deliberate). Rater B: ISSUE.
+    RULING: ISSUE only when the truncated text is unique content with no
+    other access path (a user-entered title, a file name, a URL). NO_ISSUE
+    for short resource labels, app-bar titles, chip labels, captions.
+    Confidence is capped at low; this category is reported separately as
+    not reliably decidable from source.
+
+R5  Hardcoded (non-localized) strings
+    Rater B labeled 20 rows ISSUE on this basis with category none.
+    RULING: Localization is not one of the 15 categories. A hardcoded string
+    is not, by itself, an accessibility defect for this study. Those verdicts
+    are overruled to the label supported by the anchor construct alone.
+
+R6  Duplicate anchors
+    ~20 items share (file, anchor_line) under two detector categories.
+    RULING: the gold set is deduplicated on (file, anchor_line); the item
+    keeps the category the adjudicator judged primary. Reported n is
+    post-dedup.
+
+Reporting
+---------
+Report: verdict kappa and defect/no-defect kappa on raw labels (pre-ruling);
+category kappa conditional on both raters ISSUE, after category-string
+normalization (format fix only, described in Methods); human-vs-rater kappa
+on the 40-row blind subset; the six rulings above as the adjudication
+protocol; per-category kappa as supporting material with n = 20 caveat.

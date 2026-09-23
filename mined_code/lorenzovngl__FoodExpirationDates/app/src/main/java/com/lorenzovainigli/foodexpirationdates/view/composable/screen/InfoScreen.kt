@@ -1,0 +1,254 @@
+package com.lorenzovainigli.foodexpirationdates.view.composable.screen
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.lorenzovainigli.foodexpirationdates.DEVELOPER_EMAIL
+import com.lorenzovainigli.foodexpirationdates.GITHUB_URL
+import com.lorenzovainigli.foodexpirationdates.PRIVACY_POLICY_URL
+import com.lorenzovainigli.foodexpirationdates.R
+import com.lorenzovainigli.foodexpirationdates.model.Platform
+import com.lorenzovainigli.foodexpirationdates.model.contributors
+import com.lorenzovainigli.foodexpirationdates.ui.theme.FoodExpirationDatesTheme
+import com.lorenzovainigli.foodexpirationdates.view.composable.AppDescription
+import com.lorenzovainigli.foodexpirationdates.view.composable.LinkText
+import com.lorenzovainigli.foodexpirationdates.view.composable.TextIconButton
+import com.lorenzovainigli.foodexpirationdates.view.composable.TextIconButtonData
+
+@Composable
+fun InfoScreen(
+    onClickShare: () -> Unit,
+    onClickReview: () -> Unit = {},
+    versionText: String,
+) {
+    val uriHandler = LocalUriHandler.current
+    Column(
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .padding(10.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Image(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(128.dp)
+                .padding(top = 16.dp),
+            painter = painterResource(id = R.drawable.fed_icon),
+            alignment = Alignment.Center,
+            contentDescription = null
+        )
+        Text(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally),
+            text = stringResource(id = R.string.app_name),
+            style = MaterialTheme.typography.headlineMedium,
+            textAlign = TextAlign.Center
+        )
+        Text(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            style = MaterialTheme.typography.bodySmall,
+            text = versionText,
+            textAlign = TextAlign.Center
+        )
+        AppDescription()
+        TextIconButton(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .width(256.dp),
+            onClick = {
+                uriHandler.openUri(
+                    uri = "https://github.com/lorenzovngl/FoodExpirationDates"
+                )
+            },
+            imagePainter = painterResource(id = R.drawable.github),
+            text = stringResource(id = R.string.source_code)
+        )
+        Text(
+            modifier = Modifier.padding(top = 16.dp),
+            text = stringResource(id = R.string.features),
+            style = MaterialTheme.typography.headlineMedium,
+            textAlign = TextAlign.Center
+        )
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = stringResource(id = R.string.feature_list),
+        )
+        Text(
+            modifier = Modifier.padding(top = 16.dp),
+            text = stringResource(id = R.string.support_this_project),
+            style = MaterialTheme.typography.headlineMedium,
+            textAlign = TextAlign.Center
+        )
+        arrayOf(
+            TextIconButtonData(
+                iconImageVector = Icons.Outlined.Star,
+                text = stringResource(id = R.string.leave_a_star_on_github),
+                onClick = {
+                    uriHandler.openUri(
+                        uri = GITHUB_URL
+                    )
+                },
+            ),
+            TextIconButtonData(
+                iconImageVector = Icons.Outlined.Edit,
+                text = stringResource(id = R.string.write_a_review),
+                onClick = onClickReview
+            ),
+            TextIconButtonData(
+                iconImageVector = Icons.Outlined.Share,
+                text = stringResource(id = R.string.share),
+                onClick = onClickShare
+            ),
+        ).forEach {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                TextIconButton(
+                    modifier = Modifier.width(256.dp),
+                    onClick = it.onClick,
+                    iconImageVector = it.iconImageVector,
+                    imagePainter = it.imagePainter,
+                    text = it.text
+                )
+            }
+        }
+        ContactSection()
+        ContributorsList()
+        LinkText(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(top = 4.dp),
+            text = stringResource(id = R.string.privacy_policy),
+            url = PRIVACY_POLICY_URL
+        )
+    }
+}
+
+@Composable
+fun ContactSection(
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        Text(
+            modifier = Modifier.padding(top = 16.dp),
+            text = stringResource(id = R.string.contacts),
+            style = MaterialTheme.typography.headlineMedium,
+            textAlign = TextAlign.Center
+        )
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp, bottom = 8.dp),
+            text = stringResource(id = R.string.contacts_text)
+        )
+        val uriHandler = LocalUriHandler.current
+        TextIconButton(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .width(256.dp),
+            onClick = {
+                uriHandler.openUri(
+                    uri = "mailto:$DEVELOPER_EMAIL"
+                )
+            },
+            iconImageVector = Icons.Outlined.Email,
+            text = stringResource(id = R.string.send_an_email)
+        )
+    }
+}
+
+@Composable
+fun ContributorsList(
+    modifier: Modifier = Modifier
+) {
+    val contributorsText = remember {
+        contributors.joinToString(separator = "\n") {
+            "${it.name} - ${it.platform.url.substring(0, 1)}/@${it.username}"
+        }
+    }
+    Column(modifier = modifier.fillMaxWidth()) {
+        Text(
+            modifier = Modifier.padding(top = 16.dp),
+            text = stringResource(id = R.string.contributors_list_title),
+            style = MaterialTheme.typography.headlineMedium,
+            textAlign = TextAlign.Center
+        )
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp, bottom = 4.dp),
+            text = stringResource(id = R.string.contributors_list_subtitle)
+        )
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 4.dp),
+            text = Platform.entries.joinToString(" | ") {
+                "(${it.url.substring(0, 1)}) ${it.url}"
+            },
+            fontSize = 12.sp,
+            color = Color.Gray
+        )
+        val fontSize = 12.sp
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = contributorsText,
+            textAlign = TextAlign.Center,
+            fontSize = fontSize,
+            lineHeight = fontSize * 1.5
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun InfoScreenPreview() {
+    FoodExpirationDatesTheme {
+        Surface (modifier = Modifier.fillMaxHeight()) {
+            InfoScreen(
+                onClickShare = {},
+                versionText = "Version 1.0"
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ContributorsListPreview() {
+    FoodExpirationDatesTheme {
+        Surface (modifier = Modifier.fillMaxWidth()) {
+            ContributorsList()
+        }
+    }
+}

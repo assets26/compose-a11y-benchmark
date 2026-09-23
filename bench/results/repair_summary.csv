@@ -1,0 +1,7 @@
+model,n,parse_rate,truncated_rate,error_rate,syntactic_ok,api_valid,addresses_defect,substantive,fully_correct,mean_similarity,mean_lines_dropped_frac,top_hallucinations
+claude-sonnet,144,0.931,0.069,0.0,0.985,0.91,0.575,1.0,0.5,0.964,0.028,"{'onClickLabel_outside_click': 10, 'role_on_component': 2}"
+gemini-flash,144,1.0,0.0,0.0,0.979,0.931,0.611,1.0,0.542,0.957,0.029,"{'onClickLabel_outside_click': 4, 'invented_semantics_key': 4, 'role_on_component': 2}"
+gemma3-1b,59,0.949,0.034,0.0,0.75,1.0,0.018,0.0,0.0,0.043,0.966,{}
+gpt-mini,144,1.0,0.0,0.0,0.986,0.944,0.632,1.0,0.611,0.932,0.023,"{'contentDescription_on_layout': 5, 'role_on_component': 2, 'stateDescription_as_param': 1}"
+mistral,59,0.983,0.0,0.017,0.879,0.948,0.31,0.241,0.052,0.612,0.62,{'invented_modifier': 3}
+qwen-coder,60,0.983,0.017,0.0,0.983,0.966,0.407,0.881,0.339,0.799,0.111,{'invented_semantics_key': 2}

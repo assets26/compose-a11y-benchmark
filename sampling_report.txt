@@ -1,0 +1,30 @@
+STAGE 3a SAMPLING (pilot)
+======================================================================
+Random seed (reproducible)   : 20260911
+Max candidates per repo/cat  : 3
+Total candidates available   : 6053
+Total sampled for verification: 300
+
+clickable_icon_not_iconbutton    pool=  118  after_repo_cap=   99  sampled=  20
+color_contrast                   pool=  127  after_repo_cap=   67  sampled=  20
+decorative_mislabeled            pool=  107  after_repo_cap=   85  sampled=  20
+error_state_no_semantics         pool=   97  after_repo_cap=   72  sampled=  20
+missing_content_description      pool= 1425  after_repo_cap=  323  sampled=  20
+missing_heading_semantics        pool=  537  after_repo_cap=  223  sampled=  20
+missing_interaction_semantics    pool=  875  after_repo_cap=  338  sampled=  20
+missing_merge_descendants        pool=  577  after_repo_cap=  252  sampled=  20
+missing_semantics_role           pool=  818  after_repo_cap=  336  sampled=  20
+missing_state_description        pool=  372  after_repo_cap=  200  sampled=  20
+pointerinput_no_semantics        pool=   52  after_repo_cap=   48  sampled=  20
+progress_no_semantics            pool=  299  after_repo_cap=  187  sampled=  20
+text_truncation_scaling          pool=  345  after_repo_cap=  161  sampled=  20
+textfield_no_label               pool=   54  after_repo_cap=   53  sampled=  20
+touch_target_size                pool=  250  after_repo_cap=  171  sampled=  20
+
+NEXT
+  1. Open verify_pilot.csv and fill the verdict column:
+       TRUE_ISSUE / NOT_AN_ISSUE / UNSURE
+     Judge in CONTEXT, not by pattern (see criteria sheet).
+  2. Copy your verdicts into the answerkey file.
+  3. Give verify_pilot_blind.csv to a second rater (no verdicts).
+  4. Run cohens_kappa.py on the two, then reconcile disagreements.

@@ -1,0 +1,607 @@
+/*
+ * Copyright 2026 Maximilian Schwärzler
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+package at.co.schwaerzler.maximilian.doit.ui.navigation.screen
+
+import android.util.Log
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.glance.appwidget.GlanceAppWidgetManager
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import at.co.schwaerzler.maximilian.doit.OverviewWidget
+import at.co.schwaerzler.maximilian.doit.R
+import at.co.schwaerzler.maximilian.doit.data.HomeViewModel
+import at.co.schwaerzler.maximilian.doit.data.OverviewWidgetReceiver
+import at.co.schwaerzler.maximilian.doit.data.db.entity.TodoState
+import at.co.schwaerzler.maximilian.doit.data.db.entity.TodoSummary
+import at.co.schwaerzler.maximilian.doit.ui.component.MaxWidthLayout
+import at.co.schwaerzler.maximilian.doit.ui.component.TodoListItem
+import at.co.schwaerzler.maximilian.doit.ui.theme.DoItTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlin.time.Clock
+
+/**
+ * Home screen showing open and done todo lists.
+ *
+ * Long-pressing a list item enters selection mode; the top bar then switches to a contextual
+ * toolbar with delete and select-all actions. Pressing back exits selection mode.
+ *
+ * @param onAddTodo Called when the user taps the FAB to create a new todo.
+ * @param onClickTodo Called when the user taps a todo item outside of selection mode; receives its id.
+ * @param onClickSettings Called when the user taps the settings icon.
+ */
+@Composable
+fun HomeScreen(
+    onAddTodo: () -> Unit,
+    onClickTodo: (id: Int) -> Unit,
+    onClickSettings: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory),
+) {
+    val todos by viewModel.sortedTodos.collectAsStateWithLifecycle(Pair(emptyList(), emptyList()))
+    val (openTodos, doneTodos) = todos
+
+    var selectedTodos by rememberSaveable {
+        mutableStateOf<Set<Int>>(emptySet())
+    }
+
+    BackHandler(enabled = selectedTodos.isNotEmpty()) {
+        selectedTodos = emptySet()
+    }
+
+    val snackbarHostState = remember {
+        SnackbarHostState()
+    }
+
+    val pendingUndoTodos by viewModel.pendingUndoTodos.collectAsStateWithLifecycle()
+    val resources = LocalResources.current
+
+    LaunchedEffect(pendingUndoTodos) {
+        if (pendingUndoTodos.isNotEmpty()) {
+            val snackbarResult = snackbarHostState.showSnackbar(
+                resources.getQuantityString(
+                    R.plurals.todos_deleted_template,
+                    pendingUndoTodos.size
+                ),
+                actionLabel = resources.getString(R.string.undo_snackbar_action_label),
+                duration = SnackbarDuration.Long
+            )
+
+            if (snackbarResult == SnackbarResult.ActionPerformed) {
+                viewModel.undoDeleteTodos()
+            } else {
+                viewModel.clearPendingTodos()
+            }
+        }
+    }
+
+    val todosDoneCount by viewModel.todosDone.collectAsStateWithLifecycle()
+    val widgetDialogSuppressed by viewModel.widgetDialogSuppressed.collectAsStateWithLifecycle()
+
+    val sortOrderScope = rememberCoroutineScope()
+    var sortSnackbarJob by remember { mutableStateOf<Job?>(null) }
+
+    HomeScreenContent(
+        openTodos = openTodos,
+        doneTodos = doneTodos,
+        onAddTodo = onAddTodo,
+        onClickTodo = onClickTodo,
+        toggleTodoItemSelection = { id ->
+            selectedTodos = if (id in selectedTodos) selectedTodos - id else selectedTodos + id
+        },
+        onStateToggle = { viewModel.toggleTodoDone(it) },
+        selectedTodos = selectedTodos,
+        onClearSelection = {
+            selectedTodos = emptySet()
+        },
+        onDeleteSelection = {
+            viewModel.deleteTodosByIds(selectedTodos.toList())
+            selectedTodos = emptySet()
+        },
+        modifier = modifier,
+        onSelectAll = {
+            selectedTodos += openTodos.map { it.id }
+            selectedTodos += doneTodos.map { it.id }
+        },
+        onClickSettings = onClickSettings,
+        onDeleteTodo = {
+            viewModel.deleteTodosByIds(listOf(it))
+        },
+        snackbarHostState = snackbarHostState,
+        todosDoneCount = todosDoneCount,
+        widgetDialogSuppressed = widgetDialogSuppressed,
+        onSuppressWidgetDialog = viewModel::suppressWidgetDialog,
+        onRotateSortOrder = {
+            val newOrder = viewModel.rotateSortOrder()
+            sortSnackbarJob?.cancel()
+            sortSnackbarJob = sortOrderScope.launch {
+                snackbarHostState.showSnackbar(
+                    resources.getString(newOrder.labelRes)
+                )
+            }
+        }
+    )
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HomeScreenContent(
+    openTodos: List<TodoSummary>,
+    doneTodos: List<TodoSummary>,
+    onAddTodo: () -> Unit,
+    onClickTodo: (id: Int) -> Unit,
+    onClickSettings: () -> Unit,
+    toggleTodoItemSelection: (id: Int) -> Unit,
+    onStateToggle: (TodoSummary) -> Unit,
+    selectedTodos: Set<Int>,
+    onClearSelection: () -> Unit,
+    onDeleteSelection: () -> Unit,
+    onDeleteTodo: (id: Int) -> Unit,
+    modifier: Modifier = Modifier,
+    onSelectAll: () -> Unit,
+    snackbarHostState: SnackbarHostState,
+    todosDoneCount: Int,
+    widgetDialogSuppressed: Boolean,
+    onSuppressWidgetDialog: () -> Unit,
+    onRotateSortOrder: () -> Unit
+) {
+    val selectionToolbar = selectedTodos.isNotEmpty()
+    val isAllSelected = selectedTodos.size == openTodos.size + doneTodos.size
+    var showWidgetPinIncentiveDialog by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(todosDoneCount, widgetDialogSuppressed) {
+        if (todosDoneCount < 1) {
+            Log.d(
+                "WidgetIncentive",
+                "Dialog not shown: no todos completed yet (count=$todosDoneCount)"
+            )
+            return@LaunchedEffect
+        }
+        if (widgetDialogSuppressed) {
+            Log.d("WidgetIncentive", "Dialog not shown: user opted out")
+            return@LaunchedEffect
+        }
+        val glanceIds = GlanceAppWidgetManager(context).getGlanceIds(OverviewWidget::class.java)
+        if (glanceIds.isNotEmpty()) {
+            Log.d("WidgetIncentive", "Dialog not shown: widget already pinned (ids=$glanceIds)")
+            return@LaunchedEffect
+        }
+        Log.d("WidgetIncentive", "Showing dialog (todosDoneCount=$todosDoneCount)")
+        showWidgetPinIncentiveDialog = true
+    }
+
+    Scaffold(
+        modifier.fillMaxSize(), topBar = {
+            Crossfade(
+                targetState = selectionToolbar,
+                label = "topBar"
+            ) { inSelectionMode ->
+                if (inSelectionMode) {
+                    TopAppBar(
+                        title = {
+                            Text(
+                                pluralStringResource(
+                                    R.plurals.todos_selected_template,
+                                    selectedTodos.size,
+                                    selectedTodos.size
+                                )
+                            )
+                        },
+                        actions = {
+                            IconButton(onClick = onDeleteSelection) {
+                                Icon(
+                                    painterResource(R.drawable.delete_24px),
+                                    contentDescription = null
+                                )
+                            }
+                            IconButton(onClick = if (isAllSelected) onClearSelection else onSelectAll) {
+                                Icon(
+                                    painterResource(if (isAllSelected) R.drawable.deselect_24px else R.drawable.select_all_24px),
+                                    contentDescription = if (isAllSelected) stringResource(R.string.clear_selection) else stringResource(
+                                        R.string.select_all
+                                    )
+                                )
+                            }
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer
+                        )
+                    )
+                } else {
+                    TopAppBar(
+                        title = {
+                            Text(stringResource(R.string.just_do_it_app_bar))
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer
+                        ),
+                        actions = {
+                            IconButton(onClick = onRotateSortOrder) {
+                                Icon(
+                                    painterResource(R.drawable.sort_24px),
+                                    contentDescription = null
+                                )
+                            }
+
+                            IconButton(onClick = onClickSettings) {
+                                Icon(
+                                    painterResource(R.drawable.settings_24px),
+                                    contentDescription = null
+                                )
+                            }
+                        }
+                    )
+                }
+            }
+        },
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                onClick = onAddTodo,
+                text = {
+                    Text(stringResource(R.string.add_new_todo_fab))
+                },
+                icon = {
+                    Icon(
+                        painterResource(R.drawable.add_24px),
+                        contentDescription = stringResource(R.string.add_new_todo_fab)
+                    )
+                })
+        },
+        snackbarHost = {
+            SnackbarHost(snackbarHostState)
+        }
+    ) { innerPadding ->
+        MaxWidthLayout(Modifier.padding(innerPadding)) {
+            if (openTodos.isNotEmpty() || doneTodos.isNotEmpty()) {
+                LazyColumn(
+                    Modifier
+                        .fillMaxSize()
+                ) {
+                    if (openTodos.isNotEmpty()) {
+                        item(key = "open-headline") {
+                            ListItem(
+                                headlineContent = {
+                                    Text(
+                                        stringResource(R.string.open_headline),
+                                        style = MaterialTheme.typography.headlineSmall
+                                    )
+                                },
+                                modifier = Modifier.animateItem()
+                            )
+                            HorizontalDivider()
+                        }
+                    } else {
+                        item {
+                            Box(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(min = 70.dp)
+                                    .animateItem(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    stringResource(R.string.you_did_everything_empty_text),
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 22.sp
+                                )
+                            }
+                        }
+                    }
+                    items(openTodos, key = { it.id }) { item ->
+                        TodoListItem(
+                            item,
+                            onStateToggle = { onStateToggle(item) },
+                            onClick = {
+                                if (selectionToolbar) {
+                                    toggleTodoItemSelection(item.id)
+                                } else {
+                                    onClickTodo(item.id)
+                                }
+                            },
+                            onLongClick = {
+                                toggleTodoItemSelection(item.id)
+                            },
+                            {
+                                onDeleteTodo(item.id)
+                            },
+                            selected = selectedTodos.contains(item.id),
+                            Modifier.animateItem()
+                        )
+                    }
+                    if (doneTodos.isNotEmpty()) {
+                        item(key = "done-headline") {
+                            if (openTodos.isNotEmpty()) {
+                                HorizontalDivider()
+                            }
+                            ListItem(
+                                headlineContent = {
+                                    Text(
+                                        stringResource(R.string.done_headline),
+                                        style = MaterialTheme.typography.headlineSmall
+                                    )
+                                },
+                                Modifier.animateItem()
+                            )
+                            HorizontalDivider()
+                        }
+                    }
+                    items(doneTodos, key = { it.id }) { item ->
+                        TodoListItem(
+                            item,
+                            onStateToggle = { onStateToggle(item) },
+                            onClick = {
+                                if (selectionToolbar) {
+                                    toggleTodoItemSelection(item.id)
+                                } else {
+                                    onClickTodo(item.id)
+                                }
+                            },
+                            onLongClick = {
+                                toggleTodoItemSelection(item.id)
+                            },
+                            {
+                                onDeleteTodo(item.id)
+                            },
+                            selected = selectedTodos.contains(item.id),
+                            Modifier.animateItem()
+                        )
+                    }
+                }
+            } else {
+                Box(
+                    Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            stringResource(R.string.nothing_to_do_empty_text),
+                            style = MaterialTheme.typography.headlineMedium,
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            stringResource(R.string.add_new_todo_button), Modifier.fillMaxWidth(
+                                0.9F
+                            ), textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+        }
+
+        if (showWidgetPinIncentiveDialog) {
+            WidgetPinIncentiveDialog(
+                coroutineScope,
+                onDismissRequest = {
+                    if (it) {
+                        onSuppressWidgetDialog()
+                    }
+                    showWidgetPinIncentiveDialog = false
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun WidgetPinIncentiveDialog(
+    coroutineScope: CoroutineScope,
+    modifier: Modifier = Modifier,
+    onDismissRequest: (doNotShowAgain: Boolean) -> Unit
+) {
+    val context = LocalContext.current
+    AlertDialog(
+        onDismissRequest = {
+            onDismissRequest(false)
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                coroutineScope.launch {
+                    GlanceAppWidgetManager(context).requestPinGlanceAppWidget(
+                        receiver = OverviewWidgetReceiver::class.java,
+                        preview = OverviewWidget()
+                    )
+                }.invokeOnCompletion {
+                    onDismissRequest(true)
+                }
+            }) {
+                Text(stringResource(R.string.yes_dialog))
+            }
+        },
+        modifier = modifier,
+        dismissButton = {
+            TextButton(onClick = { onDismissRequest(true) }) {
+                Text(
+                    stringResource(R.string.do_not_ask_again_dialog),
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        },
+        title = {
+            Text(stringResource(R.string.add_widget_dialog))
+        },
+        text = {
+            Text(stringResource(R.string.add_widget_dialog_text))
+        }
+    )
+}
+
+private val previewTodos = listOf(
+    TodoSummary(1, "Buy groceries", null, TodoState.OPEN, Clock.System.now()),
+    TodoSummary(2, "Read a book", null, TodoState.OPEN, Clock.System.now()),
+    TodoSummary(3, "Fix the bug", null, TodoState.DONE, Clock.System.now()),
+)
+
+@Preview(showBackground = true, name = "Locale Default")
+@Preview(showBackground = true, locale = "de-rCH", name = "Locale de-CH")
+@Composable
+private fun HomeScreenEmptyPreview() {
+    DoItTheme {
+        HomeScreenContent(
+            openTodos = emptyList(),
+            doneTodos = emptyList(),
+            onAddTodo = {},
+            onClickTodo = {},
+            toggleTodoItemSelection = {},
+            onStateToggle = {},
+            selectedTodos = emptySet(),
+            onClearSelection = {},
+            onSelectAll = {},
+            onDeleteSelection = {},
+            onClickSettings = {},
+            onDeleteTodo = {},
+            snackbarHostState = remember { SnackbarHostState() },
+            todosDoneCount = 0,
+            widgetDialogSuppressed = true,
+            onSuppressWidgetDialog = {},
+            onRotateSortOrder = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun HomeScreenWithTodosPreview() {
+    DoItTheme {
+        HomeScreenContent(
+            openTodos = previewTodos.filter { it.state == TodoState.OPEN },
+            doneTodos = previewTodos.filter { it.state == TodoState.DONE },
+            onAddTodo = {},
+            onClickTodo = {},
+            toggleTodoItemSelection = {},
+            onStateToggle = {},
+            selectedTodos = emptySet(),
+            onClearSelection = {},
+            onSelectAll = {},
+            onDeleteSelection = {},
+            onClickSettings = {},
+            onDeleteTodo = {},
+            snackbarHostState = remember { SnackbarHostState() },
+            todosDoneCount = 0,
+            widgetDialogSuppressed = true,
+            onSuppressWidgetDialog = {},
+            onRotateSortOrder = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun HomeScreenAllDonePreview() {
+    DoItTheme {
+        HomeScreenContent(
+            openTodos = emptyList(),
+            doneTodos = previewTodos.filter { it.state == TodoState.DONE },
+            onAddTodo = {},
+            onClickTodo = {},
+            toggleTodoItemSelection = {},
+            onStateToggle = {},
+            selectedTodos = emptySet(),
+            onClearSelection = {},
+            onSelectAll = {},
+            onDeleteSelection = {},
+            onClickSettings = {},
+            onDeleteTodo = {},
+            snackbarHostState = remember { SnackbarHostState() },
+            todosDoneCount = 0,
+            widgetDialogSuppressed = true,
+            onSuppressWidgetDialog = {},
+            onRotateSortOrder = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun HomeScreenSelectionPreview() {
+    DoItTheme {
+        HomeScreenContent(
+            openTodos = previewTodos.filter { it.state == TodoState.OPEN },
+            doneTodos = previewTodos.filter { it.state == TodoState.DONE },
+            onAddTodo = {},
+            onClickTodo = {},
+            toggleTodoItemSelection = {},
+            onStateToggle = {},
+            selectedTodos = setOf(1),
+            onClearSelection = {},
+            onSelectAll = {},
+            onDeleteSelection = {},
+            onClickSettings = {},
+            onDeleteTodo = {},
+            snackbarHostState = remember { SnackbarHostState() },
+            todosDoneCount = 0,
+            widgetDialogSuppressed = true,
+            onSuppressWidgetDialog = {},
+            onRotateSortOrder = {},
+        )
+    }
+}

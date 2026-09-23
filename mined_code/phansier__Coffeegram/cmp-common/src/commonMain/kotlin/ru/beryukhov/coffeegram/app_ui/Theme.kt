@@ -1,0 +1,197 @@
+package ru.beryukhov.coffeegram.app_ui
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.shapes
+import androidx.compose.material3.Typography
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
+import coffeegram.cmp_common.generated.resources.DMMono_Regular
+import coffeegram.cmp_common.generated.resources.Fraunces
+import coffeegram.cmp_common.generated.resources.Fraunces_Italic
+import coffeegram.cmp_common.generated.resources.PlusJakartaSans
+import coffeegram.cmp_common.generated.resources.Res
+import com.slapps.cupertino.adaptive.AdaptiveTheme
+import com.slapps.cupertino.adaptive.CupertinoThemeSpec
+import com.slapps.cupertino.adaptive.ExperimentalAdaptiveApi
+import com.slapps.cupertino.adaptive.MaterialThemeSpec
+import com.slapps.cupertino.adaptive.Theme
+import com.slapps.cupertino.theme.darkColorScheme
+import com.slapps.cupertino.theme.lightColorScheme
+import org.jetbrains.compose.resources.Font
+import ru.beryukhov.coffeegram.model.DarkThemeState
+import ru.beryukhov.coffeegram.model.ThemeState
+import ru.beryukhov.coffeegram.model.ThemeStateDefault
+
+private val LightThemeColors = lightColorScheme(
+
+    primary = md_theme_light_primary,
+    onPrimary = md_theme_light_onPrimary,
+    primaryContainer = md_theme_light_primaryContainer,
+    onPrimaryContainer = md_theme_light_onPrimaryContainer,
+    secondary = md_theme_light_secondary,
+    onSecondary = md_theme_light_onSecondary,
+    secondaryContainer = md_theme_light_secondaryContainer,
+    onSecondaryContainer = md_theme_light_onSecondaryContainer,
+    tertiary = md_theme_light_tertiary,
+    onTertiary = md_theme_light_onTertiary,
+    tertiaryContainer = md_theme_light_tertiaryContainer,
+    onTertiaryContainer = md_theme_light_onTertiaryContainer,
+    error = md_theme_light_error,
+    errorContainer = md_theme_light_errorContainer,
+    onError = md_theme_light_onError,
+    onErrorContainer = md_theme_light_onErrorContainer,
+    background = md_theme_light_background,
+    onBackground = md_theme_light_onBackground,
+    surface = md_theme_light_surface,
+    onSurface = md_theme_light_onSurface,
+    surfaceVariant = md_theme_light_surfaceVariant,
+    onSurfaceVariant = md_theme_light_onSurfaceVariant,
+    outline = md_theme_light_outline,
+    inverseOnSurface = md_theme_light_inverseOnSurface,
+    inverseSurface = md_theme_light_inverseSurface,
+    inversePrimary = md_theme_light_inversePrimary,
+)
+private val DarkThemeColors = darkColorScheme(
+
+    primary = md_theme_dark_primary,
+    onPrimary = md_theme_dark_onPrimary,
+    primaryContainer = md_theme_dark_primaryContainer,
+    onPrimaryContainer = md_theme_dark_onPrimaryContainer,
+    secondary = md_theme_dark_secondary,
+    onSecondary = md_theme_dark_onSecondary,
+    secondaryContainer = md_theme_dark_secondaryContainer,
+    onSecondaryContainer = md_theme_dark_onSecondaryContainer,
+    tertiary = md_theme_dark_tertiary,
+    onTertiary = md_theme_dark_onTertiary,
+    tertiaryContainer = md_theme_dark_tertiaryContainer,
+    onTertiaryContainer = md_theme_dark_onTertiaryContainer,
+    error = md_theme_dark_error,
+    errorContainer = md_theme_dark_errorContainer,
+    onError = md_theme_dark_onError,
+    onErrorContainer = md_theme_dark_onErrorContainer,
+    background = md_theme_dark_background,
+    onBackground = md_theme_dark_onBackground,
+    surface = md_theme_dark_surface,
+    onSurface = md_theme_dark_onSurface,
+    surfaceVariant = md_theme_dark_surfaceVariant,
+    onSurfaceVariant = md_theme_dark_onSurfaceVariant,
+    outline = md_theme_dark_outline,
+    inverseOnSurface = md_theme_dark_inverseOnSurface,
+    inverseSurface = md_theme_dark_inverseSurface,
+    inversePrimary = md_theme_dark_inversePrimary,
+)
+
+@OptIn(ExperimentalAdaptiveApi::class)
+@Composable
+fun CoffeegramTheme(
+    themeState: ThemeState = ThemeStateDefault,
+    content: @Composable () -> Unit,
+) {
+    val darkTheme = when (themeState.useDarkTheme) {
+        DarkThemeState.DARK -> true
+        DarkThemeState.LIGHT -> false
+        DarkThemeState.SYSTEM -> isSystemInDarkTheme()
+    }
+    val dmMonoFontFamily = FontFamily(Font(Res.font.DMMono_Regular))
+    val frauncesFontFamily = FontFamily(
+        Font(Res.font.Fraunces, style = FontStyle.Normal),
+        Font(Res.font.Fraunces_Italic, style = FontStyle.Italic)
+    )
+    val plusJakarta = FontFamily(Font(Res.font.PlusJakartaSans))
+
+    val brandScheme = if (darkTheme) DarkThemeColors else LightThemeColors
+    val materialScheme = if (themeState.isDynamic == true) {
+        dynamicColorSchemeOrNull(darkTheme) ?: brandScheme
+    } else {
+        brandScheme
+    }
+
+    CompositionLocalProvider(LocalDarkTheme provides darkTheme) {
+    AdaptiveTheme(
+        material =
+            MaterialThemeSpec(
+                colorScheme = materialScheme,
+                typography = Typography(
+                    titleLarge = TextStyle(
+                        fontFamily = frauncesFontFamily,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 24.sp,
+                        letterSpacing = (-0.02).em,
+                    ),
+                    headlineSmall = TextStyle(
+                        fontFamily = frauncesFontFamily,
+                        fontSize = 24.sp,
+                    ),
+                    titleMedium = TextStyle(
+                        fontFamily = frauncesFontFamily,
+                        fontSize = 16.sp,
+                    ),
+                    bodyMedium = TextStyle(
+                        fontFamily = plusJakarta,
+                        fontSize = 14.sp,
+                    ),
+                    bodySmall = TextStyle(
+                        fontFamily = dmMonoFontFamily,
+                        fontSize = 12.sp,
+                    ),
+                    labelSmall = TextStyle(
+                        fontFamily = plusJakarta,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 11.sp,
+                        letterSpacing = 0.1.em,
+                    ),
+                ),
+                shapes = shapes,
+            ),
+        cupertino =
+            CupertinoThemeSpec(
+                colorScheme = if (darkTheme) {
+                    darkColorScheme()
+                } else {
+                    lightColorScheme()
+                },
+            ),
+        target = if (themeState.isCupertino == true) Theme.Cupertino else Theme.Material3,
+        content = content
+    )
+    }
+}
+
+/**
+ * Whether the current theme is dark. Driven by [ThemeStore]'s [DarkThemeState] (resolving
+ * SYSTEM via [isSystemInDarkTheme]). Provided by [CoffeegramTheme] so screens can adapt
+ * non-Material content (e.g. the web MapLibre style) to the user's chosen theme.
+ */
+val LocalDarkTheme = staticCompositionLocalOf { false }
+
+@Composable
+fun PreviewTheme(
+    content: @Composable () -> Unit,
+) {
+    CoffeegramTheme(
+        themeState = ThemeStateDefault,
+    ) {
+        Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+            content()
+        }
+    }
+}
+
+expect fun isCupertinoDefault(): Boolean
+
+@Composable
+expect fun dynamicColorSchemeOrNull(darkTheme: Boolean): ColorScheme?

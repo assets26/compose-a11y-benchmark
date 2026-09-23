@@ -1,0 +1,216 @@
+package cash.p.terminal.ui.compose.components
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import cash.p.terminal.ui_compose.components.diffColor
+import cash.p.terminal.ui_compose.theme.ComposeAppTheme
+import java.math.BigDecimal
+
+@Composable
+fun Badge(modifier: Modifier = Modifier, text: String) {
+    BadgeText(
+        modifier = modifier,
+        text = text,
+        background = ComposeAppTheme.colors.jeremy,
+        textColor = ComposeAppTheme.colors.bran,
+    )
+}
+
+@Composable
+fun BadgeWithDiff(
+    modifier: Modifier = Modifier,
+    text: String,
+    diff: BigDecimal? = null
+) {
+    val background = if (diff != null) {
+        diffColor(diff).copy(alpha = 0.1f)
+    } else {
+        ComposeAppTheme.colors.jeremy
+    }
+    BadgeBase(
+        modifier = modifier,
+        background = background
+    ) {
+        if (text.isNotBlank()) {
+            Text(
+                text = text,
+                color = ComposeAppTheme.colors.bran,
+                style = ComposeAppTheme.typography.microSB,
+                maxLines = 1,
+            )
+        }
+        diff?.let { diffValue ->
+            Text(
+                modifier = if (text.isNotBlank()) Modifier.padding(start = 4.dp) else Modifier,
+                text = "${sign(diffValue)}${diffValue.abs()}",
+                color = diffColor(diffValue),
+                style = ComposeAppTheme.typography.microSB,
+                maxLines = 1,
+            )
+        }
+    }
+}
+
+@Composable
+fun BadgeText(
+    modifier: Modifier = Modifier,
+    text: String,
+    background: Color = ComposeAppTheme.colors.lucian,
+    textColor: Color = ComposeAppTheme.colors.white,
+) {
+    BadgeBase(
+        modifier = modifier,
+        background = background,
+    ) {
+        Text(
+            text = text,
+            color = textColor,
+            style = ComposeAppTheme.typography.microSB,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+/**
+ * Item-level "new" indicator: a small accent dot placed next to an individual row's title.
+ * The category-level counterpart is [BadgeText] with a "New" label. Matches the design spec —
+ * a 6dp circle in the [ComposeAppTheme.colors.laguna] accent (#4A98E9 in dark theme).
+ */
+@Composable
+fun NewDot(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .size(6.dp)
+            .clip(CircleShape)
+            .background(ComposeAppTheme.colors.laguna)
+    )
+}
+
+@Composable
+fun BadgeBase(
+    modifier: Modifier = Modifier,
+    background: Color,
+    content: @Composable RowScope.() -> Unit,
+) {
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(4.dp))
+            .background(background)
+            .padding(horizontal = 4.dp, vertical = 2.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        content = content
+    )
+}
+
+private fun sign(value: BigDecimal): String {
+    return when (value.signum()) {
+        1 -> "+"
+        -1 -> "-"
+        else -> ""
+    }
+}
+
+@Preview
+@Composable
+fun BadgePreview() {
+    ComposeAppTheme {
+        Box(
+            modifier = Modifier.padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Badge(text = "#455")
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun NewDotPreview() {
+    ComposeAppTheme {
+        Box(
+            modifier = Modifier.padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            NewDot()
+        }
+    }
+}
+
+@Preview
+@Composable
+fun BadgeCirclePreview() {
+    ComposeAppTheme {
+        Box(
+            modifier = Modifier.padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            BadgeText(
+                background = ComposeAppTheme.colors.issykBlue,
+                textColor = ComposeAppTheme.colors.tyler,
+                text = "1"
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun BadgeCircleSignal_Preview() {
+    ComposeAppTheme {
+        Box(
+            modifier = Modifier.padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            BadgeText(
+                background = ComposeAppTheme.colors.red20,
+                textColor = ComposeAppTheme.colors.lucian,
+                text = "Sell"
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun BadgeWithDiffPreview() {
+    ComposeAppTheme {
+        Box(
+            modifier = Modifier.padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            BadgeWithDiff(text = "35", diff = BigDecimal("5"))
+        }
+    }
+}
+
+@Suppress("UnusedPrivateMember")
+@Preview
+@Composable
+private fun BadgeWithDiffOnlyPreview() {
+    ComposeAppTheme {
+        Box(
+            modifier = Modifier.padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            BadgeWithDiff(text = "", diff = BigDecimal("1.63"))
+        }
+    }
+}

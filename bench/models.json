@@ -1,0 +1,16 @@
+{
+  "_comment": "backend: openai | anthropic | gemini | ollama. Env: OPENAI_API_KEY, ANTHROPIC_API_KEY, GEMINI_API_KEY. Ollama assumes http://localhost:11434. Per-model timeout_s/max_tokens override the globals below; timeout is infrastructure patience, not a capability limit, so raising it for local models does not affect comparability. max_tokens IS a capability constraint and is held identical across all seven models.",
+  "models": [
+    {"name": "claude-sonnet",  "backend": "anthropic", "model": "claude-sonnet-4-5",          "tier": "api"},
+    {"name": "gpt-mini",       "backend": "openai",    "model": "gpt-5-mini",                 "tier": "api"},
+    {"name": "gemini-flash",   "backend": "gemini",    "model": "gemini-3.8-flash",           "tier": "api"},
+    {"name": "qwen-coder",     "backend": "ollama",    "model": "qwen2.5-coder:latest",       "tier": "local", "timeout_s": 900},
+    {"name": "mistral",        "backend": "ollama",    "model": "mistral:latest",             "tier": "local", "timeout_s": 900},
+    {"name": "phi3",           "backend": "ollama",    "model": "phi3:latest",                "tier": "local", "timeout_s": 900},
+    {"name": "gemma3-1b",      "backend": "ollama",    "model": "gemma3:1b",                  "tier": "local", "timeout_s": 900}
+  ],
+  "temperature": 0.0,
+  "max_tokens": 4000,
+  "hidden_token_headroom": 3000,
+  "timeout_s": 180
+}

@@ -1,0 +1,550 @@
+package app.clearsms.ui.components
+
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Send
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.CloseFullscreen
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.OpenInFull
+import androidx.compose.material.icons.outlined.Schedule
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.path
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import app.clearsms.R
+import app.clearsms.mms.StagedAttachment
+import app.clearsms.ui.common.AttachmentError
+
+/**
+ * The compose-bar SIM indicator. [visible] only on devices with 2+ active
+ * subscriptions - single-SIM devices keep the pre-feature compose bar.
+ */
+data class SimUiState(
+    val visible: Boolean = false,
+    /** 1-based slot of the SIM the next send uses, drawn inside the icon; 0 = unknown. */
+    val slot: Int = 0,
+    /** Count of active SIMs, for the accessibility description. */
+    val simCount: Int = 0,
+    /** Operator / user-given subscription name, surfaced as a toast on tap. */
+    val operatorName: String = "",
+    /** System SIM colour (ARGB) for the chosen subscription; null = none. */
+    val iconTint: Int? = null,
+) {
+    /**
+     * Accessibility description of the icon indicator ("SIM 1 of 2 -
+     * Airtel"). Built here, not as a resource, so the mapping stays
+     * unit-testable and consistent with the tap toast.
+     */
+    val contentDescription: String get() = "SIM $slot of $simCount$nameSuffix"
+
+    /**
+     * Tap-toast label, slot FIRST ("SIM 1 - Airtel"): with the same carrier
+     * on both SIMs the operator name alone is ambiguous, the slot never is.
+     * The name (the platform's SubscriptionInfo display name, which is the
+     * user's nickname when one is set) stays for users who rely on it.
+     */
+    val tapLabel: String get() = "SIM $slot$nameSuffix"
+
+    /**
+     * Long-press identity hint, "Sends with SIM 1 - Airtel" (GitHub #7,
+     * round 2): tap already CYCLES and announces the new choice, so
+     * long-press is the non-mutating "tell me what this is" - it names the
+     * SIM the next send will use without changing anything. Slot first for
+     * the same reason as [tapLabel]: with the same carrier on both SIMs the
+     * name alone is ambiguous, the slot never is.
+     */
+    val hintLabel: String get() = "Sends with SIM $slot$nameSuffix"
+
+    private val nameSuffix: String get() = if (operatorName.isBlank()) "" else " - $operatorName"
+}
+
+/**
+ * The one compose bar: an attach affordance (a "+" opening the attachment
+ * sheet), removable attachment chips with a running size indicator, text
+ * field, dual-SIM indicator (tap cycles SIMs and toasts the operator name)
+ * and a Send button whose long-press opens the schedule picker (text-only
+ * messages; with attachments staged, scheduling is SMS-only and the
+ * long-press explains that instead). A small toggle at the box's top right
+ * expands the field to fill all space above the keyboard for long
+ * messages ([ComposerExpansion] holds the pure state logic); expanded,
+ * attach/SIM/Send hide and [recipientLabel] keeps the recipient visible.
+ * Shared by the conversation screen and the new-conversation screen so
+ * send affordances - and the expansion behaviour - never diverge.
+ */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun MessageComposerBar(
+    draft: String,
+    onDraftChange: (String) -> Unit,
+    onSend: () -> Unit,
+    sim: SimUiState,
+    onCycleSim: () -> SimUiState?,
+    onScheduleSend: () -> Unit,
+    recipientLabel: String,
+    modifier: Modifier = Modifier,
+    attachments: List<StagedAttachment> = emptyList(),
+    onAttachClick: (() -> Unit)? = null,
+    onRemoveAttachment: (StagedAttachment) -> Unit = {},
+    attachmentError: AttachmentError? = null,
+) {
+    val context = LocalContext.current
+    // Expand-to-full-screen: state lives HERE, in the one shared bar, so
+    // both compose entry points get identical behaviour for free.
+    // rememberSaveable keeps the choice across rotation.
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    val barState = ComposerExpansion.affordances(expanded)
+    // Back collapses first; collapsed, the handler is disabled so back is
+    // never swallowed and leaves the screen as always.
+    BackHandler(enabled = ComposerExpansion.backCollapsesFirst(expanded)) { expanded = false }
+
+    // The field's text + cursor/selection, saved across config changes via
+    // TextFieldValue.Saver, so a long message never loses the caret. The
+    // String draft stays the source of truth in the ViewModel; external
+    // changes (send-consume, failure-restore, persisted-draft load) are
+    // adopted only across an empty boundary - see shouldAdoptExternalDraft.
+    var fieldValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue(draft, TextRange(draft.length)))
+    }
+    if (ComposerExpansion.shouldAdoptExternalDraft(external = draft, field = fieldValue.text)) {
+        fieldValue = TextFieldValue(draft, TextRange(draft.length))
+    }
+
+    // Expanded, the box pads by the LIVE insets - max(IME, nav bar), pure
+    // and unit-tested - rather than any assumed keyboard height; the
+    // status-bar inset keeps the recipient header out from under the clock.
+    val density = LocalDensity.current
+    val expandedBottomPad =
+        with(density) {
+            ComposerExpansion
+                .expandedBottomInsetPx(
+                    imeBottomPx = WindowInsets.ime.getBottom(this),
+                    navigationBarsBottomPx = WindowInsets.navigationBars.getBottom(this),
+                ).toDp()
+        }
+    Column(
+        modifier =
+            if (expanded) {
+                modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.surface)
+                    .statusBarsPadding()
+                    .padding(bottom = expandedBottomPad)
+            } else {
+                // union (not chained padding) = max(ime, navigation bar):
+                // keyboard open, the IME inset governs; closed, the bar must
+                // still clear the system navigation bar (3-button mode drew
+                // the field's bottom underneath it).
+                modifier
+                    .fillMaxWidth()
+                    .windowInsetsPadding(WindowInsets.ime.union(WindowInsets.navigationBars))
+            },
+    ) {
+        if (barState.recipientHeaderVisible) {
+            // Expanded, the field covers the top app bar, so the recipient
+            // identity (contact name or number / the conversation's sender)
+            // moves into this header - the user always sees who they are
+            // writing to. The shrink toggle keeps its top-right home.
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 8.dp, top = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = recipientLabel,
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
+                )
+                ExpandToggle(expanded = true, onToggle = { expanded = false })
+            }
+        }
+        if (barState.attachmentsRowVisible) {
+            if (attachments.isNotEmpty()) {
+                AttachmentChipsRow(attachments = attachments, onRemove = onRemoveAttachment, error = attachmentError)
+            } else {
+                // An error can outlive its refused attachment (nothing staged).
+                AttachmentErrorText(attachmentError)
+            }
+        }
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .then(if (barState.fieldFillsHeight) Modifier.weight(1f) else Modifier)
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            if (barState.attachVisible && onAttachClick != null) {
+                TooltipIconButton(
+                    label = stringResource(R.string.compose_attach),
+                    onClick = onAttachClick,
+                    icon = Icons.Outlined.Add,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            // ONE OutlinedTextField call for both states (only modifiers and
+            // maxLines change), so the field node - and with it the in-flight
+            // selection and internal scroll - survives every expand/collapse.
+            Box(
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .then(if (barState.fieldFillsHeight) Modifier.fillMaxHeight() else Modifier),
+            ) {
+                OutlinedTextField(
+                    value = fieldValue,
+                    onValueChange = {
+                        fieldValue = it
+                        onDraftChange(it.text)
+                    },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .then(if (barState.fieldFillsHeight) Modifier.fillMaxHeight() else Modifier),
+                    placeholder = { Text(stringResource(R.string.conversation_reply_hint)) },
+                    shape = RoundedCornerShape(28.dp),
+                    maxLines = barState.fieldMaxLines,
+                )
+                if (!expanded) {
+                    // The operator's "one small icon on top right": it rides
+                    // the compose box's own top-right corner.
+                    ExpandToggle(
+                        expanded = false,
+                        onToggle = { expanded = true },
+                        modifier = Modifier.align(Alignment.TopEnd),
+                    )
+                }
+            }
+            // Compact SIM indicator, dual-SIM devices only: a plain SIM-card
+            // outline whose ONLY content is the slot number - the stock icon's
+            // contact dots made the digit illegible (GitHub #7). Tapping
+            // cycles SIMs and toasts the slot-first label; long-press is the
+            // non-mutating identity hint ("Sends with SIM 1 - Airtel").
+            // Outline and digit take the system's SIM colour when it is
+            // legible on this theme's surface (see simIndicatorTint).
+            if (barState.simIndicatorVisible) {
+                if (sim.visible) {
+                    val simIdentity = stringResource(R.string.conversation_sim_identity)
+                    val simTint =
+                        simIndicatorTint(
+                            systemTint = sim.iconTint?.let { Color(it) },
+                            surface = MaterialTheme.colorScheme.surface,
+                            fallback = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier =
+                            Modifier
+                                .clip(RoundedCornerShape(14.dp))
+                                .combinedClickable(
+                                    onClick = {
+                                        // Toast the POST-switch state the cycle returns - never
+                                        // the `sim` parameter: that is the state captured when
+                                        // this composition was built, so inside the click lambda
+                                        // it is one step BEHIND the switch it just made
+                                        // (switching to SIM 2 used to toast "SIM 1"). No switch
+                                        // (no active SIMs) means no toast.
+                                        onCycleSim()?.let { switched ->
+                                            Toast.makeText(context, switched.tapLabel, Toast.LENGTH_SHORT).show()
+                                        }
+                                    },
+                                    onClickLabel = stringResource(R.string.conversation_sim_switch),
+                                    onLongClick = {
+                                        Toast.makeText(context, sim.hintLabel, Toast.LENGTH_LONG).show()
+                                    },
+                                    onLongClickLabel = simIdentity,
+                                ).padding(6.dp),
+                    ) {
+                        Icon(
+                            SimOutlineGlyph,
+                            contentDescription = sim.contentDescription,
+                            tint = simTint,
+                        )
+                        // The digit IS the indicator: as large as the outline's
+                        // interior (~11dp wide at the 24dp icon size) allows
+                        // without clipping. Same tint as the outline, so the
+                        // system colour (or the onSurfaceVariant fallback) reads
+                        // as ONE mark that stays legible on the bar surface in
+                        // both light and dark themes.
+                        Text(
+                            text = sim.slot.toString(),
+                            fontSize = ComposeBarIndicatorMetrics.GlyphFontSize,
+                            lineHeight = ComposeBarIndicatorMetrics.GlyphFontSize,
+                            fontWeight = FontWeight.Bold,
+                            color = simTint,
+                        )
+                    }
+                }
+            }
+            // Send: tap sends now, long-press opens the schedule picker. A
+            // custom surface because FilledIconButton exposes no long-press.
+            // While there is a text-only message to send, a small clock rides
+            // the button's top-start corner hinting that Send has a long-press
+            // behind it; with attachments staged, scheduling is SMS-only and
+            // the long-press says so instead. Hidden while EXPANDED (the
+            // operator's ask): the full-screen box is for writing, and
+            // send-with-schedule stays a collapsed-only affordance.
+            if (barState.sendVisible) {
+                val enabled = draft.isNotBlank() || attachments.isNotEmpty()
+                val scheduleAvailable = scheduleHintVisible(draft, attachments.size)
+                val scheduleSmsOnly = stringResource(R.string.compose_attachment_schedule_sms_only)
+                Box {
+                    Surface(
+                        shape = RoundedCornerShape(20.dp),
+                        color =
+                            if (enabled) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.surfaceVariant
+                            },
+                        modifier =
+                            Modifier.combinedClickable(
+                                enabled = enabled,
+                                onClick = onSend,
+                                onClickLabel = stringResource(R.string.action_send),
+                                onLongClick =
+                                    if (scheduleAvailable) {
+                                        onScheduleSend
+                                    } else {
+                                        { Toast.makeText(context, scheduleSmsOnly, Toast.LENGTH_SHORT).show() }
+                                    },
+                                onLongClickLabel = stringResource(R.string.conversation_schedule_send),
+                            ),
+                    ) {
+                        Icon(
+                            Icons.AutoMirrored.Outlined.Send,
+                            contentDescription = stringResource(R.string.action_send),
+                            tint =
+                                if (enabled) {
+                                    MaterialTheme.colorScheme.onPrimary
+                                } else {
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                },
+                            modifier = Modifier.padding(10.dp),
+                        )
+                    }
+                    if (scheduleAvailable) {
+                        Icon(
+                            Icons.Outlined.Schedule,
+                            contentDescription = stringResource(R.string.conversation_schedule_send),
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier =
+                                Modifier
+                                    .align(Alignment.TopStart)
+                                    .offset(x = (-4).dp, y = (-4).dp)
+                                    .size(14.dp)
+                                    .background(MaterialTheme.colorScheme.surface, CircleShape),
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * The expand/shrink toggle riding the compose box's top-right corner: a
+ * deliberately SMALL glyph (20dp) whose clickable padding still yields a
+ * 40dp touch target. Distinct content descriptions and click labels per
+ * state, so TalkBack announces "Expand compose box" vs "Shrink compose
+ * box". A custom affordance rather than [TooltipIconButton]: the wrapper's
+ * 48dp IconButton overlapping the text field's corner would swallow taps
+ * meant to place the cursor near the end of the text.
+ */
+@Composable
+private fun ExpandToggle(
+    expanded: Boolean,
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val label = stringResource(if (expanded) R.string.compose_collapse else R.string.compose_expand)
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier =
+            modifier
+                .clip(CircleShape)
+                .clickable(onClick = onToggle, onClickLabel = label)
+                .padding(10.dp),
+    ) {
+        Icon(
+            if (expanded) Icons.Outlined.CloseFullscreen else Icons.Outlined.OpenInFull,
+            contentDescription = label,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(20.dp),
+        )
+    }
+}
+
+/**
+ * Whether the schedule affordances (clock badge; reachable long-press) are
+ * live: exactly when the compose field has something to send AND no
+ * attachments are staged. Scheduling is SMS-only this wave: a scheduled
+ * row persists only text, and building staged-part persistence plus an
+ * alarm-path MMS dispatch would double the send surface for a niche
+ * combination - the compose bar says so honestly instead of guessing.
+ */
+internal fun scheduleHintVisible(
+    draft: String,
+    attachmentCount: Int = 0,
+): Boolean = draft.isNotBlank() && attachmentCount == 0
+
+/**
+ * The ONE set of size constants for the compose bar's small indicator
+ * glyphs. The SIM slot indicator draws from here so the outline and the
+ * slot digit stay sized together.
+ */
+internal object ComposeBarIndicatorMetrics {
+    /** Icon footprint - the SIM outline's intrinsic size. */
+    val IconSize = 24.dp
+
+    /** Glyph drawn inside the footprint (the SIM slot digit). */
+    val GlyphFontSize = 12.sp
+}
+
+/**
+ * The colour the SIM indicator (outline + digit) is drawn in, pure so the
+ * decision is unit-testable without a Compose harness. The system's SIM
+ * colour ([android.telephony.SubscriptionInfo.getIconTint]) wins when
+ * present AND legible - it is the colour the user already sees for this SIM
+ * in system settings (GitHub #7). Legible means the WCAG 1.4.11 non-text
+ * contrast minimum, 3:1 against the surface the bar sits on (the same
+ * contrast-ratio arithmetic the brand tiles use, [contrastRatio], not a new
+ * invention) - so a dark system tint on a dark theme, or a pale one on
+ * light, falls back to [fallback] (onSurfaceVariant, the pre-tint colour)
+ * instead of vanishing. Absent tint falls back the same way; duplicate
+ * tints across SIMs are fine - the slot digit disambiguates, per round 1.
+ */
+internal fun simIndicatorTint(
+    systemTint: Color?,
+    surface: Color,
+    fallback: Color,
+): Color =
+    if (systemTint != null && contrastRatio(systemTint.copy(alpha = 1f), surface) >= 3.0) {
+        systemTint.copy(alpha = 1f)
+    } else {
+        fallback
+    }
+
+/**
+ * A plain SIM-card outline - the familiar clipped-corner card shape and
+ * nothing inside it. Replaces the stock Material outlined `SimCard` icon,
+ * whose chip-contact dots competed with the slot digit and made it
+ * unreadable (GitHub #7). Stroke-only, so [Icon]'s tint colors just the
+ * outline and the digit sits directly on the bar surface. No dots, no chip
+ * contacts - the overlaid slot digit is the glyph's only content.
+ */
+private val SimOutlineGlyph: ImageVector by lazy {
+    ImageVector
+        .Builder(
+            name = "SimOutlineGlyph",
+            defaultWidth = ComposeBarIndicatorMetrics.IconSize,
+            defaultHeight = ComposeBarIndicatorMetrics.IconSize,
+            viewportWidth = 24f,
+            viewportHeight = 24f,
+        ).apply {
+            path(
+                // Any opaque color works: Icon recolors the whole vector via tint.
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 1.6f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round,
+            ) {
+                moveTo(6.5f, 8.5f)
+                // The clipped corner that reads as "SIM card".
+                lineTo(11.5f, 3.5f)
+                lineTo(16f, 3.5f)
+                quadTo(17.5f, 3.5f, 17.5f, 5f)
+                lineTo(17.5f, 19f)
+                quadTo(17.5f, 20.5f, 16f, 20.5f)
+                lineTo(8f, 20.5f)
+                quadTo(6.5f, 20.5f, 6.5f, 19f)
+                close()
+            }
+        }.build()
+}
+
+/**
+ * Replaces [MessageComposerBar] for one-way senders (alphanumeric ids, short
+ * codes). Lives here because it is a bottom bar: like the composer it must
+ * pad for the system navigation bar itself (the Scaffold bottomBar slot adds
+ * no inset), and this file is the single sanctioned home for inset reads
+ * (see SystemBarInsetOwnershipConventionTest).
+ */
+@Composable
+fun NotRepliableBar() {
+    Surface(color = MaterialTheme.colorScheme.surfaceVariant) {
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            Icon(
+                Icons.Outlined.Info,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                text = stringResource(R.string.conversation_not_repliable),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}

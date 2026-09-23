@@ -1,0 +1,2443 @@
+item_id,category,repo,file,composable,evidence,snippet,verdict,notes,abs_path,resolve_method,file_found,decl_line,decl_name,decl_confidence,anchor_line,anchor_pattern,anchor_scope,anchor_text,anchor_found,context,imports
+pilot-0201,pointerinput_no_semantics,msusman1__Amadz,msusman1__Amadz/app/src/main/java/com/talsk/amadz/ui/home/KeyPad.kt,RowScope,detectTapGestures without semantics/Role,"
+@Composable
+fun RowScope.DialButton(
+    title: Char,
+    subtitle: String,
+    onTapDown: (Char) -> Unit,
+    onTapUp: () -> Unit
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+
+    Column(
+        modifier = Modifier
+            .weight(1f)
+            .height(56.dp)
+            .background(
+                shape = RoundedCornerShape(16.dp),",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/msusman1__Amadz/app/src/main/java/com/talsk/amadz/ui/home/KeyPad.kt,exact,True,231,RowScope.DialButton,1.0,251.0,detectTapGestures,body,detectTapGestures(,True,"  231 | fun RowScope.DialButton(
+  232 |     title: Char,
+  233 |     subtitle: String,
+  234 |     onTapDown: (Char) -> Unit,
+  235 |     onTapUp: () -> Unit
+  236 | ) {
+  237 |     val interactionSource = remember { MutableInteractionSource() }
+  238 | 
+  239 |     Column(
+  240 |         modifier = Modifier
+  241 |             .weight(1f)
+  242 |             .height(56.dp)
+  243 |             .background(
+  244 |                 shape = RoundedCornerShape(16.dp),
+  245 |                 color = MaterialTheme.colorScheme.background,
+  246 | 
+  247 |                 )
+  248 |             .clip(RoundedCornerShape(16.dp))
+  249 |             .indication(interactionSource, LocalIndication.current)
+  250 |             .pointerInput(Unit) {
+  251 |                 detectTapGestures(
+  252 |                     onPress = { offset ->
+  253 |                         val press = PressInteraction.Press(offset)
+  254 |                         interactionSource.emit(press)
+  255 |                         onTapDown(title)
+  256 |                         tryAwaitRelease()
+  257 |                         interactionSource.emit(PressInteraction.Release(press))
+  258 |                         onTapUp()
+  259 |                     }
+  260 |                 )
+  261 |             },
+  262 |         verticalArrangement = Arrangement.Center,
+  263 |         horizontalAlignment = Alignment.CenterHorizontally
+  264 |     ) {
+  265 |         Text(
+  266 |             text = title.toString(),
+  267 |             style = MaterialTheme.typography.headlineMedium,
+  268 |             fontWeight = FontWeight.Bold,
+  269 |             color = MaterialTheme.colorScheme.onBackground
+  270 |         )
+  271 |         Text(
+  272 |             text = subtitle, style = MaterialTheme.typography.bodySmall,
+  273 |             color = MaterialTheme.colorScheme.onBackground
+  274 |         )
+  275 |     }
+  276 | }","import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Backspace
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.talsk.amadz.R
+import com.talsk.amadz.ui.IconButtonLongClickable
+import com.talsk.amadz.ui.theme.AmadzTheme"
+pilot-0202,pointerinput_no_semantics,wisnukurniawan__Compose-Expense,wisnukurniawan__Compose-Expense/app/src/main/java/com/wisnu/kurniawan/wallee/features/transaction/detail/ui/TransactionDetailScreen.kt,TransactionDetailScreen,detectTapGestures without semantics/Role,"
+@Composable
+fun TransactionDetailScreen(
+    viewModel: TransactionDetailViewModel,
+    onClosePage: () -> Unit,
+    onCancelClick: () -> Unit,
+    onAccountSectionClick: () -> Unit,
+    onAddAccountClick: () -> Unit,
+    onCategorySectionClick: () -> Unit,
+    onTransferAccountSectionClick: () -> Unit,
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    val focusRequester = remember { FocusRequester() }
+    val localFocusManager = LocalFocusManager.current
+    val activity = LocalContext.current as AppCompatActivity",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/wisnukurniawan__Compose-Expense/app/src/main/java/com/wisnu/kurniawan/wallee/features/transaction/detail/ui/TransactionDetailScreen.kt,exact,True,92,TransactionDetailScreen,1.0,7.0,detectTapGestures,file,import androidx.compose.foundation.gestures.detectTapGestures,True,"    1 | package com.wisnu.kurniawan.wallee.features.transaction.detail.ui
+    2 | 
+    3 | import androidx.appcompat.app.AppCompatActivity
+    4 | import androidx.compose.foundation.BorderStroke
+    5 | import androidx.compose.foundation.background
+    6 | import androidx.compose.foundation.clickable
+    7 | import androidx.compose.foundation.gestures.detectTapGestures
+    8 | import androidx.compose.foundation.interaction.MutableInteractionSource
+    9 | import androidx.compose.foundation.layout.Arrangement
+   10 | import androidx.compose.foundation.layout.Box
+   11 | import androidx.compose.foundation.layout.PaddingValues
+   12 | import androidx.compose.foundation.layout.Row
+   13 | import androidx.compose.foundation.layout.Spacer
+   14 | import androidx.compose.foundation.layout.fillMaxSize
+   15 | import androidx.compose.foundation.layout.fillMaxWidth
+   16 | import androidx.compose.foundation.layout.height
+   17 | import androidx.compose.foundation.layout.imePadding
+   18 | import androidx.compose.foundation.layout.navigationBarsPadding
+   19 | import androidx.compose.foundation.layout.padding
+   20 | import androidx.compose.foundation.layout.size
+   21 | import androidx.compose.foundation.layout.width
+   22 | import androidx.compose.foundation.lazy.LazyColumn
+   23 | import androidx.compose.foundation.lazy.grid.GridCells
+   24 | import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+   25 | import androidx.compose.foundation.lazy.grid.items
+   26 | import androidx.compose.foundation.shape.RoundedCornerShape
+   27 | import androidx.compose.foundation.text.KeyboardActions
+   28 | import androidx.compose.foundation.text.KeyboardOptions
+   29 | import androidx.compose.material.Chip
+   30 | import androidx.compose.material.ChipDefaults
+   31 | import androidx.compose.material.ExperimentalMaterialApi
+   32 | import androidx.compose.material3.Text
+   33 | import androidx.compose.material3.TextButton
+   34 | import androidx.compose.material.icons.Icons
+   35 | import androidx.compose.material.icons.rounded.ChevronRight
+   36 | import androidx.compose.material3.DatePicker
+   37 | import androidx.compose.material3.DatePickerDefaults
+   38 | import androidx.compose.material3.DatePickerDialog
+   39 | import androidx.compose.material3.DisplayMode
+   40 | import androidx.compose.material3.ExperimentalMaterial3Api
+   41 | import androidx.compose.material3.LocalContentColor
+   42 | import androidx.compose.material3.MaterialTheme
+   43 | import androidx.compose.material3.SelectableDates
+   44 | import androidx.compose.material3.rememberDatePickerState
+   45 | import androidx.compose.runtime.Composable
+   46 | import androidx.compose.runtime.CompositionLocalProvider
+   47 | import androidx.compose.runtime.derivedStateOf","import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Chip
+import androidx.compose.material.ChipDefaults
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ChevronRight
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DisplayMode
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.wisnu.foundation.coredatetime.toLocalDateTime
+import com.wisnu.foundation.coredatetime.toMillis
+import com.wisnu.kurniawan.wallee.R
+import com.wisnu.kurniawan.wallee.foundation.extension.getEmojiAndText
+import com.wisnu.kurniawan.wallee.foundation.theme.AlphaDisabled
+import com.wisnu.kurniawan.wallee.foundation.theme.AlphaHigh
+import com.wisnu.kurniawan.wallee.foundation.theme.MediumRadius
+import com.wisnu.kurniawan.wallee.foundation.uicomponent.ActionContentCell
+import com.wisnu.kurniawan.wallee.foundation.uicomponent.PgBasicTextField
+import com.wisnu.kurniawan.wallee.foundation.uicomponent.PgContentTitle
+import com.wisnu.kurniawan.wallee.foundation.uicomponent.PgHeaderEditMode
+import com.wisnu.kurniawan.wallee.foundation.uicomponent.PgHeadlineLabel
+import com.wisnu.kurniawan.wallee.foundation.uicomponent.PgIcon
+import com.wisnu.kurniawan.wallee.foundation.uicomponent.PgPageLayout
+import com.wisnu.kurniawan.wallee.foundation.uicomponent.PgSecondaryButton
+import com.wisnu.kurniawan.wallee.foundation.uicomponent.PgTabLabel
+import com.wisnu.kurniawan.wallee.foundation.uiextension.paddingCell
+import com.wisnu.kurniawan.wallee.foundation.viewmodel.HandleEffect
+import com.wisnu.kurniawan.wallee.model.CategoryType
+import com.wisnu.kurniawan.wallee.model.TransactionType
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset"
+pilot-0203,pointerinput_no_semantics,DaKlok__BibleLockScreen,DaKlok__BibleLockScreen/app/src/main/java/com/daklok/biblelockscreen/ColorPickerDialog.kt,ColorPickerDialog,detectTapGestures without semantics/Role,"
+@Composable
+fun ColorPickerDialog(
+    initialColor: Color = Color.White,
+    strings: AppStrings,
+    onDismiss: () -> Unit,
+    onColorSelected: (Color) -> Unit
+) {
+    val (initH, initS, initV) = colorToHsv(initialColor)
+
+    var hueState   by remember { mutableStateOf(initH) }
+    var satState   by remember { mutableStateOf(initS) }
+    var valueState by remember { mutableStateOf(initV) }
+
+    val currentColor by remember(hueState, satState, valueState) {
+        derivedStateOf { hsvToColor(hueState, satState, valueState) }",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/DaKlok__BibleLockScreen/app/src/main/java/com/daklok/biblelockscreen/ColorPickerDialog.kt,exact,True,109,ColorPickerDialog,1.0,186.0,detectTapGestures,body,detectTapGestures { handle(it) },True,"  174 |                         modifier = Modifier
+  175 |                             .size(160.dp)
+  176 |                             .clip(CircleShape)
+  177 |                             .pointerInput(valueState) {
+  178 |                                 val sz = size.width.toFloat()
+  179 |                                 val cx = sz / 2f; val r = sz / 2f
+  180 |                                 fun handle(pos: Offset) {
+  181 |                                     val dx = pos.x - cx; val dy = pos.y - cx
+  182 |                                     val dist = sqrt(dx * dx + dy * dy).coerceAtMost(r)
+  183 |                                     val h = ((atan2(dy, dx) * 180f / PI.toFloat()) + 360f) % 360f
+  184 |                                     setHsv(h, dist / r, valueState, fromWheel = true)
+  185 |                                 }
+  186 |                                 detectTapGestures { handle(it) }
+  187 |                             }
+  188 |                             .pointerInput(valueState) {
+  189 |                                 val sz = size.width.toFloat()
+  190 |                                 val cx = sz / 2f; val r = sz / 2f
+  191 |                                 detectDragGestures { change, _ ->
+  192 |                                     val pos = change.position
+  193 |                                     val dx  = pos.x - cx; val dy = pos.y - cx
+  194 |                                     val dist = sqrt(dx * dx + dy * dy).coerceAtMost(r)
+  195 |                                     val h = ((atan2(dy, dx) * 180f / PI.toFloat()) + 360f) % 360f
+  196 |                                     setHsv(h, dist / r, valueState, fromWheel = true)
+  197 |                                 }
+  198 |                             }
+  199 |                     ) {
+  200 |                         Canvas(modifier = Modifier.fillMaxSize()) {
+  201 |                             drawColorWheel(valueState)
+  202 |                             // cursor
+  203 |                             val cx2  = size.width  / 2f
+  204 |                             val cy2  = size.height / 2f
+  205 |                             val r2   = minOf(cx2, cy2)
+  206 |                             val ang  = hueState * PI.toFloat() / 180f
+  207 |                             val dotX = cx2 + satState * r2 * cos(ang)
+  208 |                             val dotY = cy2 + satState * r2 * sin(ang)
+  209 |                             drawCircle(Color.White,        radius = 10f, center = Offset(dotX, dotY))
+  210 |                             drawCircle(currentColor,       radius = 7f,  center = Offset(dotX, dotY))
+  211 |                         }
+  212 |                     }
+  213 | 
+  214 |                     Column(
+  215 |                         modifier            = Modifier.weight(1f),
+  216 |                         verticalArrangement = Arrangement.spacedBy(8.dp)
+  217 |                     ) {
+  218 |                         // Swatch
+  219 |                         Box(
+  220 |                             modifier = Modifier
+  221 |                                 .fillMaxWidth()
+  222 |                                 .height(44.dp)
+  223 |                                 .clip(RoundedCornerShape(10.dp))
+  224 |                                 .background(currentColor)
+  225 |                                 .border(
+  226 |                                     0.5.dp,","import com.daklok.biblelockscreen.strings.*
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import kotlin.math.*"
+pilot-0204,pointerinput_no_semantics,android__androidify,android__androidify/feature/camera/src/main/java/com/android/developers/androidify/camera/CameraViewfinder.kt,CameraViewfinder,detectTapGestures without semantics/Role,"
+@Composable
+internal fun CameraViewfinder(
+    surfaceRequest: SurfaceRequest,
+    autofocusUiState: AutofocusUiState,
+    tapToFocus: (tapCoords: Offset) -> Unit,
+    onScaleZoom: (zoomScaleFactor: Float) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val onScaleCurrentZoom by rememberUpdatedState(onScaleZoom)
+    val currentTapToFocus by rememberUpdatedState(tapToFocus)
+    val coordinateTransformer = remember { MutableCoordinateTransformer() }
+    CameraXViewfinder(
+        surfaceRequest = surfaceRequest,
+        coordinateTransformer = coordinateTransformer,
+        modifier = modifier",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/android__androidify/feature/camera/src/main/java/com/android/developers/androidify/camera/CameraViewfinder.kt,exact,True,49,CameraViewfinder,1.0,64.0,detectTapGestures,body,detectTapGestures { tapCoords ->,True,"   49 | internal fun CameraViewfinder(
+   50 |     surfaceRequest: SurfaceRequest,
+   51 |     autofocusUiState: AutofocusUiState,
+   52 |     tapToFocus: (tapCoords: Offset) -> Unit,
+   53 |     onScaleZoom: (zoomScaleFactor: Float) -> Unit,
+   54 |     modifier: Modifier = Modifier,
+   55 | ) {
+   56 |     val onScaleCurrentZoom by rememberUpdatedState(onScaleZoom)
+   57 |     val currentTapToFocus by rememberUpdatedState(tapToFocus)
+   58 |     val coordinateTransformer = remember { MutableCoordinateTransformer() }
+   59 |     CameraXViewfinder(
+   60 |         surfaceRequest = surfaceRequest,
+   61 |         coordinateTransformer = coordinateTransformer,
+   62 |         modifier = modifier
+   63 |             .pointerInput(coordinateTransformer) {
+   64 |                 detectTapGestures { tapCoords ->
+   65 |                     with(coordinateTransformer) {
+   66 |                         currentTapToFocus(tapCoords.transform())
+   67 |                     }
+   68 |                 }
+   69 |             }
+   70 |             .transformable(
+   71 |                 rememberTransformableState(
+   72 |                     onTransformation = { _, zoomChange, _, _ ->
+   73 |                         onScaleCurrentZoom(zoomChange)
+   74 |                     },
+   75 |                 ),
+   76 |             ),
+   77 |     )
+   78 | 
+   79 |     if (autofocusUiState is AutofocusUiState.Specified) {
+   80 |         // Show the autofocus indicator while the autofocus routine is running
+   81 |         val showAutofocusIndicator = autofocusUiState.status == AutofocusUiState.Status.RUNNING
+   82 |         // Map coordinates from surface coordinates back to screen coordinates
+   83 |         val tapCoords =
+   84 |             remember(coordinateTransformer.transformMatrix, autofocusUiState.surfaceCoordinates) {
+   85 |                 Matrix().run {
+   86 |                     setFrom(coordinateTransformer.transformMatrix)
+   87 |                     invert()
+   88 |                     map(autofocusUiState.surfaceCoordinates)
+   89 |                 }
+   90 |             }
+   91 |         AnimatedVisibility(
+   92 |             visible = showAutofocusIndicator,
+   93 |             enter = fadeIn(),
+   94 |             exit = fadeOut(),
+   95 |             modifier = Modifier
+   96 |                 .offset { tapCoords.round() }
+   97 |                 .offset(-TAP_TO_FOCUS_INDICATOR_SIZE / 2, -TAP_TO_FOCUS_INDICATOR_SIZE / 2),
+   98 |         ) {
+   99 |             Spacer(
+  100 |                 Modifier
+  101 |                     .border(
+  102 |                         2.dp,
+  103 |                         when (autofocusUiState.status) {
+  104 |                             AutofocusUiState.Status.SUCCESS -> LimeGreen","import androidx.camera.compose.CameraXViewfinder
+import androidx.camera.core.SurfaceRequest
+import androidx.camera.viewfinder.compose.MutableCoordinateTransformer
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.rememberTransformableState
+import androidx.compose.foundation.gestures.transformable
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Matrix
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.round
+import com.android.developers.androidify.theme.Error
+import com.android.developers.androidify.theme.LimeGreen
+import com.android.developers.androidify.theme.Surface"
+pilot-0205,pointerinput_no_semantics,ArcaDone__AwesomeUI,ArcaDone__AwesomeUI/sharedUI/src/commonMain/kotlin/com/arcadone/awesomeui/components/chart/RadarChart.kt,RadarChartMultiCanvas,detectTapGestures without semantics/Role,"
+@Composable
+private fun RadarChartMultiCanvas(
+    axisLabels: List<RadarAxisLabel>,
+    series: List<RadarSeries>,
+    style: RadarChartStyle,
+    selectedSeriesIndex: Int?,
+    selectedPointIndex: Int?,
+    onPointTap: (Int, Int) -> Unit,
+) {
+    val axisCount = axisLabels.size
+    val angleStep = 2 * PI / axisCount
+    val density = LocalDensity.current
+    val hitRadiusPx = with(density) { style.hitRadius.toPx() }
+    val chartSizePx = with(density) { style.chartSize.toPx() }
+",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/ArcaDone__AwesomeUI/sharedUI/src/commonMain/kotlin/com/arcadone/awesomeui/components/chart/RadarChart.kt,exact,True,395,RadarChartMultiCanvas,1.0,413.0,detectTapGestures,body,detectTapGestures { tapOffset ->,True,"  395 | private fun RadarChartMultiCanvas(
+  396 |     axisLabels: List<RadarAxisLabel>,
+  397 |     series: List<RadarSeries>,
+  398 |     style: RadarChartStyle,
+  399 |     selectedSeriesIndex: Int?,
+  400 |     selectedPointIndex: Int?,
+  401 |     onPointTap: (Int, Int) -> Unit,
+  402 | ) {
+  403 |     val axisCount = axisLabels.size
+  404 |     val angleStep = 2 * PI / axisCount
+  405 |     val density = LocalDensity.current
+  406 |     val hitRadiusPx = with(density) { style.hitRadius.toPx() }
+  407 |     val chartSizePx = with(density) { style.chartSize.toPx() }
+  408 | 
+  409 |     Box(
+  410 |         modifier = Modifier
+  411 |             .size(style.chartSize)
+  412 |             .pointerInput(series, axisLabels) {
+  413 |                 detectTapGestures { tapOffset ->
+  414 |                     val centerX = chartSizePx / 2
+  415 |                     val centerY = chartSizePx / 2
+  416 |                     val radius = chartSizePx / 2 * 0.85f
+  417 | 
+  418 |                     // Check each series and point for hit
+  419 |                     for (seriesIndex in series.indices.reversed()) {
+  420 |                         val values = series[seriesIndex].values
+  421 |                         for (pointIndex in 0 until minOf(values.size, axisCount)) {
+  422 |                             val angle = -PI / 2 + angleStep * pointIndex
+  423 |                             val value = values[pointIndex].coerceIn(0f, 1f)
+  424 |                             val r = radius * value
+  425 |                             val pointX = centerX + r * cos(angle).toFloat()
+  426 |                             val pointY = centerY + r * sin(angle).toFloat()
+  427 | 
+  428 |                             val distance = sqrt(
+  429 |                                 (tapOffset.x - pointX).pow(2) +
+  430 |                                     (tapOffset.y - pointY).pow(2),
+  431 |                             )
+  432 | 
+  433 |                             if (distance <= hitRadiusPx) {
+  434 |                                 onPointTap(seriesIndex, pointIndex)
+  435 |                                 return@detectTapGestures
+  436 |                             }
+  437 |                         }
+  438 |                     }
+  439 |                     // Tap outside any point - deselect
+  440 |                     onPointTap(-1, -1)
+  441 |                 }
+  442 |             }
+  443 |             .drawBehind {
+  444 |                 val centerX = size.width / 2
+  445 |                 val centerY = size.height / 2
+  446 |                 val radius = size.minDimension / 2 * 0.85f
+  447 | 
+  448 |                 // Draw grid circles
+  449 |                 for (i in 1..style.gridLevels) {
+  450 |                     val r = radius * i / style.gridLevels
+  451 |                     drawCircle(
+  452 |                         color = style.gridColor.copy(alpha = 0.15f),
+  453 |                         radius = r,","import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.arcadone.awesomeui.components.utils.clickableNoOverlay
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt"
+pilot-0206,pointerinput_no_semantics,braniik__slate,braniik__slate/app/src/main/java/com/braniik/slate/ui/drawer/list/HomeList.kt,VerticalListItem,detectTapGestures without semantics/Role,"
+@Composable
+private fun VerticalListItem(
+    homeApp: HomeScreenApp,
+    info: AppInfo,
+    mode: HomeMode,
+    dragOffsetPx: Float,
+    onTap: (HomeScreenApp) -> Unit,
+    onLongPress: (HomeScreenApp) -> Unit,
+    onDragStart: () -> Unit,
+    onDrag: (Float) -> Unit,
+    onDragEnd: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val canDrag = mode == HomeMode.EDITING
+    val currentOnDragStart by rememberUpdatedState(onDragStart)",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/braniik__slate/app/src/main/java/com/braniik/slate/ui/drawer/list/HomeList.kt,exact,True,176,VerticalListItem,1.0,200.0,detectTapGestures,body,detectTapGestures(,True,"  176 | private fun VerticalListItem(
+  177 |     homeApp: HomeScreenApp,
+  178 |     info: AppInfo,
+  179 |     mode: HomeMode,
+  180 |     dragOffsetPx: Float,
+  181 |     onTap: (HomeScreenApp) -> Unit,
+  182 |     onLongPress: (HomeScreenApp) -> Unit,
+  183 |     onDragStart: () -> Unit,
+  184 |     onDrag: (Float) -> Unit,
+  185 |     onDragEnd: () -> Unit,
+  186 |     modifier: Modifier = Modifier
+  187 | ) {
+  188 |     val canDrag = mode == HomeMode.EDITING
+  189 |     val currentOnDragStart by rememberUpdatedState(onDragStart)
+  190 |     val currentOnDrag by rememberUpdatedState(onDrag)
+  191 |     val currentOnDragEnd by rememberUpdatedState(onDragEnd)
+  192 | 
+  193 |     Row(
+  194 |         verticalAlignment = Alignment.CenterVertically,
+  195 |         modifier = modifier
+  196 |             .fillMaxWidth()
+  197 |             .then(deleteBorder(mode))
+  198 |             .offset { IntOffset(0, dragOffsetPx.toInt()) }
+  199 |             .pointerInput(homeApp.key) {
+  200 |                 detectTapGestures(
+  201 |                     onLongPress = { onLongPress(homeApp) },
+  202 |                     onTap = { onTap(homeApp) }
+  203 |                 )
+  204 |             }
+  205 |             .then(
+  206 |                 if (canDrag) {
+  207 |                     Modifier.pointerInput(homeApp.key) {
+  208 |                         detectDragGestures(
+  209 |                             onDragStart = { currentOnDragStart() },
+  210 |                             onDrag = { change, amount ->
+  211 |                                 change.consume()
+  212 |                                 currentOnDrag(amount.y)
+  213 |                             },
+  214 |                             onDragEnd = { currentOnDragEnd() },
+  215 |                             onDragCancel = { currentOnDragEnd() }
+  216 |                         )
+  217 |                     }
+  218 |                 } else Modifier
+  219 |             )
+  220 |             .padding(vertical = 10.dp, horizontal = 4.dp)
+  221 |     ) {
+  222 |         if (homeApp.showLabel) {
+  223 |             val iconSize = homeApp.listIconSizeDp.dp
+  224 |             Image(
+  225 |                 bitmap = rememberAppIcon(info, homeApp.listIconSizeDp),
+  226 |                 contentDescription = info.label,
+  227 |                 modifier = Modifier
+  228 |                     .size(iconSize)
+  229 |                     .rotate(homeApp.rotationDeg)
+  230 |                     .clip(iconShapeFor(homeApp.iconShape))
+  231 |             )
+  232 |             Spacer(Modifier.width(16.dp))
+  233 |         }
+  234 | 
+  235 |         Text(
+  236 |             text = info.label,
+  237 |             fontSize = homeApp.listTextSizeSp.sp,
+  238 |             color = LocalWallpaperTextColor.current,
+  239 |             maxLines = 1,
+  240 |             overflow = TextOverflow.Ellipsis,","import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
+import com.braniik.slate.data.HomeScreenApp
+import com.braniik.slate.data.key
+import com.braniik.slate.data.LocalWallpaperTextColor
+import com.braniik.slate.ui.drawer.AppInfo
+import com.braniik.slate.ui.drawer.HomeMode
+import com.braniik.slate.ui.drawer.common.iconShapeFor
+import com.braniik.slate.ui.drawer.rememberAppIcon
+import com.braniik.slate.ui.theme.SlateDanger"
+pilot-0207,pointerinput_no_semantics,modelorona__TapLock,modelorona__TapLock/app/src/main/java/com/ah/taplock/SettingsComponents.kt,DoubleTapTestArea,detectTapGestures without semantics/Role,"
+@Composable
+fun DoubleTapTestArea(timeoutMs: Int) {
+    val detector = remember { DoubleTapDetector() }
+    var showSuccess by remember { mutableStateOf(false) }
+    val borderColor = if (showSuccess) Color(0xFF4CAF50) else MaterialTheme.colorScheme.outline
+
+    LaunchedEffect(showSuccess) {
+        if (showSuccess) {
+            delay(1000)
+            showSuccess = false
+        }
+    }
+
+    Box(
+        modifier = Modifier",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/modelorona__TapLock/app/src/main/java/com/ah/taplock/SettingsComponents.kt,exact,True,186,DoubleTapTestArea,1.0,208.0,detectTapGestures,body,detectTapGestures {,True,"  186 | fun DoubleTapTestArea(timeoutMs: Int) {
+  187 |     val detector = remember { DoubleTapDetector() }
+  188 |     var showSuccess by remember { mutableStateOf(false) }
+  189 |     val borderColor = if (showSuccess) Color(0xFF4CAF50) else MaterialTheme.colorScheme.outline
+  190 | 
+  191 |     LaunchedEffect(showSuccess) {
+  192 |         if (showSuccess) {
+  193 |             delay(1000)
+  194 |             showSuccess = false
+  195 |         }
+  196 |     }
+  197 | 
+  198 |     Box(
+  199 |         modifier = Modifier
+  200 |             .fillMaxWidth()
+  201 |             .height(80.dp)
+  202 |             .border(
+  203 |                 width = 2.dp,
+  204 |                 color = borderColor,
+  205 |                 shape = RoundedCornerShape(12.dp)
+  206 |             )
+  207 |             .pointerInput(timeoutMs) {
+  208 |                 detectTapGestures {
+  209 |                     if (detector.onTap(timeoutMs)) {
+  210 |                         showSuccess = true
+  211 |                     }
+  212 |                 }
+  213 |             },
+  214 |         contentAlignment = Alignment.Center
+  215 |     ) {
+  216 |         if (showSuccess) {
+  217 |             Row(
+  218 |                 horizontalArrangement = Arrangement.spacedBy(8.dp),
+  219 |                 verticalAlignment = Alignment.CenterVertically
+  220 |             ) {
+  221 |                 Icon(
+  222 |                     Icons.Filled.Check,
+  223 |                     contentDescription = null,
+  224 |                     tint = Color(0xFF4CAF50),
+  225 |                     modifier = Modifier.size(24.dp)
+  226 |                 )
+  227 |                 Text(
+  228 |                     stringResource(R.string.tap_test_success),
+  229 |                     color = Color(0xFF4CAF50),
+  230 |                     style = MaterialTheme.typography.bodyLarge
+  231 |                 )
+  232 |             }
+  233 |         } else {
+  234 |             Text(
+  235 |                 stringResource(R.string.tap_test_label),
+  236 |                 style = MaterialTheme.typography.bodyMedium,
+  237 |                 color = MaterialTheme.colorScheme.onSurfaceVariant
+  238 |             )
+  239 |         }
+  240 |     }
+  241 | }
+  242 | 
+  243 | @OptIn(ExperimentalMaterial3Api::class)
+  244 | @Composable
+  245 | fun TapModeSelector(
+  246 |     label: String,
+  247 |     mode: TapZoneMode,
+  248 |     onModeChange: (TapZoneMode) -> Unit,","import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay"
+pilot-0208,pointerinput_no_semantics,OMGSoundboard__android-app,OMGSoundboard__android-app/app/src/main/java/audio/omgsoundboard/presentation/composables/CategoryItem.kt,CategoryItem,detectTapGestures without semantics/Role,"
+@Composable
+fun CategoryItem(
+    item: Category,
+    index: Int,
+    onDropMenu: (Offset) -> Unit,
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val scope = rememberCoroutineScope()
+    var layoutCoordinates: LayoutCoordinates? = null
+
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(60.dp)
+            .padding(bottom = 6.dp)",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/OMGSoundboard__android-app/app/src/main/java/audio/omgsoundboard/presentation/composables/CategoryItem.kt,exact,True,35,CategoryItem,1.0,54.0,detectTapGestures,body,detectTapGestures(,True,"   35 | fun CategoryItem(
+   36 |     item: Category,
+   37 |     index: Int,
+   38 |     onDropMenu: (Offset) -> Unit,
+   39 | ) {
+   40 |     val interactionSource = remember { MutableInteractionSource() }
+   41 |     val scope = rememberCoroutineScope()
+   42 |     var layoutCoordinates: LayoutCoordinates? = null
+   43 | 
+   44 |     Surface(
+   45 |         modifier = Modifier
+   46 |             .fillMaxWidth()
+   47 |             .height(60.dp)
+   48 |             .padding(bottom = 6.dp)
+   49 |             .onGloballyPositioned { coordinates ->
+   50 |                 layoutCoordinates = coordinates
+   51 |             }
+   52 |             .indication(interactionSource, LocalIndication.current)
+   53 |             .pointerInput(Unit) {
+   54 |                 detectTapGestures(
+   55 |                     onLongPress = { offset ->
+   56 |                         scope.launch {
+   57 |                             val press = PressInteraction.Press(offset)
+   58 |                             interactionSource.emit(press)
+   59 |                             layoutCoordinates?.let { cords ->
+   60 |                                 val globalOffset = cords.localToWindow(offset)
+   61 |                                 onDropMenu(globalOffset)
+   62 |                             }
+   63 |                             interactionSource.emit(PressInteraction.Release(press))
+   64 |                         }
+   65 |                     }
+   66 |                 )
+   67 |             },
+   68 |         color = MaterialTheme.colorScheme.surfaceVariant,
+   69 |         shape = RoundedCornerShape(0.dp),
+   70 |     ) {
+   71 |         Row(
+   72 |             horizontalArrangement = Arrangement.Start,
+   73 |             verticalAlignment = Alignment.CenterVertically
+   74 |         ) {
+   75 |             Box(
+   76 |                 modifier = Modifier
+   77 |                     .background(
+   78 |                         if (index % 2 == 0) {
+   79 |                             MaterialTheme.colorScheme.tertiary
+   80 |                         } else {
+   81 |                             MaterialTheme.colorScheme.primary
+   82 |                         }
+   83 |                     )
+   84 |                     .width(3.dp)
+   85 |                     .height(60.dp)
+   86 |             )
+   87 |             Text(
+   88 |                 modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
+   89 |                 text = item.name,
+   90 |             )
+   91 |         }
+   92 |     }
+   93 | }","import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.unit.dp
+import audio.omgsoundboard.core.domain.models.Category
+import kotlinx.coroutines.launch"
+pilot-0209,pointerinput_no_semantics,braniik__slate,braniik__slate/app/src/main/java/com/braniik/slate/ui/drawer/list/HomeList.kt,HorizontalListItem,detectTapGestures without semantics/Role,"
+@Composable
+private fun HorizontalListItem(
+    homeApp: HomeScreenApp,
+    info: AppInfo,
+    mode: HomeMode,
+    dragOffsetPx: Float,
+    onTap: (HomeScreenApp) -> Unit,
+    onLongPress: (HomeScreenApp) -> Unit,
+    onDragStart: () -> Unit,
+    onDrag: (Float) -> Unit,
+    onDragEnd: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val canDrag = mode == HomeMode.EDITING
+    val currentOnDragStart by rememberUpdatedState(onDragStart)",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/braniik__slate/app/src/main/java/com/braniik/slate/ui/drawer/list/HomeList.kt,exact,True,247,HorizontalListItem,1.0,273.0,detectTapGestures,body,detectTapGestures(,True,"  247 | private fun HorizontalListItem(
+  248 |     homeApp: HomeScreenApp,
+  249 |     info: AppInfo,
+  250 |     mode: HomeMode,
+  251 |     dragOffsetPx: Float,
+  252 |     onTap: (HomeScreenApp) -> Unit,
+  253 |     onLongPress: (HomeScreenApp) -> Unit,
+  254 |     onDragStart: () -> Unit,
+  255 |     onDrag: (Float) -> Unit,
+  256 |     onDragEnd: () -> Unit,
+  257 |     modifier: Modifier = Modifier
+  258 | ) {
+  259 |     val canDrag = mode == HomeMode.EDITING
+  260 |     val currentOnDragStart by rememberUpdatedState(onDragStart)
+  261 |     val currentOnDrag by rememberUpdatedState(onDrag)
+  262 |     val currentOnDragEnd by rememberUpdatedState(onDragEnd)
+  263 | 
+  264 |     val iconSize = homeApp.listIconSizeDp.dp
+  265 | 
+  266 |     Column(
+  267 |         horizontalAlignment = Alignment.CenterHorizontally,
+  268 |         verticalArrangement = Arrangement.spacedBy(6.dp),
+  269 |         modifier = modifier
+  270 |             .then(deleteBorder(mode))
+  271 |             .offset { IntOffset(dragOffsetPx.toInt(), 0) }
+  272 |             .pointerInput(homeApp.key) {
+  273 |                 detectTapGestures(
+  274 |                     onLongPress = { onLongPress(homeApp) },
+  275 |                     onTap = { onTap(homeApp) }
+  276 |                 )
+  277 |             }
+  278 |             .then(
+  279 |                 if (canDrag) {
+  280 |                     Modifier.pointerInput(homeApp.key) {
+  281 |                         detectDragGestures(
+  282 |                             onDragStart = { currentOnDragStart() },
+  283 |                             onDrag = { change, amount ->
+  284 |                                 change.consume()
+  285 |                                 currentOnDrag(amount.x)
+  286 |                             },
+  287 |                             onDragEnd = { currentOnDragEnd() },
+  288 |                             onDragCancel = { currentOnDragEnd() }
+  289 |                         )
+  290 |                     }
+  291 |                 } else Modifier
+  292 |             )
+  293 |             .padding(horizontal = 12.dp, vertical = 10.dp)
+  294 |     ) {
+  295 |         if (homeApp.showLabel) {
+  296 |             Image(
+  297 |                 bitmap = rememberAppIcon(info, homeApp.listIconSizeDp),
+  298 |                 contentDescription = info.label,
+  299 |                 modifier = Modifier
+  300 |                     .size(iconSize)
+  301 |                     .rotate(homeApp.rotationDeg)
+  302 |                     .clip(iconShapeFor(homeApp.iconShape))
+  303 |             )
+  304 |         }
+  305 | 
+  306 |         Text(
+  307 |             text = info.label,
+  308 |             fontSize = homeApp.listTextSizeSp.sp,
+  309 |             color = LocalWallpaperTextColor.current,
+  310 |             maxLines = 1,
+  311 |             overflow = TextOverflow.Ellipsis,
+  312 |             textAlign = TextAlign.Center
+  313 |         )","import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
+import com.braniik.slate.data.HomeScreenApp
+import com.braniik.slate.data.key
+import com.braniik.slate.data.LocalWallpaperTextColor
+import com.braniik.slate.ui.drawer.AppInfo
+import com.braniik.slate.ui.drawer.HomeMode
+import com.braniik.slate.ui.drawer.common.iconShapeFor
+import com.braniik.slate.ui.drawer.rememberAppIcon
+import com.braniik.slate.ui.theme.SlateDanger"
+pilot-0210,pointerinput_no_semantics,crome1394__point-forecast,crome1394__point-forecast/forecast-point/app/src/main/java/com/crome/forecastpoint/MainActivity.kt,AppDrawer,detectTapGestures without semantics/Role,"
+@Composable
+private fun AppDrawer(
+    favorites: List<SavedLocation>,
+    activeId: String?,
+    navConfig: List<com.crome.forecastpoint.data.DrawerNavConfigItem>,
+    onNavOrderChange: (List<String>) -> Unit,
+    onForecast: () -> Unit,
+    onCurrentLocation: () -> Unit,
+    onAddCity: () -> Unit,
+    onMap: () -> Unit,
+    onSun: () -> Unit,
+    onMoon: () -> Unit,
+    onSpaceWeather: () -> Unit,
+    onEarthquakes: () -> Unit,
+    onStorms: () -> Unit,",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/crome1394__point-forecast/forecast-point/app/src/main/java/com/crome/forecastpoint/MainActivity.kt,exact,True,951,AppDrawer,1.0,1073.0,detectDragGestures,body,detectDragGesturesAfterLongPress(,True," 1061 |                                 .zIndex(if (isDragging) 2f else 0f)
+ 1062 |                                 .offset {
+ 1063 |                                     IntOffset(
+ 1064 |                                         x = 0,
+ 1065 |                                         y = if (isDragging) dragOffsetY.roundToInt() else 0,
+ 1066 |                                     )
+ 1067 |                                 }
+ 1068 |                                 .background(
+ 1069 |                                     if (isDragging) Color(0xFF37474F) else Color.Transparent,
+ 1070 |                                 )
+ 1071 |                                 .pointerInput(Unit) {
+ 1072 |                                     // Stable key() + Unit keeps the gesture alive across reorders
+ 1073 |                                     detectDragGesturesAfterLongPress(
+ 1074 |                                         onDragStart = {
+ 1075 |                                             val idx = order.indexOf(id)
+ 1076 |                                             if (idx < 0) return@detectDragGesturesAfterLongPress
+ 1077 |                                             draggingIndex = idx
+ 1078 |                                             dragOffsetY = 0f
+ 1079 |                                             dragStartOrder = order
+ 1080 |                                         },
+ 1081 |                                         onDragCancel = {
+ 1082 |                                             order = dragStartOrder
+ 1083 |                                             draggingIndex = -1
+ 1084 |                                             dragOffsetY = 0f
+ 1085 |                                         },
+ 1086 |                                         onDragEnd = {
+ 1087 |                                             draggingIndex = -1
+ 1088 |                                             dragOffsetY = 0f
+ 1089 |                                             onNavOrderChange(order)
+ 1090 |                                         },
+ 1091 |                                         onDrag = { change, dragAmount ->
+ 1092 |                                             change.consume()
+ 1093 |                                             val from = draggingIndex
+ 1094 |                                             if (from < 0) return@detectDragGesturesAfterLongPress
+ 1095 |                                             dragOffsetY += dragAmount.y
+ 1096 |                                             val shift = (dragOffsetY / rowHeightPx).toInt()
+ 1097 |                                             if (shift != 0) {
+ 1098 |                                                 val to = (from + shift).coerceIn(0, order.lastIndex)
+ 1099 |                                                 if (to != from) {
+ 1100 |                                                     val next = order.toMutableList()
+ 1101 |                                                     val item = next.removeAt(from)
+ 1102 |                                                     next.add(to, item)
+ 1103 |                                                     order = next
+ 1104 |                                                     draggingIndex = to
+ 1105 |                                                     dragOffsetY -= shift * rowHeightPx
+ 1106 |                                                 }
+ 1107 |                                             }
+ 1108 |                                         },
+ 1109 |                                     )
+ 1110 |                                 }
+ 1111 |                                 .clickable(enabled = draggingIndex < 0, onClick = onClick)
+ 1112 |                                 .padding(horizontal = 6.dp),
+ 1113 |                             verticalAlignment = Alignment.CenterVertically,","import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
+import android.net.Uri
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DragHandle
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.NightsStay
+import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Thunderstorm
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.WbSunny
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
+import androidx.core.content.ContextCompat
+import com.crome.forecastpoint.data.PreferencesRepository
+import com.crome.forecastpoint.data.SavedLocation
+import com.crome.forecastpoint.data.SpaceWeatherService
+import com.crome.forecastpoint.ui.WeatherViewModel
+import kotlin.math.roundToInt
+import com.crome.forecastpoint.ui.screens.AboutScreen
+import com.crome.forecastpoint.ui.screens.CelestialBody
+import com.crome.forecastpoint.ui.screens.ForecastScreen
+import com.crome.forecastpoint.ui.screens.HazardLoadingBanner
+import com.crome.forecastpoint.ui.screens.HourlyScreen
+import com.crome.forecastpoint.ui.screens.MapScreen
+import com.crome.forecastpoint.ui.screens.SearchScreen
+import com.crome.forecastpoint.ui.screens.SettingsScreen
+import com.crome.forecastpoint.ui.screens.SunMoonScreen
+import com.crome.forecastpoint.ui.theme.ForecastPointTheme
+import com.crome.forecastpoint.ui.theme.PrimaryBlue
+import com.crome.forecastpoint.ui.theme.SurfaceDark
+import com.crome.forecastpoint.util.CelestialCalculator
+import com.crome.forecastpoint.util.RadarUrl
+import kotlinx.coroutines.launch"
+pilot-0211,pointerinput_no_semantics,marosseleng__compose-material3-datetime-pickers,marosseleng__compose-material3-datetime-pickers/datetimepickers/src/main/java/com/marosseleng/compose/material3/datetimepickers/time/ui/TimePicker.kt,TouchRegisteringDial,detectTapGestures without semantics/Role," */
+@Composable
+internal fun TouchRegisteringDial(
+    onAngleAndDistanceRatioChange: (angle: Float, ratio: Float) -> Unit,
+    onTouchStop: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable BoxScope.() -> Unit,
+) {
+    val diameterDp = 256.dp
+    val diameterPx = with(LocalDensity.current) { diameterDp.toPx() }
+    val radiusPx = diameterPx / 2f
+    var centerX: Float by remember {
+        mutableStateOf(0f)
+    }
+    var centerY: Float by remember {
+        mutableStateOf(0f)",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/marosseleng__compose-material3-datetime-pickers/datetimepickers/src/main/java/com/marosseleng/compose/material3/datetimepickers/time/ui/TimePicker.kt,exact,True,685,TouchRegisteringDial,1.0,740.0,detectTapGestures,body,detectTapGestures {,True,"  728 |                 val windowBounds = it.boundsInWindow()
+  729 |                 centerX = windowBounds.size.width / 2f
+  730 |                 centerY = windowBounds.size.height / 2f
+  731 |             }
+  732 |             .pointerInput(Unit) {
+  733 |                 detectDragGestures(onDragEnd = onTouchStop, onDragCancel = onTouchStop) { change, _ ->
+  734 |                     touchX = change.position.x
+  735 |                     touchY = change.position.y
+  736 |                     onAngleAndDistanceRatioChange(angleFloat, distanceFromCenterRatio)
+  737 |                 }
+  738 |             }
+  739 |             .pointerInput(Unit) {
+  740 |                 detectTapGestures {
+  741 |                     touchX = it.x
+  742 |                     touchY = it.y
+  743 |                     onAngleAndDistanceRatioChange(angleFloat, distanceFromCenterRatio)
+  744 |                     onTouchStop()
+  745 |                 }
+  746 |             }
+  747 |             .background(LocalTimePickerColors.current.dialBackgroundColor),
+  748 |         content = content,
+  749 |     )
+  750 | }
+  751 | 
+  752 | /**
+  753 |  * Represents the single hour/minute number.
+  754 |  *
+  755 |  * @param isSelected whether this value is selected.
+  756 |  * @param value value to print. `null` if there is just a dot (for minutes that are not multipliers of 5).
+  757 |  */
+  758 | @Composable
+  759 | internal fun BoxScope.HourNumber(
+  760 |     isSelected: Boolean,
+  761 |     value: Int?,
+  762 |     modifier: Modifier = Modifier,
+  763 | ) {
+  764 |     // TODO: try to draw the boundary
+  765 |     val foregroundColor = if (isSelected) {
+  766 |         LocalTimePickerColors.current.dialNumberSelectedTextColor
+  767 |     } else {
+  768 |         LocalTimePickerColors.current.dialNumberUnselectedTextColor
+  769 |     }
+  770 |     val backgroundColor = if (isSelected) {
+  771 |         LocalTimePickerColors.current.dialNumberSelectedBackgroundColor
+  772 |     } else {
+  773 |         LocalTimePickerColors.current.dialNumberUnselectedBackgroundColor
+  774 |     }
+  775 |     Box(
+  776 |         modifier = modifier
+  777 |             .background(backgroundColor)
+  778 |             .zIndex(if (isSelected) -1f else 0f),
+  779 |         contentAlignment = Alignment.Center,
+  780 |     ) {","import android.text.format.DateFormat
+import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
+import com.marosseleng.compose.material3.datetimepickers.common.domain.getDefaultLocale
+import com.marosseleng.compose.material3.datetimepickers.common.domain.roundToNearest
+import com.marosseleng.compose.material3.datetimepickers.common.domain.withNotNull
+import com.marosseleng.compose.material3.datetimepickers.time.domain.AmPmMode
+import com.marosseleng.compose.material3.datetimepickers.time.domain.ClockDialMode
+import com.marosseleng.compose.material3.datetimepickers.time.domain.LocalTimePickerColors
+import com.marosseleng.compose.material3.datetimepickers.time.domain.LocalTimePickerShapes
+import com.marosseleng.compose.material3.datetimepickers.time.domain.LocalTimePickerTypography
+import com.marosseleng.compose.material3.datetimepickers.time.domain.TimePickerColors
+import com.marosseleng.compose.material3.datetimepickers.time.domain.TimePickerDefaults
+import com.marosseleng.compose.material3.datetimepickers.time.domain.TimePickerShapes
+import com.marosseleng.compose.material3.datetimepickers.time.domain.TimePickerTypography
+import com.marosseleng.compose.material3.datetimepickers.time.domain.getHour
+import java.text.DateFormatSymbols
+import java.time.LocalTime
+import java.util.Calendar
+import java.util.Locale
+import kotlin.math.PI
+import kotlin.math.atan2
+import kotlin.math.roundToInt
+import kotlin.math.sqrt"
+pilot-0212,pointerinput_no_semantics,android__nowinandroid,android__nowinandroid/core/designsystem/src/main/kotlin/com/google/samples/apps/nowinandroid/core/designsystem/component/scrollbar/Scrollbar.kt,Scrollbar,detectTapGestures without semantics/Role," * Returns the position of the scrollbar thumb on the track as a percentage
+ */
+private fun ScrollbarTrack.thumbPosition(
+    dimension: Float,
+): Float = max(
+    a = min(
+        a = dimension / size,
+        b = 1f,
+    ),
+    b = 0f,
+)
+
+/**
+ * Class definition for the core properties of a scroll bar
+ */
+@Immutable",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/android__nowinandroid/core/designsystem/src/main/kotlin/com/google/samples/apps/nowinandroid/core/designsystem/component/scrollbar/Scrollbar.kt,exact,True,79,onScroll,1.0,23.0,detectTapGestures,file,import androidx.compose.foundation.gestures.detectTapGestures,True,"   11 |  * distributed under the License is distributed on an ""AS IS"" BASIS,
+   12 |  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   13 |  * See the License for the specific language governing permissions and
+   14 |  * limitations under the License.
+   15 |  */
+   16 | 
+   17 | package com.google.samples.apps.nowinandroid.core.designsystem.component.scrollbar
+   18 | 
+   19 | import androidx.compose.foundation.gestures.Orientation
+   20 | import androidx.compose.foundation.gestures.Orientation.Horizontal
+   21 | import androidx.compose.foundation.gestures.Orientation.Vertical
+   22 | import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+   23 | import androidx.compose.foundation.gestures.detectTapGestures
+   24 | import androidx.compose.foundation.gestures.detectVerticalDragGestures
+   25 | import androidx.compose.foundation.hoverable
+   26 | import androidx.compose.foundation.interaction.DragInteraction
+   27 | import androidx.compose.foundation.interaction.MutableInteractionSource
+   28 | import androidx.compose.foundation.interaction.PressInteraction
+   29 | import androidx.compose.foundation.layout.Box
+   30 | import androidx.compose.foundation.layout.fillMaxHeight
+   31 | import androidx.compose.foundation.layout.fillMaxWidth
+   32 | import androidx.compose.runtime.Composable
+   33 | import androidx.compose.runtime.Immutable
+   34 | import androidx.compose.runtime.LaunchedEffect
+   35 | import androidx.compose.runtime.getValue
+   36 | import androidx.compose.runtime.mutableFloatStateOf
+   37 | import androidx.compose.runtime.mutableLongStateOf
+   38 | import androidx.compose.runtime.mutableStateOf
+   39 | import androidx.compose.runtime.remember
+   40 | import androidx.compose.runtime.setValue
+   41 | import androidx.compose.runtime.snapshotFlow
+   42 | import androidx.compose.ui.Modifier
+   43 | import androidx.compose.ui.geometry.Offset
+   44 | import androidx.compose.ui.input.pointer.PointerInputChange
+   45 | import androidx.compose.ui.input.pointer.pointerInput
+   46 | import androidx.compose.ui.layout.Layout
+   47 | import androidx.compose.ui.layout.layout
+   48 | import androidx.compose.ui.layout.onGloballyPositioned
+   49 | import androidx.compose.ui.layout.positionInRoot
+   50 | import androidx.compose.ui.unit.Dp
+   51 | import androidx.compose.ui.unit.IntOffset
+   52 | import androidx.compose.ui.unit.IntSize
+   53 | import androidx.compose.ui.unit.dp
+   54 | import androidx.compose.ui.util.packFloats
+   55 | import androidx.compose.ui.util.unpackFloat1
+   56 | import androidx.compose.ui.util.unpackFloat2
+   57 | import kotlinx.coroutines.TimeoutCancellationException
+   58 | import kotlinx.coroutines.delay
+   59 | import kotlinx.coroutines.withTimeout
+   60 | import kotlin.math.max
+   61 | import kotlin.math.min
+   62 | import kotlin.math.roundToInt
+   63 | ","import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.Orientation.Horizontal
+import androidx.compose.foundation.gestures.Orientation.Vertical
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerInputChange
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.packFloats
+import androidx.compose.ui.util.unpackFloat1
+import androidx.compose.ui.util.unpackFloat2
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withTimeout
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.roundToInt"
+pilot-0213,pointerinput_no_semantics,dmzz-yyhyy__LightNovelReader,dmzz-yyhyy__LightNovelReader/app/src/main/kotlin/indi/dmzz_yyhyy/lightnovelreader/ui/components/ElasticContainer.kt,ElasticPressContainer,detectTapGestures without semantics/Role,"
+@Composable
+fun ElasticPressContainer(
+    pagerState: PagerState,
+    modifier: Modifier = Modifier,
+    content: @Composable BoxScope.() -> Unit
+) {
+    var pressed by remember { mutableStateOf(false) }
+    val targetScale =
+        when {
+            pressed -> 0.98f
+            pagerState.isScrollInProgress -> 0.97f
+            else -> 1f
+        }
+
+    val scale by animateFloatAsState(",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/dmzz-yyhyy__LightNovelReader/app/src/main/kotlin/indi/dmzz_yyhyy/lightnovelreader/ui/components/ElasticContainer.kt,exact,True,22,ElasticPressContainer,1.0,51.0,detectTapGestures,body,detectTapGestures(,True,"   22 | fun ElasticPressContainer(
+   23 |     pagerState: PagerState,
+   24 |     modifier: Modifier = Modifier,
+   25 |     content: @Composable BoxScope.() -> Unit
+   26 | ) {
+   27 |     var pressed by remember { mutableStateOf(false) }
+   28 |     val targetScale =
+   29 |         when {
+   30 |             pressed -> 0.98f
+   31 |             pagerState.isScrollInProgress -> 0.97f
+   32 |             else -> 1f
+   33 |         }
+   34 | 
+   35 |     val scale by animateFloatAsState(
+   36 |         targetValue = targetScale,
+   37 |         animationSpec = spring(
+   38 |             dampingRatio = 0.55f,
+   39 |             stiffness = Spring.StiffnessLow
+   40 |         ),
+   41 |         label = ""scale""
+   42 |     )
+   43 | 
+   44 |     Box(
+   45 |         modifier = modifier
+   46 |             .graphicsLayer {
+   47 |                 scaleX = scale
+   48 |                 scaleY = scale
+   49 |             }
+   50 |             .pointerInput(Unit) {
+   51 |                 detectTapGestures(
+   52 |                     onPress = {
+   53 |                         pressed = true
+   54 |                         try {
+   55 |                             tryAwaitRelease()
+   56 |                         } finally {
+   57 |                             pressed = false
+   58 |                         }
+   59 |                     }
+   60 |                 )
+   61 |             },
+   62 |         content = content
+   63 |     )
+   64 | }","import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput"
+pilot-0214,pointerinput_no_semantics,cvc953__localplayer,cvc953__localplayer/app/src/main/java/com/cvc953/localplayer/ui/components/SquigglyProgressBar.kt,SquigglyProgressBar,detectTapGestures without semantics/Role,"
+@Composable
+fun SquigglyProgressBar(
+    progress: Float,
+    duration: Long,
+    isPlaying: Boolean,
+    onSeek: (Long) -> Unit,
+    onSeekStart: () -> Unit,
+    onSeekEnd: () -> Unit,
+    color: Color,
+    modifier: Modifier,
+) {
+    val density = LocalDensity.current
+    val waveLengthPx = with(density) { WAVE_LENGTH.toPx() }
+    val lineAmplitudePx = with(density) { LINE_AMPLITUDE.toPx() }
+    val phaseSpeedPx = with(density) { PHASE_SPEED.toPx() }",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/cvc953__localplayer/app/src/main/java/com/cvc953/localplayer/ui/components/SquigglyProgressBar.kt,exact,True,49,SquigglyProgressBar,1.0,117.0,detectTapGestures,body,detectTapGestures(,True,"  105 |             Stroke(
+  106 |                 width = strokeWidthPx,
+  107 |                 cap = StrokeCap.Round,
+  108 |                 join = StrokeJoin.Round,
+  109 |             )
+  110 |         }
+  111 | 
+  112 |     Box(
+  113 |         modifier =
+  114 |             modifier
+  115 |                 .height(BAR_HEIGHT.dp)
+  116 |                 .pointerInput(duration) {
+  117 |                     detectTapGestures(
+  118 |                         onTap = { offset ->
+  119 |                             if (duration <= 0L) return@detectTapGestures
+  120 |                             val fraction = (offset.x / size.width).coerceIn(0f, 1f)
+  121 |                             onSeek((fraction * duration).toLong())
+  122 |                         },
+  123 |                     )
+  124 |                 }.pointerInput(duration) {
+  125 |                     detectHorizontalDragGestures(
+  126 |                         onDragStart = { offset ->
+  127 |                             if (duration <= 0L) return@detectHorizontalDragGestures
+  128 |                             onSeekStart()
+  129 |                             val fraction = (offset.x / size.width).coerceIn(0f, 1f)
+  130 |                             onSeek((fraction * duration).toLong())
+  131 |                         },
+  132 |                         onHorizontalDrag = { change, _ ->
+  133 |                             if (duration <= 0L) return@detectHorizontalDragGestures
+  134 |                             change.consume()
+  135 |                             val fraction = (change.position.x / size.width).coerceIn(0f, 1f)
+  136 |                             onSeek((fraction * duration).toLong())
+  137 |                         },
+  138 |                         onDragEnd = {
+  139 |                             onSeekEnd()
+  140 |                         },
+  141 |                         onDragCancel = {
+  142 |                             onSeekEnd()
+  143 |                         },
+  144 |                     )
+  145 |                 },
+  146 |     ) {
+  147 |         Canvas(modifier = Modifier.fillMaxSize()) {
+  148 |             val phaseOffset = phaseOffsetNormalized * waveLengthPx
+  149 |             val amplitudePx = lineAmplitudePx * heightFraction
+  150 |             val totalProgressPx = size.width * progress.coerceIn(0f, 1f)
+  151 |             val waveStart = -phaseOffset - waveLengthPx / 5f
+  152 | 
+  153 |             path.rewind()
+  154 |             buildWavePath(
+  155 |                 path = path,
+  156 |                 waveStart = waveStart,
+  157 |                 waveEnd = size.width,","import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
+import kotlin.math.PI
+import kotlin.math.sin"
+pilot-0215,pointerinput_no_semantics,ArcaDone__AwesomeUI,ArcaDone__AwesomeUI/sharedUI/src/commonMain/kotlin/com/arcadone/awesomeui/components/chart/progreessionchart/ProgressionChartVariant.kt,LineChartItem,detectTapGestures without semantics/Role,"
+@Composable
+private fun LineChartItem(
+    data: List<ChartDataPoint>,
+    modifier: Modifier = Modifier,
+    style: ProgressionChartStyle,
+    animate: Boolean,
+    animateToProgress: Float,
+    interactive: Boolean,
+    showTooltip: Boolean,
+) {
+    if (data.isEmpty()) return
+
+    val targetProgress = animateToProgress.coerceIn(0f, 1f)
+
+    // Animation progress (0.0 to targetProgress)",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/ArcaDone__AwesomeUI/sharedUI/src/commonMain/kotlin/com/arcadone/awesomeui/components/chart/progreessionchart/ProgressionChartVariant.kt,exact,True,310,LineChartItem,1.0,403.0,detectTapGestures,body,detectTapGestures { tapOffset ->,True,"  391 |                 screenPosition = pointOnPath,
+  392 |             )
+  393 |         }
+  394 |     }
+  395 | 
+  396 |     Box(modifier = modifier) {
+  397 |         // Main chart canvas
+  398 |         Box(
+  399 |             modifier = Modifier
+  400 |                 .matchParentSize()
+  401 |                 .pointerInput(data, interactive) {
+  402 |                     if (!interactive) return@pointerInput
+  403 |                     detectTapGestures { tapOffset ->
+  404 |                         updateSelection(
+  405 |                             tapX = tapOffset.x,
+  406 |                             width = size.width.toFloat(),
+  407 |                             height = size.height.toFloat(),
+  408 |                         )
+  409 |                     }
+  410 |                 }
+  411 |                 .pointerInput(data, interactive) {
+  412 |                     if (!interactive) return@pointerInput
+  413 |                     detectDragGestures(
+  414 |                         onDragStart = { offset ->
+  415 |                             isDragging = true
+  416 |                             updateSelection(
+  417 |                                 tapX = offset.x,
+  418 |                                 width = size.width.toFloat(),
+  419 |                                 height = size.height.toFloat(),
+  420 |                             )
+  421 |                         },
+  422 |                         onDragEnd = {
+  423 |                             isDragging = false
+  424 |                         },
+  425 |                         onDragCancel = {
+  426 |                             isDragging = false
+  427 |                         },
+  428 |                         onDrag = { change, _ ->
+  429 |                             change.consume()
+  430 |                             updateSelection(
+  431 |                                 tapX = change.position.x,
+  432 |                                 width = size.width.toFloat(),
+  433 |                                 height = size.height.toFloat(),
+  434 |                             )
+  435 |                         },
+  436 |                     )
+  437 |                 }
+  438 |                 .drawWithContent {
+  439 |                     val width = size.width
+  440 |                     val height = size.height
+  441 | 
+  442 |                     // Grid lines
+  443 |                     for (i in 1..style.gridLines) {","import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.TrendingDown
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.arcadone.awesomeui.components.chart.line.ChartDataPoint"
+pilot-0216,pointerinput_no_semantics,crome1394__point-forecast,crome1394__point-forecast/forecast-point/app/src/main/java/com/crome/forecastpoint/ui/screens/SettingsScreen.kt,HourlyTabConfigEditor,detectTapGestures without semantics/Role," */
+@Composable
+private fun HourlyTabConfigEditor(
+    config: List<HourlyTabConfigItem>,
+    onConfigChange: (List<HourlyTabConfigItem>) -> Unit,
+) {
+    var items by remember { mutableStateOf(config) }
+    val density = LocalDensity.current
+    val rowHeightPx = with(density) { 56.dp.toPx() }
+    var draggingIndex by remember { mutableIntStateOf(-1) }
+    var dragOffsetY by remember { mutableFloatStateOf(0f) }
+    LaunchedEffect(config) {
+        if (draggingIndex < 0 && config != items) items = config
+    }
+
+    fun commit(next: List<HourlyTabConfigItem>) {",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/crome1394__point-forecast/forecast-point/app/src/main/java/com/crome/forecastpoint/ui/screens/SettingsScreen.kt,exact,True,700,HourlyTabConfigEditor,1.0,768.0,detectDragGestures,body,detectDragGesturesAfterLongPress(,True,"  756 |                                 isDragging -> Color(0xFF37474F)
+  757 |                                 !item.enabled -> Color(0xFF1A2226)
+  758 |                                 else -> SurfaceDark
+  759 |                             },
+  760 |                         )
+  761 |                         .border(
+  762 |                             width = 1.dp,
+  763 |                             color = accent.copy(alpha = if (item.enabled) 0.45f else 0.2f),
+  764 |                             shape = RoundedCornerShape(8.dp),
+  765 |                         )
+  766 |                         // Stable key — do NOT depend on index/items or the gesture cancels on swap
+  767 |                         .pointerInput(Unit) {
+  768 |                             detectDragGesturesAfterLongPress(
+  769 |                                 onDragStart = {
+  770 |                                     val idx = items.indexOfFirst { it.id == item.id }
+  771 |                                     if (idx < 0) return@detectDragGesturesAfterLongPress
+  772 |                                     draggingIndex = idx
+  773 |                                     dragOffsetY = 0f
+  774 |                                 },
+  775 |                                 onDragCancel = {
+  776 |                                     draggingIndex = -1
+  777 |                                     dragOffsetY = 0f
+  778 |                                 },
+  779 |                                 onDragEnd = {
+  780 |                                     draggingIndex = -1
+  781 |                                     dragOffsetY = 0f
+  782 |                                 },
+  783 |                                 onDrag = { change, dragAmount ->
+  784 |                                     change.consume()
+  785 |                                     val from = draggingIndex
+  786 |                                     if (from < 0) return@detectDragGesturesAfterLongPress
+  787 |                                     dragOffsetY += dragAmount.y
+  788 |                                     val shift = (dragOffsetY / rowHeightPx).toInt()
+  789 |                                     if (shift != 0) {
+  790 |                                         val to = (from + shift).coerceIn(0, items.lastIndex)
+  791 |                                         if (to != from) {
+  792 |                                             val next = items.toMutableList()
+  793 |                                             val moved = next.removeAt(from)
+  794 |                                             next.add(to, moved)
+  795 |                                             items = next
+  796 |                                             onConfigChange(next)
+  797 |                                             draggingIndex = to
+  798 |                                             dragOffsetY -= shift * rowHeightPx
+  799 |                                         }
+  800 |                                     }
+  801 |                                 },
+  802 |                             )
+  803 |                         }
+  804 |                         .padding(end = 6.dp, top = 2.dp, bottom = 2.dp),
+  805 |                     verticalAlignment = Alignment.CenterVertically,
+  806 |                 ) {
+  807 |                     Box(
+  808 |                         Modifier","import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DragHandle
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
+import com.crome.forecastpoint.data.DrawerNavConfigItem
+import com.crome.forecastpoint.data.HourlyTabConfigItem
+import com.crome.forecastpoint.data.PreferencesRepository
+import com.crome.forecastpoint.ui.theme.OnSurfaceMuted
+import com.crome.forecastpoint.ui.theme.SurfaceDark
+import kotlin.math.roundToInt"
+pilot-0217,pointerinput_no_semantics,zhishengplus__ZhishengWeather,zhishengplus__ZhishengWeather/app/src/main/kotlin/com/zhisheng/weather/ui/RadarScreen.kt,RadarScrubber,detectTapGestures without semantics/Role,"
+@Composable
+private fun RadarScrubber(
+    frames: List<RadarFrame>,
+    nowIndex: Int,
+    selectedIndex: Int,
+    utcOffsetSeconds: Int?,
+    onSelect: (Int) -> Unit,
+) {
+    val palette = LocalZhishengPalette.current
+    var trackWidthPx by remember { mutableFloatStateOf(1f) }
+    fun indexAt(x: Float): Int {
+        if (frames.isEmpty() || trackWidthPx <= 0f) return 0
+        return (x / trackWidthPx * frames.size).toInt().coerceIn(0, frames.lastIndex)
+    }
+    // 分界刻度：过去/未来两段的交界，「现在」用橙色标记",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/zhishengplus__ZhishengWeather/app/src/main/kotlin/com/zhisheng/weather/ui/RadarScreen.kt,exact,True,821,RadarScrubber,1.0,841.0,detectTapGestures,body,.pointerInput(frames) { detectTapGestures { offset -> onSelect(indexAt(offset.x)) } },True,"  821 | private fun RadarScrubber(
+  822 |     frames: List<RadarFrame>,
+  823 |     nowIndex: Int,
+  824 |     selectedIndex: Int,
+  825 |     utcOffsetSeconds: Int?,
+  826 |     onSelect: (Int) -> Unit,
+  827 | ) {
+  828 |     val palette = LocalZhishengPalette.current
+  829 |     var trackWidthPx by remember { mutableFloatStateOf(1f) }
+  830 |     fun indexAt(x: Float): Int {
+  831 |         if (frames.isEmpty() || trackWidthPx <= 0f) return 0
+  832 |         return (x / trackWidthPx * frames.size).toInt().coerceIn(0, frames.lastIndex)
+  833 |     }
+  834 |     // 分界刻度：过去/未来两段的交界，「现在」用橙色标记
+  835 |     val boundaryTick = (nowIndex + 1).coerceIn(0, frames.size)
+  836 |     val hasFutureSegment = boundaryTick < frames.size
+  837 |     Column(Modifier.fillMaxWidth()) {
+  838 |         Box(
+  839 |             Modifier.fillMaxWidth().height(42.dp)
+  840 |                 .onSizeChanged { trackWidthPx = it.width.toFloat() }
+  841 |                 .pointerInput(frames) { detectTapGestures { offset -> onSelect(indexAt(offset.x)) } }
+  842 |                 .pointerInput(frames) {
+  843 |                     detectHorizontalDragGestures(
+  844 |                         onDragStart = { offset -> onSelect(indexAt(offset.x)) },
+  845 |                         onHorizontalDrag = { change, _ -> onSelect(indexAt(change.position.x)) },
+  846 |                     )
+  847 |                 },
+  848 |         ) {
+  849 |             Canvas(Modifier.fillMaxSize()) {
+  850 |                 val n = frames.size.coerceAtLeast(1)
+  851 |                 val midY = size.height / 2f
+  852 |                 drawLine(palette.cardBorder, Offset(0f, midY), Offset(size.width, midY), 3f)
+  853 |                 if (hasFutureSegment) {
+  854 |                     // 过去段：mint 已播放填充；未来段：cyan 已播放填充
+  855 |                     val boundaryX = boundaryTick / n.toFloat() * size.width
+  856 |                     val pastFillEnd = if (selectedIndex <= nowIndex) {
+  857 |                         (selectedIndex + 1f) / n * size.width
+  858 |                     } else {
+  859 |                         boundaryX
+  860 |                     }
+  861 |                     drawLine(
+  862 |                         palette.mint.copy(alpha = 0.45f),
+  863 |                         Offset(0f, midY),
+  864 |                         Offset(pastFillEnd, midY),
+  865 |                         6f,
+  866 |                         cap = StrokeCap.Butt,
+  867 |                     )
+  868 |                     if (selectedIndex > nowIndex) {
+  869 |                         val futureFillEnd = (selectedIndex + 1f) / n * size.width
+  870 |                         drawLine(
+  871 |                             palette.cyan.copy(alpha = 0.40f),
+  872 |                             Offset(boundaryX, midY),
+  873 |                             Offset(futureFillEnd, midY),
+  874 |                             6f,
+  875 |                             cap = StrokeCap.Butt,
+  876 |                         )
+  877 |                     }
+  878 |                 } else {
+  879 |                     val fillEnd = (selectedIndex + 1f) / n * size.width
+  880 |                     drawLine(
+  881 |                         palette.mint.copy(alpha = 0.45f),","import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
+import android.provider.Settings
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.zhisheng.weather.data.CaiyunRadarException
+import com.zhisheng.weather.data.CaiyunRadarReason
+import com.zhisheng.weather.data.CaiyunRadarRepository
+import com.zhisheng.weather.data.RadarRepository
+import com.zhisheng.weather.data.SecretStore
+import com.zhisheng.weather.data.SettingsRepository
+import com.zhisheng.weather.model.City
+import com.zhisheng.weather.model.RadarCoverageState
+import com.zhisheng.weather.model.RadarFeed
+import com.zhisheng.weather.model.RadarFrame
+import com.zhisheng.weather.model.RadarSource
+import com.zhisheng.weather.ui.theme.LocalZhishengPalette
+import com.zhisheng.weather.ui.theme.ZhishengPalette
+import com.zhisheng.weather.ui.theme.ZhishengBg
+import com.zhisheng.weather.ui.theme.ZhishengMint
+import com.zhisheng.weather.ui.theme.ZhishengOrange
+import com.zhisheng.weather.ui.theme.ZhishengTextSecondary
+import com.zhisheng.weather.ui.theme.ZhishengTextTertiary
+import com.zhisheng.weather.ui.home.Scanlines
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
+import org.maplibre.android.camera.CameraPosition
+import org.maplibre.android.camera.CameraUpdateFactory
+import org.maplibre.android.geometry.LatLng
+import org.maplibre.android.geometry.LatLngQuad
+import org.maplibre.android.maps.MapLibreMap
+import org.maplibre.android.maps.MapView
+import org.maplibre.android.maps.Style
+import org.maplibre.android.style.layers.CircleLayer
+import org.maplibre.android.style.layers.RasterLayer
+import org.maplibre.android.style.layers.TransitionOptions
+import org.maplibre.android.style.layers.PropertyFactory.circleColor
+import org.maplibre.android.style.layers.PropertyFactory.circleRadius
+import org.maplibre.android.style.layers.PropertyFactory.circleStrokeColor
+import org.maplibre.android.style.layers.PropertyFactory.circleStrokeWidth
+import org.maplibre.android.style.layers.PropertyFactory.rasterFadeDuration
+import org.maplibre.android.style.layers.PropertyFactory.rasterOpacity
+import org.maplibre.android.style.sources.GeoJsonSource
+import org.maplibre.android.style.sources.ImageSource
+import org.maplibre.android.style.sources.RasterSource
+import org.maplibre.android.style.sources.TileSet
+import org.maplibre.geojson.Feature
+import org.maplibre.geojson.Point
+import kotlin.math.cos
+import kotlin.math.sin"
+pilot-0218,pointerinput_no_semantics,Darkrock-Studios__hammer-editor,Darkrock-Studios__hammer-editor/composeUi/src/commonMain/kotlin/com/darkrockstudios/apps/hammer/common/storyeditor/OutlineOverviewUi.kt,OutlineOverviewContent,detectTapGestures without semantics/Role," */
+@Composable
+fun OutlineOverviewContent(
+	component: OutlineOverview,
+	onDismiss: () -> Unit,
+) {
+	val state by component.state.subscribeAsState()
+
+	val chapters = remember(state.overview) { groupByChapter(state.overview) }
+	val totalScenes = remember(chapters) { chapters.sumOf { it.scenes.size } }
+	val totalChapters = chapters.count { it.chapter != null }
+
+	val listState = rememberLazyListState()
+	val coroutineScope = rememberCoroutineScope()
+
+	val activeChapterIndex by remember(chapters.size) {",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/Darkrock-Studios__hammer-editor/composeUi/src/commonMain/kotlin/com/darkrockstudios/apps/hammer/common/storyeditor/OutlineOverviewUi.kt,exact,True,98,OutlineOverviewContent,1.0,133.0,detectTapGestures,body,detectTapGestures(onTap = { onDismiss() }),True,"   98 | fun OutlineOverviewContent(
+   99 | 	component: OutlineOverview,
+  100 | 	onDismiss: () -> Unit,
+  101 | ) {
+  102 | 	val state by component.state.subscribeAsState()
+  103 | 
+  104 | 	val chapters = remember(state.overview) { groupByChapter(state.overview) }
+  105 | 	val totalScenes = remember(chapters) { chapters.sumOf { it.scenes.size } }
+  106 | 	val totalChapters = chapters.count { it.chapter != null }
+  107 | 
+  108 | 	val listState = rememberLazyListState()
+  109 | 	val coroutineScope = rememberCoroutineScope()
+  110 | 
+  111 | 	val activeChapterIndex by remember(chapters.size) {
+  112 | 		derivedStateOf {
+  113 | 			if (chapters.isEmpty()) 0
+  114 | 			else (listState.firstVisibleItemIndex - FRONTISPIECE_ITEM_COUNT)
+  115 | 				.coerceIn(0, chapters.size - 1)
+  116 | 		}
+  117 | 	}
+  118 | 
+  119 | 	val scrollToChapter: (Int) -> Unit = { idx ->
+  120 | 		coroutineScope.launch {
+  121 | 			listState.animateScrollToItem(idx + FRONTISPIECE_ITEM_COUNT)
+  122 | 		}
+  123 | 	}
+  124 | 
+  125 | 	val projectName = remember(state.overview) {
+  126 | 		state.overview.firstOrNull()?.projectName()
+  127 | 	}
+  128 | 
+  129 | 	Box(
+  130 | 		modifier = Modifier
+  131 | 			.fillMaxSize()
+  132 | 			.pointerInput(Unit) {
+  133 | 				detectTapGestures(onTap = { onDismiss() })
+  134 | 			},
+  135 | 		contentAlignment = Alignment.Center,
+  136 | 	) {
+  137 | 		BoxWithConstraints(
+  138 | 			modifier = Modifier.fillMaxSize(),
+  139 | 			contentAlignment = Alignment.Center,
+  140 | 		) {
+  141 | 			val isWide = maxWidth >= WideThreshold
+  142 | 
+  143 | 			Column(
+  144 | 				modifier = Modifier
+  145 | 					.padding(if (isWide) Ui.Padding.XXL else 0.dp)
+  146 | 					.widthIn(max = 1080.dp)
+  147 | 					.heightIn(max = 880.dp)
+  148 | 					.fillMaxWidth()
+  149 | 					.fillMaxHeight()
+  150 | 					.background(MaterialTheme.colorScheme.surface)
+  151 | 					.border(
+  152 | 						width = Dp.Hairline,
+  153 | 						color = MaterialTheme.colorScheme.outlineVariant,
+  154 | 						shape = RectangleShape,
+  155 | 					)
+  156 | 					.pointerInput(Unit) {
+  157 | 						detectTapGestures(onTap = {})
+  158 | 					},
+  159 | 			) {
+  160 | 				Masthead(
+  161 | 					chapterCount = totalChapters,
+  162 | 					sceneCount = totalScenes,
+  163 | 					isWide = isWide,
+  164 | 					onClose = onDismiss,
+  165 | 				)
+  166 | 
+  167 | 				HdFolioDivider()
+  168 | 
+  169 | 				if (chapters.isEmpty()) {
+  170 | 					EmptyOutline(modifier = Modifier.weight(1f))
+  171 | 				} else if (isWide) {
+  172 | 					Row(
+  173 | 						modifier = Modifier","import androidx.compose.animation.*
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import com.darkrockstudios.apps.hammer.*
+import com.darkrockstudios.apps.hammer.common.components.storyeditor.outlineoverview.OutlineOverview
+import com.darkrockstudios.apps.hammer.common.compose.AnimatedFullScreenDialog
+import com.darkrockstudios.apps.hammer.common.compose.MpScrollBarGutter
+import com.darkrockstudios.apps.hammer.common.compose.MpScrollBarList
+import com.darkrockstudios.apps.hammer.common.compose.Ui
+import com.darkrockstudios.apps.hammer.common.compose.designsystem.HdFolioDivider
+import com.darkrockstudios.apps.hammer.common.compose.designsystem.HdMonoLabel
+import com.darkrockstudios.apps.hammer.common.compose.designsystem.romanNumeral
+import com.darkrockstudios.apps.hammer.common.compose.resources.get
+import com.darkrockstudios.apps.hammer.common.compose.scrollBarOverlay
+import com.darkrockstudios.apps.hammer.common.data.SceneItem
+import kotlinx.coroutines.launch"
+pilot-0219,pointerinput_no_semantics,Nevodev__Cresto,Nevodev__Cresto/app/src/main/java/com/nevoit/cresto/ui/components/glasense/GlasenseSwitch.kt,GlasenseSwitch,detectTapGestures without semantics/Role,"
+@Composable
+fun GlasenseSwitch(
+    backgroundColor: Color,
+    enabled: Boolean = true,
+    checked: Boolean,
+    colors: GlasenseColors = AppColors,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    val liquidGlass = LocalThemeSettings.current.liquidGlass
+    if (liquidGlass) {
+        val trackBackdrop = rememberLayerBackdrop {
+            drawRect(backgroundColor)
+            drawContent()
+        }
+",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/Nevodev__Cresto/app/src/main/java/com/nevoit/cresto/ui/components/glasense/GlasenseSwitch.kt,exact,True,84,GlasenseSwitch,1.0,214.0,detectTapGestures,body,detectTapGestures(,True,"  202 |         }
+  203 | 
+  204 |         LaunchedEffect(checked) {
+  205 |             physicsController.sync(checked)
+  206 |         }
+  207 | 
+  208 |         BoxWithConstraints(
+  209 |             modifier = Modifier
+  210 |                 .height(28.dp)
+  211 |                 .width(46.dp)
+  212 |                 .pointerInput(enabled) {
+  213 |                     if (enabled) {
+  214 |                         detectTapGestures(
+  215 |                             onPress = {
+  216 |                                 physicsController.press()
+  217 | 
+  218 |                                 val success = tryAwaitRelease()
+  219 | 
+  220 |                                 if (success) {
+  221 |                                     haptic.performHapticFeedback(HapticFeedbackType.ToggleOn)
+  222 |                                     currentOnCheckedChange(!currentChecked)
+  223 |                                     scope.launch {
+  224 |                                         delay(200.milliseconds)
+  225 |                                         if (!physicsController.isSyncing) {
+  226 |                                             physicsController.release()
+  227 |                                         }
+  228 |                                     }
+  229 |                                 } else {
+  230 |                                     physicsController.release()
+  231 |                                 }
+  232 |                             }
+  233 |                         )
+  234 |                     }
+  235 |                 },
+  236 |         ) {
+  237 |             val canvasWidth = constraints.maxWidth.toFloat()
+  238 |             val canvasHeight = constraints.maxHeight.toFloat()
+  239 |             Canvas(
+  240 |                 modifier = Modifier
+  241 |                     .alpha(0f)
+  242 |                     .layerBackdrop(trackBackdrop)
+  243 |                     .fillMaxSize()
+  244 |             ) {
+  245 |                 translate(left = startPadding, top = startPadding) {
+  246 |                     drawTrack(
+  247 |                         width = canvasWidth - startPadding * 2,
+  248 |                         height = canvasHeight - startPadding * 2,
+  249 |                         color = trackColorAnimation,
+  250 |                         density = density
+  251 |                     )
+  252 |                 }
+  253 |             }
+  254 |             Box(","import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawOutline
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
+import com.kyant.backdrop.backdrops.layerBackdrop
+import com.kyant.backdrop.backdrops.rememberLayerBackdrop
+import com.kyant.backdrop.drawBackdrop
+import com.kyant.backdrop.effects.lens
+import com.kyant.backdrop.highlight.Highlight
+import com.kyant.backdrop.shadow.InnerShadow
+import com.kyant.backdrop.shadow.Shadow
+import com.kyant.shapes.Capsule
+import com.nevoit.cresto.theme.AppColors
+import com.nevoit.cresto.theme.LocalThemeSettings
+import com.nevoit.glasense.component.Switch
+import com.nevoit.glasense.theme.GlasenseColors
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.android.awaitFrame
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlin.math.abs
+import kotlin.time.Duration.Companion.milliseconds"
+pilot-0220,pointerinput_no_semantics,DaKlok__BibleLockScreen,DaKlok__BibleLockScreen/app/src/main/java/com/daklok/biblelockscreen/ColorPickerDialog.kt,ColorPickerDialog,detectTapGestures without semantics/Role,"
+@Composable
+fun ColorPickerDialog(
+    initialColor: Color = Color.White,
+    strings: AppStrings,
+    onDismiss: () -> Unit,
+    onColorSelected: (Color) -> Unit
+) {
+    val (initH, initS, initV) = colorToHsv(initialColor)
+
+    var hueState   by remember { mutableStateOf(initH) }
+    var satState   by remember { mutableStateOf(initS) }
+    var valueState by remember { mutableStateOf(initV) }
+
+    val currentColor by remember(hueState, satState, valueState) {
+        derivedStateOf { hsvToColor(hueState, satState, valueState) }",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/DaKlok__BibleLockScreen/app/src/main/java/com/daklok/biblelockscreen/ColorPickerDialog.kt,exact,True,109,ColorPickerDialog,1.0,186.0,detectTapGestures,body,detectTapGestures { handle(it) },True,"  174 |                         modifier = Modifier
+  175 |                             .size(160.dp)
+  176 |                             .clip(CircleShape)
+  177 |                             .pointerInput(valueState) {
+  178 |                                 val sz = size.width.toFloat()
+  179 |                                 val cx = sz / 2f; val r = sz / 2f
+  180 |                                 fun handle(pos: Offset) {
+  181 |                                     val dx = pos.x - cx; val dy = pos.y - cx
+  182 |                                     val dist = sqrt(dx * dx + dy * dy).coerceAtMost(r)
+  183 |                                     val h = ((atan2(dy, dx) * 180f / PI.toFloat()) + 360f) % 360f
+  184 |                                     setHsv(h, dist / r, valueState, fromWheel = true)
+  185 |                                 }
+  186 |                                 detectTapGestures { handle(it) }
+  187 |                             }
+  188 |                             .pointerInput(valueState) {
+  189 |                                 val sz = size.width.toFloat()
+  190 |                                 val cx = sz / 2f; val r = sz / 2f
+  191 |                                 detectDragGestures { change, _ ->
+  192 |                                     val pos = change.position
+  193 |                                     val dx  = pos.x - cx; val dy = pos.y - cx
+  194 |                                     val dist = sqrt(dx * dx + dy * dy).coerceAtMost(r)
+  195 |                                     val h = ((atan2(dy, dx) * 180f / PI.toFloat()) + 360f) % 360f
+  196 |                                     setHsv(h, dist / r, valueState, fromWheel = true)
+  197 |                                 }
+  198 |                             }
+  199 |                     ) {
+  200 |                         Canvas(modifier = Modifier.fillMaxSize()) {
+  201 |                             drawColorWheel(valueState)
+  202 |                             // cursor
+  203 |                             val cx2  = size.width  / 2f
+  204 |                             val cy2  = size.height / 2f
+  205 |                             val r2   = minOf(cx2, cy2)
+  206 |                             val ang  = hueState * PI.toFloat() / 180f
+  207 |                             val dotX = cx2 + satState * r2 * cos(ang)
+  208 |                             val dotY = cy2 + satState * r2 * sin(ang)
+  209 |                             drawCircle(Color.White,        radius = 10f, center = Offset(dotX, dotY))
+  210 |                             drawCircle(currentColor,       radius = 7f,  center = Offset(dotX, dotY))
+  211 |                         }
+  212 |                     }
+  213 | 
+  214 |                     Column(
+  215 |                         modifier            = Modifier.weight(1f),
+  216 |                         verticalArrangement = Arrangement.spacedBy(8.dp)
+  217 |                     ) {
+  218 |                         // Swatch
+  219 |                         Box(
+  220 |                             modifier = Modifier
+  221 |                                 .fillMaxWidth()
+  222 |                                 .height(44.dp)
+  223 |                                 .clip(RoundedCornerShape(10.dp))
+  224 |                                 .background(currentColor)
+  225 |                                 .border(
+  226 |                                     0.5.dp,","import com.daklok.biblelockscreen.strings.*
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import kotlin.math.*"

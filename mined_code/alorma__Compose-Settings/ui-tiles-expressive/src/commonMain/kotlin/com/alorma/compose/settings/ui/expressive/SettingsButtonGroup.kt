@@ -1,0 +1,71 @@
+package com.alorma.compose.settings.ui.expressive
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.ButtonGroupDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.ListItemColors
+import androidx.compose.material3.ListItemElevation
+import androidx.compose.material3.ListItemShapes
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedToggleButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.ToggleButtonDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.alorma.compose.settings.ui.core.LocalSettingsGroupEnabled
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+@Suppress("LongParameterList")
+fun <T> SettingsButtonGroup(
+  title: @Composable () -> Unit,
+  items: List<T>,
+  selectedItem: T?,
+  onItemSelected: (T) -> Unit,
+  itemTitleMap: (T) -> CharSequence,
+  modifier: Modifier = Modifier,
+  enabled: Boolean = LocalSettingsGroupEnabled.current,
+  colors: ListItemColors = SettingsTileDefaults.colors(),
+  subtitle: @Composable (() -> Unit)? = null,
+  icon: @Composable (() -> Unit)? = null,
+  shapes: ListItemShapes = SettingsTileDefaults.shapes(),
+  elevation: ListItemElevation = SettingsTileDefaults.elevation(),
+) {
+  SettingsTileScaffold(
+    modifier = modifier,
+    enabled = enabled,
+    title = title,
+    supportingContent = {
+      Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+      ) {
+        subtitle?.invoke()
+
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
+        ) {
+          items.forEachIndexed { _, item ->
+            OutlinedToggleButton(
+              modifier = Modifier.weight(1f),
+              checked = item == selectedItem,
+              onCheckedChange = { onItemSelected(item) },
+              enabled = enabled,
+              colors = ToggleButtonDefaults.toggleButtonColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+            ) {
+              Text(text = itemTitleMap(item).toString())
+            }
+          }
+        }
+      }
+    },
+    leadingContent = icon,
+    colors = colors,
+    shapes = shapes,
+    elevation = elevation,
+  )
+}

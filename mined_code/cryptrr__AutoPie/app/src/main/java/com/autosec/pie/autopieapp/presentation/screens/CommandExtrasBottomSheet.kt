@@ -1,0 +1,1047 @@
+package com.autopi.autopieapp.presentation.screens
+
+import android.app.Activity
+import android.app.Activity.RESULT_OK
+import android.content.Intent
+import android.os.Build
+import android.widget.Space
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.PlaylistRemove
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.SliderState
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startForegroundService
+import androidx.lifecycle.viewModelScope
+import com.autopi.autopieapp.data.CommandExtraInput
+import com.autopi.autopieapp.data.CommandExtra
+import com.autopi.autopieapp.data.CommandFlags
+import com.autopi.autopieapp.data.CommandModel
+import com.autopi.autopieapp.data.ExtraFlags
+import com.autopi.autopieapp.data.SECRET_VALUE_PLACEHOLDER
+import com.autopi.autopieapp.data.firstStepOrSelf
+import com.autopi.autopieapp.data.environmentVariableReferenceOrNull
+import com.autopi.autopieapp.data.flagValue
+import com.autopi.autopieapp.data.hasFlag
+import com.autopi.autopieapp.data.hasNextStep
+import com.autopi.autopieapp.data.isSecretExtra
+import com.autopi.autopieapp.data.matchesExtraValues
+import com.autopi.autopieapp.data.resolveMultiSelectableDefaults
+import com.autopi.autopieapp.data.resolveEnvironmentBackedValue
+import com.autopi.autopieapp.data.secretKey
+import com.autopi.autopieapp.data.services.SecretsService
+import com.autopi.autopieapp.data.toMultiSelectableValue
+import com.autopi.autopieapp.domain.ViewModelEvent
+import com.autopi.autopieapp.presentation.elements.GenericTextFormField
+import com.autopi.autopieapp.presentation.elements.OptionSelector
+import com.autopi.autopieapp.data.services.ForegroundService
+import com.autopi.autopieapp.presentation.elements.EmptyItemsBadge
+import com.autopi.autopieapp.presentation.elements.FlagSelector
+import com.autopi.autopieapp.presentation.elements.FlatMultiOptionSelector
+import com.autopi.autopieapp.presentation.elements.FlatOptionSelector
+import com.autopi.autopieapp.presentation.elements.FolderPicker
+import com.autopi.autopieapp.presentation.elements.GenericTextAndSelectorFormField
+import com.autopi.autopieapp.presentation.elements.MultiFilePicker
+import com.autopi.autopieapp.presentation.elements.MultiOptionSelector
+import com.autopi.autopieapp.presentation.elements.OptionSelectorBoolean
+import com.autopi.autopieapp.presentation.elements.PasswordFormField
+import com.autopi.autopieapp.presentation.elements.SingleFilePicker
+import com.autopi.autopieapp.presentation.elements.SliderSelector
+import com.autopi.autopieapp.presentation.elements.toSliderValue
+import com.autopi.utils.getActivity
+import com.autopi.autopieapp.presentation.viewModels.ShareReceiverViewModel
+import com.google.gson.Gson
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import org.koin.java.KoinJavaComponent
+import timber.log.Timber
+import kotlin.math.roundToInt
+
+private fun String.toShellBooleanOrNull(): String? = when (trim().lowercase()) {
+    "true", "1", "yes", "on" -> "true"
+    "false", "0", "no", "off" -> "false"
+    else -> null
+}
+
+private fun String.toSelectableOptions(): Map<String, String> =
+    split(',')
+        .map(String::trim)
+        .filter(String::isNotEmpty)
+        .associateTo(linkedMapOf()) { option ->
+            val label = option.substringBefore("=").trim()
+            val value = option.substringAfter("=", option).trim()
+            label to value
+        }
+
+private fun CommandExtra.toInitialInput(): CommandExtraInput =
+    CommandExtraInput(
+        name,
+        default,
+        when {
+            flags.hasFlag(ExtraFlags.INTERNAL_CONFIG) -> default
+            type == "BOOLEAN" -> defaultBoolean.toString()
+            type == "SLIDER" -> {
+                val value = default.split(",").getOrNull(1) ?: default
+                if (flags.hasFlag(ExtraFlags.INT)) {
+                    value.trim().toFloatOrNull()?.roundToInt()?.toString() ?: value
+                } else {
+                    value
+                }
+            }
+            type == "FLAG" -> ""
+            else -> default
+        },
+        type,
+        defaultBoolean,
+        id,
+        description
+    )
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CommandExtrasBottomSheet(
+    state: SheetState,
+    open: MutableState<Boolean>,
+    parentSheetState: SheetState? = null,
+    callerName: String = "SHARE",
+    isAsync: Boolean,
+    onHide: () -> Unit = {},
+    onExpand: () -> Unit = {},
+) {
+
+    val viewModel: ShareReceiverViewModel = koinViewModel()
+
+    val scope = rememberCoroutineScope()
+
+    val activity = LocalContext.current.getActivity()
+
+    LaunchedEffect(key1 = state.targetValue) {
+        if (state.targetValue == SheetValue.Expanded) {
+            parentSheetState?.hide()
+        } else {
+            parentSheetState?.show()
+        }
+    }
+
+
+
+
+    @Composable
+    fun bottomSheetContent() {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+            //.height(700.dp)
+            //.fillMaxHeight(0.40F)
+            ,
+            contentAlignment = Alignment.TopStart
+
+        )
+        {
+
+
+            Column(
+                Modifier
+                    //.fillMaxSize()
+                    .padding(horizontal = 15.dp)
+
+            ) {
+
+
+                if(viewModel.commandNotFound.value == true){
+                    Box(Modifier.fillMaxWidth()){
+                        EmptyItemsBadge(Icons.Default.PlaylistRemove, "Command does not exist.")
+                    }
+                }
+
+                viewModel.currentExtrasDetails.value?.let {
+                    val activeCommand = it.second.firstStepOrSelf()
+                    key(activeCommand.steps.size, activeCommand.path, activeCommand.command) {
+                        CommandExtraInputs(activeCommand, parentSheetState, open, state, callerName, isAsync)
+                    }
+                }
+
+            }
+        }
+
+
+    }
+
+    ModalBottomSheet(
+        sheetState = state,
+        content = { bottomSheetContent() },
+        shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp),
+        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+        onDismissRequest = {
+            scope.launch {
+                viewModel.currentExtrasDetails.value?.let { (_, command, inputs) ->
+                    if (command.multiStage == true) {
+                        inputs.processId?.let { processId ->
+                            viewModel.main.dispatchEvent(ViewModelEvent.StopShell(processId))
+                        }
+                    }
+                }
+                if(callerName == "DIRECT_ICON" || callerName == "EXTERNAL_APP"){
+                    activity?.finish()
+                }
+                viewModel.currentExtrasDetails.value = null
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
+@Composable
+fun CommandExtraInputs(command: CommandModel, parentSheetState: SheetState? = null, openState: MutableState<Boolean>,sheetState: SheetState, callerName: String,isAsync: Boolean,) {
+
+    val activity = LocalContext.current.getActivity()
+
+
+    val viewModel: ShareReceiverViewModel = koinViewModel()
+    val secretsService: SecretsService by KoinJavaComponent.inject(SecretsService::class.java)
+
+    // Keep these tied to the active invocation. Remembering the first values caused a
+    // reused sheet to retain the null inputs from an earlier non-share invocation.
+    val currentInputs = viewModel.currentExtrasDetails.value?.third
+    val inputFiles = currentInputs?.inputFiles
+    val inputText = currentInputs?.inputText
+
+    val extraInput = remember {
+        mutableStateOf("")
+    }
+
+    val extraInputList = remember {
+        derivedStateOf { if(extraInput.value.isNotEmpty()) extraInput.value.split(",") else emptyList() }
+    }
+
+
+    var isLoading by remember(command) {
+        mutableStateOf(false)
+    }
+
+    val requestedProcessId = viewModel.currentExtrasDetails.value?.third?.processId
+    val processId = remember(command, requestedProcessId) {
+        requestedProcessId ?: (100000..999999).random()
+    }
+
+    LaunchedEffect(command, processId) {
+        if (command.multiStage == true) {
+            val currentDetails = viewModel.currentExtrasDetails.value
+            if (currentDetails != null && currentDetails.third.processId == null) {
+                viewModel.currentExtrasDetails.value = Triple(
+                    currentDetails.first,
+                    currentDetails.second,
+                    currentDetails.third.copy(processId = processId)
+                )
+            }
+            viewModel.main.dispatchEvent(ViewModelEvent.CreateShell(processId))
+        }
+    }
+
+
+    val commandExtraInputs = remember(command.extras) {
+        mutableStateOf(
+            command.extras.orEmpty()
+                .map { extra -> extra.toInitialInput() }
+        )
+    }
+
+    fun isUnsetInternalConfigExtra(extra: CommandExtra): Boolean {
+        if (!extra.flags.hasFlag(ExtraFlags.INTERNAL_CONFIG)) return false
+        if (extra.isSecretExtra()) {
+            val commandId = command.id.ifBlank { command.name }
+            return secretsService.get(extra.secretKey(commandId)).isNullOrBlank()
+        }
+        return extra.default.isBlank()
+    }
+
+    val internalConfigExtras = command.extras.orEmpty()
+        .filter { it.flags.hasFlag(ExtraFlags.INTERNAL_CONFIG) }
+    val hasEmptyInternalConfigExtra = internalConfigExtras.any(::isUnsetInternalConfigExtra)
+    var showInternalConfigExtras by rememberSaveable(command.id, internalConfigExtras.map { it.id }.joinToString()) {
+        mutableStateOf(hasEmptyInternalConfigExtra)
+    }
+
+    val extraValuesById = commandExtraInputs.value.associate { it.id to it.value }
+    val visibleExtras = command.extras.orEmpty()
+        .filter { extra ->
+            !extra.flags.hasFlag(ExtraFlags.INTERNAL_CONFIG) || showInternalConfigExtras
+        }
+        .filter { extra ->
+            extra.visibleWhen?.matchesExtraValues(extraValuesById) != false
+        }
+
+    fun addToExtraInputs(commandExtraInput: CommandExtraInput) {
+        if (commandExtraInputs.value.any { it.id == commandExtraInput.id }) {
+            commandExtraInputs.value = commandExtraInputs.value.toMutableList().also {
+                val index = it.indexOfFirst { it.id == commandExtraInput.id }
+
+                it.set(index, commandExtraInput)
+            }
+        } else {
+            commandExtraInputs.value =
+                commandExtraInputs.value.toMutableList().also { it.add(0, commandExtraInput) }
+        }
+        Timber.d("Extra commands list: $commandExtraInputs")
+    }
+
+    val isRealtimeCommand = command.flags.hasFlag(CommandFlags.REALTIME)
+    val realtimeInputs = commandExtraInputs.value
+    val realtimeTriggerInputs = realtimeInputs.filter { input ->
+        val extra = command.extras.orEmpty()
+            .firstOrNull { extra -> extra.id == input.id || extra.name == input.name }
+        extra?.flags.hasFlag(ExtraFlags.INTERNAL_CONFIG) != true &&
+            (isRealtimeCommand || extra?.flags.hasFlag(ExtraFlags.REALTIME) == true)
+    }
+    val isRealtimeEnabled = isRealtimeCommand || realtimeTriggerInputs.isNotEmpty()
+    val realtimeInputTextKey = if (isRealtimeCommand) inputText else null
+    val realtimeInputFilesKey = if (isRealtimeCommand) inputFiles else null
+    val realtimeExtraInputKey = if (isRealtimeCommand) extraInput.value else null
+    val realtimeExtraInputListKey = if (isRealtimeCommand) extraInputList.value else null
+    LaunchedEffect(
+        isRealtimeEnabled,
+        realtimeTriggerInputs,
+        realtimeInputTextKey,
+        realtimeInputFilesKey,
+        realtimeExtraInputKey,
+        realtimeExtraInputListKey
+    ) {
+        if (!isRealtimeEnabled) return@LaunchedEffect
+
+        delay(150L)
+        viewModel.runCommandDirectly(
+            command,
+            inputText ?: extraInput.value,
+            inputFiles ?: extraInputList.value,
+            realtimeInputs,
+            processId,
+            sendNotifications = false,
+            closeExtrasOnComplete = false,
+            keepShellAlive = true
+        )
+    }
+
+    val scrollState = rememberScrollState()
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = command.name,
+            modifier = Modifier.weight(1F),
+            lineHeight = 32.sp,
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+        if (internalConfigExtras.isNotEmpty()) {
+            IconButton(
+                modifier = Modifier
+                    .size(28.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.secondaryContainer)
+                    .border(
+                        width = 2.dp,
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = RoundedCornerShape(12.dp)
+                    ),
+                onClick = {
+                    showInternalConfigExtras = !showInternalConfigExtras
+                },
+            ) {
+                Icon(
+                    imageVector = if (showInternalConfigExtras) {
+                        Icons.Default.KeyboardArrowDown
+                    } else {
+                        Icons.Default.KeyboardArrowUp
+                    },
+                    contentDescription = if (showInternalConfigExtras) {
+                        "Hide internal config extras"
+                    } else {
+                        "Show internal config extras"
+                    },
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    }
+    
+    Spacer(modifier = Modifier.height(20.dp))
+
+    Box(){
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(20.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            modifier = Modifier.fillMaxWidth().verticalScroll(scrollState).padding(bottom = 90.dp)
+        ) {
+
+            if(inputFiles == null && inputText == null && listOf("INPUT_FILE", "INPUT_URL", "INPUT_URLS", "INPUT_FILES").any{command.command.contains(it)}){
+                GenericTextAndSelectorFormField(text = extraInput, title = "INPUT", subtitle = "Put file, url or text here to set as INPUT for the command.", useRelativePaths = false)
+            }
+
+
+            for(extra in visibleExtras.filter { it.type != "FLAG" }) {
+                key(extra.id) {
+                    val displayName = extra.name.replace('_', ' ')
+                    val useSmallWidth = extra.description.isEmpty() &&
+                        !extra.flags.hasFlag(ExtraFlags.LARGE) &&
+                        extra.type != "SELECTABLE_FLAT" &&
+                        extra.type != "MULTI_SELECTABLE_FLAT"
+                    Column(Modifier.fillMaxWidth(if (useSmallWidth) 0.47F else 1F)) {
+                    when (extra.type) {
+                        "STRING" -> {
+
+                            val isPasswordField = remember(extra.name, extra.flags) {
+                                extra.flags.hasFlag(ExtraFlags.PASSWORD) ||
+                                    extra.name.endsWith("PASSWORD") ||
+                                    extra.name.endsWith("PASSWD") ||
+                                    extra.name.endsWith("SECRET")
+                            }
+                            val useMultiFilePicker = remember(extra.name, extra.flags) {
+                                extra.flags.hasFlag(ExtraFlags.MULTI_FILE_PICKER) || extra.name.endsWith("FILES")
+                            }
+                            val useSingleFilePicker = remember(extra.name, extra.flags) {
+                                extra.flags.hasFlag(ExtraFlags.FILE_PICKER) || extra.name.endsWith("FILE")
+                            }
+                            val useFolderPicker = remember(extra.name, extra.flags) {
+                                extra.flags.hasFlag(ExtraFlags.FOLDER_PICKER) || extra.name.endsWith("FOLDER")
+                            }
+                            val pickerMimeType = extra.flags.flagValue(ExtraFlags.MIME_TYPE) ?: "*/*"
+
+                            val displayedDefault = remember(command.id, command.name, extra.id, extra.default) {
+                                val commandId = command.id.ifBlank { command.name }
+                                if (
+                                    extra.isSecretExtra() &&
+                                    secretsService.get(extra.secretKey(commandId)) != null
+                                ) {
+                                    SECRET_VALUE_PLACEHOLDER
+                                } else {
+                                    extra.default
+                                }
+                            }
+
+                            val textValue = remember(extra.id, displayedDefault) {
+                                mutableStateOf(displayedDefault)
+                            }
+
+                            val shellEnvironmentVariable = remember(extra.default) {
+                                extra.default.environmentVariableReferenceOrNull()
+                            }
+
+                            LaunchedEffect(processId, extra.id, shellEnvironmentVariable) {
+                                shellEnvironmentVariable?.let { variableName ->
+                                    textValue.value = resolveEnvironmentBackedValue(extra.default) {
+                                        viewModel.processManagerService
+                                            .getShellEnvironmentVariable(processId, it)
+                                    }
+                                }
+                            }
+
+                            LaunchedEffect(key1 = textValue.value) {
+                                addToExtraInputs(
+                                    CommandExtraInput(
+                                        extra.name,
+                                        extra.default,
+                                        textValue.value,
+                                        extra.type,
+                                        extra.defaultBoolean,
+                                        extra.id,
+                                        extra.description
+                                    )
+                                )
+                            }
+
+
+                            if(isPasswordField){
+                                PasswordFormField(text = textValue, title = displayName, subtitle = extra.description, mask = '⬤')
+                            }
+                            else{
+                                GenericTextFormField(
+                                    text = textValue,
+                                    title = displayName,
+                                    subtitle = extra.description,
+                                    trailingIcon = if(useFolderPicker){
+                                        {
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                                FolderPicker(useRelativePaths = true) {
+                                                    textValue.value = it
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else if(useMultiFilePicker){
+                                        {
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                                MultiFilePicker(
+                                                    useRelativePaths = true,
+                                                    mimeType = pickerMimeType
+                                                ) {
+                                                    textValue.value = it.joinToString(",")
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else if(useSingleFilePicker){
+                                        {
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                                SingleFilePicker(
+                                                    useRelativePaths = true,
+                                                    mimeType = pickerMimeType
+                                                ) {
+                                                    textValue.value = it
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        null
+                                    }
+                                )
+                            }
+
+
+
+                        }
+
+                        "BOOLEAN" -> {
+                            val booleanExpanded = remember { mutableStateOf(false) }
+                            val shellEnvironmentVariable = remember(extra.default) {
+                                extra.default.environmentVariableReferenceOrNull()
+                            }
+                            val selectedOptionForBoolean =
+                                rememberSaveable(extra.id, extra.default, extra.defaultBoolean) {
+                                    mutableStateOf(extra.defaultBoolean.toString())
+                                }
+                            val booleanOptions = listOf("TRUE", "FALSE")
+
+                            LaunchedEffect(processId, extra.id, shellEnvironmentVariable) {
+                                shellEnvironmentVariable?.let { variableName ->
+                                    resolveEnvironmentBackedValue(extra.default) {
+                                        viewModel.processManagerService
+                                            .getShellEnvironmentVariable(processId, it)
+                                    }
+                                        ?.toShellBooleanOrNull()
+                                        ?.let { selectedOptionForBoolean.value = it }
+                                }
+                            }
+
+                            LaunchedEffect(key1 = selectedOptionForBoolean.value) {
+                                addToExtraInputs(
+                                    CommandExtraInput(
+                                        extra.name,
+                                        extra.default,
+                                        selectedOptionForBoolean.value,
+                                        extra.type,
+                                        extra.defaultBoolean,
+                                        extra.id,
+                                        extra.description
+                                    )
+                                )
+                            }
+
+                            Text(text = displayName, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+                            if(extra.description.isNotEmpty()){
+                                Spacer(modifier = Modifier.height(3.dp))
+                                Text(text = extra.description, fontSize = 14.sp, fontWeight = FontWeight.Normal)
+                            }
+                            Spacer(modifier = Modifier.height(10.dp))
+
+
+                            OptionSelectorBoolean(
+                                options = booleanOptions,
+                                selectedOption = selectedOptionForBoolean,
+                                expanded = booleanExpanded
+                            )
+                        }
+
+                        "SELECTABLE", "SELECTABLE_FLAT" -> {
+                            val isFlat = extra.type == "SELECTABLE_FLAT"
+                            val expanded = remember { mutableStateOf(false) }
+                            val configuredOptions = extra.selectableOptions
+                            val shellEnvironmentVariable = remember(configuredOptions) {
+                                configuredOptions.values.singleOrNull()
+                                    ?.environmentVariableReferenceOrNull()
+                            }
+                            val defaultEnvironmentVariable = remember(extra.default) {
+                                extra.default.environmentVariableReferenceOrNull()
+                            }
+                            var options by remember(extra.id, configuredOptions) {
+                                mutableStateOf(configuredOptions)
+                            }
+                            var selectableFetchFailed by remember(extra.id, configuredOptions) {
+                                mutableStateOf(false)
+                            }
+                            val selectedOption =
+                                rememberSaveable(extra.id, extra.default, configuredOptions) {
+                                    mutableStateOf(
+                                        configuredOptions[extra.default]
+                                            ?: extra.default.ifEmpty {
+                                                configuredOptions.values.firstOrNull().orEmpty()
+                                            }
+                                    )
+                                }
+
+                            LaunchedEffect(
+                                processId,
+                                extra.id,
+                                shellEnvironmentVariable,
+                                defaultEnvironmentVariable
+                            ) {
+                                val resolvedDefault = resolveEnvironmentBackedValue(extra.default) {
+                                    viewModel.processManagerService
+                                        .getShellEnvironmentVariable(processId, it)
+                                }
+                                val resolvedOptions = if (shellEnvironmentVariable != null) {
+                                    viewModel.processManagerService
+                                        .getShellEnvironmentVariable(processId, shellEnvironmentVariable)
+                                        ?.toSelectableOptions()
+                                        ?.takeIf { it.isNotEmpty() }
+                                } else {
+                                    configuredOptions
+                                }
+
+                                if (resolvedOptions == null) {
+                                    selectableFetchFailed = true
+                                    expanded.value = false
+                                    options = emptyMap()
+                                    selectedOption.value = "Error fetching"
+                                } else {
+                                    selectableFetchFailed = false
+                                    options = resolvedOptions
+                                    selectedOption.value = resolvedOptions[resolvedDefault]
+                                        ?: resolvedDefault.ifEmpty {
+                                            resolvedOptions.values.firstOrNull().orEmpty()
+                                        }
+                                }
+                            }
+
+                            LaunchedEffect(key1 = selectedOption.value) {
+                                addToExtraInputs(
+                                    CommandExtraInput(
+                                        extra.name,
+                                        selectedOption.value,
+                                        selectedOption.value,
+                                        extra.type,
+                                        extra.defaultBoolean,
+                                        extra.id,
+                                        extra.description
+                                    )
+                                )
+                            }
+
+                            Column {
+                                Text(
+                                    text = displayName,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                if(extra.description.isNotEmpty()){
+                                    Spacer(modifier = Modifier.height(3.dp))
+                                    Text(text = extra.description, fontSize = 14.sp, fontWeight = FontWeight.Normal)
+                                }
+                                Spacer(modifier = Modifier.height(10.dp))
+
+                                if (isFlat) {
+                                    FlatOptionSelector(
+                                        options = options,
+                                        selectedOption = selectedOption,
+                                        enabled = !selectableFetchFailed
+                                    )
+                                } else {
+                                    OptionSelector(
+                                        options = options,
+                                        selectedOption = selectedOption,
+                                        expanded = expanded,
+                                        enabled = !selectableFetchFailed
+                                    )
+                                }
+                            }
+                        }
+                        "MULTI_SELECTABLE", "MULTI_SELECTABLE_FLAT" -> {
+                            val isFlat = extra.type == "MULTI_SELECTABLE_FLAT"
+                            val expanded = remember { mutableStateOf(false) }
+                            val configuredOptions = extra.selectableOptions
+                            val shellEnvironmentVariable = remember(configuredOptions) {
+                                configuredOptions.values.singleOrNull()
+                                    ?.environmentVariableReferenceOrNull()
+                            }
+                            val defaultEnvironmentVariable = remember(extra.default) {
+                                extra.default.environmentVariableReferenceOrNull()
+                            }
+                            var options by remember(extra.id, configuredOptions) {
+                                mutableStateOf(configuredOptions)
+                            }
+                            var selectableFetchFailed by remember(extra.id, configuredOptions) {
+                                mutableStateOf(false)
+                            }
+                            val selectedOptions =
+                                rememberSaveable(extra.id, extra.default, configuredOptions) {
+                                    mutableStateOf(
+                                        resolveMultiSelectableDefaults(extra.default, configuredOptions)
+                                    )
+                                }
+
+                            LaunchedEffect(
+                                processId,
+                                extra.id,
+                                shellEnvironmentVariable,
+                                defaultEnvironmentVariable
+                            ) {
+                                val resolvedDefault = resolveEnvironmentBackedValue(extra.default) {
+                                    viewModel.processManagerService
+                                        .getShellEnvironmentVariable(processId, it)
+                                }
+                                val resolvedOptions = if (shellEnvironmentVariable != null) {
+                                    viewModel.processManagerService
+                                        .getShellEnvironmentVariable(processId, shellEnvironmentVariable)
+                                        ?.toSelectableOptions()
+                                        ?.takeIf { it.isNotEmpty() }
+                                } else {
+                                    configuredOptions
+                                }
+
+                                if (resolvedOptions == null) {
+                                        selectableFetchFailed = true
+                                        expanded.value = false
+                                        options = emptyMap()
+                                        selectedOptions.value = emptyList()
+                                } else {
+                                        selectableFetchFailed = false
+                                        options = resolvedOptions
+                                        selectedOptions.value = resolveMultiSelectableDefaults(
+                                            resolvedDefault,
+                                            resolvedOptions
+                                        )
+                                }
+                            }
+
+                            LaunchedEffect(selectedOptions.value) {
+                                val value = selectedOptions.value.toMultiSelectableValue()
+                                addToExtraInputs(
+                                    CommandExtraInput(
+                                        extra.name,
+                                        extra.default,
+                                        value,
+                                        extra.type,
+                                        extra.defaultBoolean,
+                                        extra.id,
+                                        extra.description
+                                    )
+                                )
+                            }
+
+                            Column {
+                                Text(
+                                    text = displayName,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                if (extra.description.isNotEmpty()) {
+                                    Spacer(modifier = Modifier.height(3.dp))
+                                    Text(
+                                        text = extra.description,
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Normal
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(10.dp))
+
+                                if (isFlat) {
+                                    FlatMultiOptionSelector(
+                                        options = options,
+                                        selectedOptions = selectedOptions,
+                                        enabled = !selectableFetchFailed
+                                    )
+                                } else {
+                                    MultiOptionSelector(
+                                        options = options,
+                                        selectedOptions = selectedOptions,
+                                        expanded = expanded,
+                                        enabled = !selectableFetchFailed
+                                    )
+                                }
+                            }
+                        }
+                        "SLIDER" -> {
+                            val isIntegerSlider = extra.flags.hasFlag(ExtraFlags.INT)
+                            val shellEnvironmentVariable = remember(extra.default) {
+                                extra.default.environmentVariableReferenceOrNull()
+                            }
+                            var sliderConfiguration by remember(extra.id, extra.default) {
+                                mutableStateOf(extra.default)
+                            }
+
+                            LaunchedEffect(processId, extra.id, shellEnvironmentVariable) {
+                                shellEnvironmentVariable?.let { variableName ->
+                                    sliderConfiguration = resolveEnvironmentBackedValue(extra.default) {
+                                        viewModel.processManagerService
+                                            .getShellEnvironmentVariable(processId, it)
+                                    }
+                                }
+                            }
+
+                            val sliderValues = sliderConfiguration.split(",")
+                            val configuredStart = sliderValues.elementAtOrNull(0)?.trim()?.toFloatOrNull() ?: 0F
+                            val configuredEnd = sliderValues.elementAtOrNull(2)?.trim()?.toFloatOrNull() ?: 100F
+                            val startValue = if (isIntegerSlider) configuredStart.roundToInt().toFloat() else configuredStart
+                            val endValue = if (isIntegerSlider) configuredEnd.roundToInt().toFloat() else configuredEnd
+                            val rangeStart = minOf(startValue, endValue)
+                            val rangeEnd = maxOf(startValue, endValue).takeIf { it > rangeStart }
+                                ?: (rangeStart + 1F)
+                            val configuredDefault = sliderValues.elementAtOrNull(1)
+                                ?.trim()
+                                ?.toFloatOrNull()
+                                ?: 57F
+                            val defaultValue = (if (isIntegerSlider) {
+                                configuredDefault.roundToInt().toFloat()
+                            } else {
+                                configuredDefault
+                            }).coerceIn(rangeStart, rangeEnd)
+
+                            //Timber.d("RawDef: ${extra.default} DEFAULT: ${extra.default.split(",")} Start value: $startValue, End value: $endValue, Default Value: $defaultValue")
+
+
+                            val sliderState = remember(sliderConfiguration, isIntegerSlider) {
+                                SliderState(
+                                    value = defaultValue,
+                                    valueRange = rangeStart..rangeEnd,
+                                    steps = if (isIntegerSlider) {
+                                        (rangeEnd - rangeStart).roundToInt().minus(1).coerceAtLeast(0)
+                                    } else {
+                                        0
+                                    }
+                                )
+                            }
+
+                            LaunchedEffect(key1 = sliderState.value) {
+                                addToExtraInputs(
+                                    CommandExtraInput(
+                                        extra.name,
+                                        extra.default,
+                                        sliderState.value.toSliderValue(isIntegerSlider),
+                                        extra.type,
+                                        extra.defaultBoolean,
+                                        extra.id,
+                                        extra.description
+                                    )
+                                )
+                            }
+
+                            Column {
+                                Text(
+                                    text = displayName,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                if(extra.description.isNotEmpty()){
+                                    Spacer(modifier = Modifier.height(3.dp))
+                                    Text(text = extra.description, fontSize = 14.sp, fontWeight = FontWeight.Normal)
+                                }
+                                Spacer(modifier = Modifier.height(10.dp))
+
+                                SliderSelector(
+                                    state = sliderState,
+                                    value = sliderState.value.toSliderValue(isIntegerSlider),
+                                    isInteger = isIntegerSlider
+                                )
+
+                            }
+                        }
+                    }
+                    }
+                }
+            }
+
+            val horizontalScrollState = rememberScrollState()
+
+
+            if(visibleExtras.any { it.type == "FLAG" }){
+                Column {
+                    Text(
+                        text = "FLAGS",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(modifier = Modifier.height(3.dp))
+                    Text(text = "Extra flags to enable/disable.", fontSize = 14.sp, fontWeight = FontWeight.Normal)
+                }
+            }
+
+
+
+            Row(Modifier.horizontalScroll(horizontalScrollState), horizontalArrangement = Arrangement.spacedBy(5.dp)){
+                for(flag in visibleExtras.filter { it.type == "FLAG" }){
+                    key(flag.id) {
+                    val isChecked = rememberSaveable(flag.id, flag.defaultBoolean) {
+                        mutableStateOf(flag.defaultBoolean)
+                    }
+
+                    //Timber.d("RawDef: ${extra.default} DEFAULT: ${extra.default.split(",")} Start value: $startValue, End value: $endValue, Default Value: $defaultValue")
+
+                    LaunchedEffect(key1 = isChecked.value) {
+                        addToExtraInputs(
+                            CommandExtraInput(
+                                flag.name,
+                                flag.default,
+                                if (isChecked.value) flag.default else "",
+                                flag.type,
+                                flag.defaultBoolean,
+                                flag.id,
+                                flag.description
+                            )
+                        )
+                    }
+
+                    Column(Modifier.widthIn(min = 100.dp, max = 250.dp)){
+
+                        FlagSelector(
+                            flag.copy(name = flag.name.replace('_', ' ')),
+                            isChecked.value
+                        ) { isChecked.value = it }
+
+                    }
+
+                }
+                }
+            }
+
+        }
+
+
+        Row(
+            Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.secondaryContainer)
+        ) {
+            Button(
+                modifier = Modifier
+                    .padding(vertical = 15.dp)
+                    .height(52.dp)
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(20),
+                //contentPadding = PaddingValues(vertical = 20.dp),
+                onClick = {
+                    viewModel.main.viewModelScope.launch {
+
+                        if(isLoading){
+                            return@launch
+                        }
+
+                        isLoading = true
+
+                        viewModel.onCommandClickWithExtras(command, inputText ?: extraInput.value, inputFiles ?: extraInputList.value, commandExtraInputs.value, processId)
+
+                        if (command.hasNextStep()) {
+                            return@launch
+                        }
+
+                        if (isRealtimeEnabled) {
+                            isLoading = false
+                            return@launch
+                        }
+
+                        //Don't close the activity if intent is started with async false.
+                        //If intent is started with async true, the closing logic is in the event listener inside DirectCommandActivity
+                        if(callerName == "EXTERNAL_APP"){
+                            return@launch
+                        }
+
+                        if(parentSheetState != null){
+                            //When this activity is opened from share receiver
+                            delay(900)
+                            activity?.finish()
+                            viewModel.currentExtrasDetails.value = null
+                        }else{
+                            //when this activity is opened from the app itself.
+                            delay(1500)
+                            openState.value = false
+                            viewModel.currentExtrasDetails.value = null
+                        }
+                    }
+                },
+
+                ) {
+
+
+                Column {
+                    when (isLoading) {
+                        true -> {
+                            CircularProgressIndicator(
+                                strokeWidth = 3.dp,
+                                modifier = Modifier.size(24.dp),
+                                color = Color.Black.copy(alpha = 0.4F)
+                            )
+                        }
+
+                        false -> {
+                            Text(
+                                text = "RUN",
+                                //modifier = Modifier.align(Alignment.Center),
+                                letterSpacing = 1.11.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+                }
+
+            }
+        }
+
+
+    }
+
+}

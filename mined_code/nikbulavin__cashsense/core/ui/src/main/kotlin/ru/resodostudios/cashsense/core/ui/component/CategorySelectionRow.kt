@@ -1,0 +1,99 @@
+package ru.resodostudios.cashsense.core.ui.component
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.dp
+import ru.resodostudios.cashsense.core.designsystem.component.AnimatedIcon
+import ru.resodostudios.cashsense.core.designsystem.icon.CsIcons
+import ru.resodostudios.cashsense.core.designsystem.icon.outlined.Check
+import ru.resodostudios.cashsense.core.designsystem.theme.CsTheme
+import ru.resodostudios.cashsense.core.model.Category
+import ru.resodostudios.cashsense.core.ui.CategoryPreviewParameterProvider
+import ru.resodostudios.cashsense.core.ui.model.StoredIcon
+
+@Composable
+fun CategorySelectionRow(
+    availableCategories: List<Category>,
+    selectedCategories: Set<Category>,
+    onCategoryFilterUpdate: (Category, Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    FlowRow(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        availableCategories.forEach { category ->
+            CategoryChip(
+                selected = category in selectedCategories,
+                category = category,
+                onClick = onCategoryFilterUpdate,
+            )
+        }
+    }
+}
+
+@Composable
+private fun CategoryChip(
+    selected: Boolean,
+    category: Category,
+    onClick: (Category, Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val hapticFeedback = LocalHapticFeedback.current
+
+    FilterChip(
+        selected = selected,
+        onClick = {
+            hapticFeedback.performHapticFeedback(
+                if (selected) HapticFeedbackType.ToggleOff else HapticFeedbackType.ToggleOn
+            )
+            onClick(category, !selected)
+        },
+        label = {
+            Text(
+                text = category.title,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
+        leadingIcon = {
+            AnimatedIcon(
+                icon = if (selected) CsIcons.Outlined.Check else StoredIcon.asImageVector(category.iconId),
+                iconSize = FilterChipDefaults.IconSize,
+            )
+        },
+        modifier = modifier,
+        shapes = FilterChipDefaults.shapes(),
+    )
+}
+
+@Preview
+@Composable
+private fun CategorySelectorRowPreview(
+    @PreviewParameter(CategoryPreviewParameterProvider::class)
+    categories: List<Category>,
+) {
+    CsTheme {
+        Surface {
+            CategorySelectionRow(
+                availableCategories = categories,
+                selectedCategories = setOf(categories.first()),
+                onCategoryFilterUpdate = { _, _ -> },
+                modifier = Modifier.padding(16.dp),
+            )
+        }
+    }
+}

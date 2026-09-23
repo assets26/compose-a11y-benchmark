@@ -1,0 +1,14 @@
+gold_category,claude-sonnet,gemini-flash,gpt-mini,mistral,phi3,qwen-coder
+clickable_icon_not_iconbutton,1.0,1.0,1.0,1.0,0.857,1.0
+color_contrast,1.0,0.667,1.0,1.0,1.0,0.333
+decorative_mislabeled,1.0,0.909,0.909,1.0,1.0,0.727
+missing_content_description,1.0,1.0,1.0,1.0,,1.0
+missing_heading_semantics,0.8,0.733,1.0,1.0,,0.667
+missing_interaction_semantics,1.0,1.0,1.0,1.0,1.0,0.818
+missing_merge_descendants,1.0,0.909,0.909,1.0,,0.636
+missing_semantics_role,1.0,0.862,1.0,1.0,1.0,0.897
+missing_state_description,1.0,1.0,1.0,1.0,1.0,1.0
+pointerinput_no_semantics,1.0,1.0,1.0,1.0,,1.0
+text_truncation_scaling,1.0,0.923,0.923,0.923,1.0,0.846
+textfield_no_label,1.0,1.0,1.0,1.0,1.0,0.75
+touch_target_size,1.0,1.0,1.0,1.0,,1.0

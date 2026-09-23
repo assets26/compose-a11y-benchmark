@@ -1,0 +1,67 @@
+package com.nevoit.cresto.ui.components.packed
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.nevoit.cresto.theme.AppColors
+import com.nevoit.cresto.theme.AppSpecs
+import com.nevoit.glasense.core.component.Text
+import com.nevoit.glasense.theme.GlasenseTheme
+
+/**
+ * A container composable for configuration items, providing a consistent layout with an optional title and a background.
+ *
+ * @param title An optional title to be displayed above the container.
+ * @param backgroundColor The background color of the main content area.
+ * @param content The composable content to be displayed inside the container.
+ */
+@Composable
+fun ConfigContainer(
+    title: String? = null,
+    backgroundColor: Color,
+    content: @Composable () -> Unit,
+) {
+    // The main column that holds the optional title and the content box.
+    Column(modifier = Modifier.fillMaxWidth()) {
+        // Display the title only if it is not null.
+        if (title != null) {
+            Text(
+                text = title,
+                style = GlasenseTheme.type.subHeadline.copy(lineHeight = 14.sp),
+                color = AppColors.contentVariant,
+                modifier = Modifier
+                    .padding(
+                        start = 12.dp,
+                        top = 0.dp,
+                        end = 12.dp,
+                        bottom = 12.dp
+                    )
+                    .fillMaxWidth()
+            )
+        }
+        // The main box that contains the content with a specific background and shape.
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = backgroundColor, shape = AppSpecs.cardShape)
+        ) {
+            // An inner box to provide padding for the content.
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(12.dp)
+            ) {
+                // The actual content provided to the composable.
+                content()
+            }
+        }
+    }
+}

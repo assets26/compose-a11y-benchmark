@@ -1,0 +1,665 @@
+package ca.voiditswarranty.roadtripradar.ui
+
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.res.Configuration
+import android.view.WindowManager
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import ca.voiditswarranty.roadtripradar.R
+import ca.voiditswarranty.roadtripradar.data.isDarkForAppTheme
+import ca.voiditswarranty.roadtripradar.data.resolvedStyleUri
+import ca.voiditswarranty.roadtripradar.model.MapStyle
+import ca.voiditswarranty.roadtripradar.model.RadarRingsData
+import ca.voiditswarranty.roadtripradar.model.buildRadarRingsData
+import ca.voiditswarranty.roadtripradar.model.ringDistancesForZoom
+import ca.voiditswarranty.roadtripradar.ui.tutorial.LocalTutorialAnchors
+import ca.voiditswarranty.roadtripradar.ui.tutorial.TutorialGroup
+import ca.voiditswarranty.roadtripradar.ui.tutorial.TutorialOverlay
+import ca.voiditswarranty.roadtripradar.ui.tutorial.rememberTutorialAnchorsState
+import ca.voiditswarranty.roadtripradar.viewmodel.MapViewModel
+import androidx.compose.runtime.CompositionLocalProvider
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
+import org.maplibre.compose.camera.CameraMoveReason
+import org.maplibre.compose.camera.CameraPosition
+import org.maplibre.compose.camera.CameraState
+import org.maplibre.compose.camera.rememberCameraState
+import org.maplibre.compose.layers.Anchor
+import org.maplibre.compose.location.BearingUpdate
+import org.maplibre.compose.location.LocationTrackingEffect
+import org.maplibre.compose.location.UserLocationState
+import org.maplibre.compose.location.rememberDefaultLocationProvider
+import org.maplibre.compose.location.rememberNullLocationProvider
+import org.maplibre.compose.location.rememberUserLocationState
+import org.maplibre.compose.map.MapOptions
+import org.maplibre.compose.map.MaplibreMap
+import org.maplibre.compose.map.OrnamentOptions
+import org.maplibre.compose.style.BaseStyle
+import org.maplibre.compose.util.ClickResult
+import org.maplibre.spatialk.geojson.Position
+import org.maplibre.spatialk.units.Length
+
+@SuppressLint("MissingPermission")
+@Composable
+fun MapScreen(
+    vm: MapViewModel,
+    mapStyle: MapStyle,
+    onStyleChange: (MapStyle) -> Unit,
+    locationPermissionGranted: Boolean,
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    // Location
+    val locationProvider = if (locationPermissionGranted && vm.useGps) {
+        rememberDefaultLocationProvider()
+    } else {
+        rememberNullLocationProvider()
+    }
+    val locationState = rememberUserLocationState(locationProvider = locationProvider)
+    val hasLocation = vm.useGps && locationState.location != null
+    val hasGpsFix = hasGoodGpsFix(
+        useGps = vm.useGps,
+        hasLocation = hasLocation,
+        accuracyMeters = locationState.location?.accuracy,
+    )
+
+    // Camera
+    val configuration = LocalConfiguration.current
+    val mapStyleUri = mapStyle.resolvedStyleUri(context)
+    val mapOverlaysDark = mapStyle.isDarkForAppTheme(context)
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val screenHeight = configuration.screenHeightDp.dp
+    val density = LocalDensity.current
+    val safeInsets = WindowInsets.safeDrawing
+    val topInset = with(density) { safeInsets.getTop(density).toDp() }
+    val bottomInset = with(density) { safeInsets.getBottom(density).toDp() }
+    val usableHeight = (screenHeight - topInset - bottomInset).coerceAtLeast(1.dp)
+    val centerOffsetFraction =
+        if (isLandscape) vm.mapCenterOffsetLandscapeFraction else vm.mapCenterOffsetPortraitFraction
+
+    // Treat slider value as desired map-center distance from bottom of the usable map area.
+    val (computedTopPadding, computedBottomPadding) = computeCameraOffsetPadding(
+        usableHeight = usableHeight,
+        centerOffsetFraction = centerOffsetFraction,
+    )
+    val cameraPadding = PaddingValues(
+        top = topInset + computedTopPadding,
+        bottom = bottomInset + computedBottomPadding,
+    )
+    val savedZoom = remember { vm.prefsRepo.zoomLevel.toDouble() }
+    val startPosition = remember { vm.prefsRepo.lastKnownPosition }
+
+    val cameraState = rememberCameraState(
+        firstPosition = CameraPosition(
+            target = startPosition,
+            zoom = savedZoom,
+            padding = cameraPadding,
+        )
+    )
+
+    LaunchedEffect(centerOffsetFraction, isLandscape, screenHeight, topInset, bottomInset) {
+        cameraState.animateTo(
+            cameraState.position.copy(
+                padding = cameraPadding,
+            )
+        )
+    }
+
+    LaunchedEffect(cameraState.moveReason) {
+        if (cameraState.moveReason == CameraMoveReason.GESTURE) {
+            vm.isTrackingCamera = false
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        snapshotFlow { cameraState.position.zoom }
+            .collect { zoom -> vm.onZoomChanged(zoom.toFloat()) }
+    }
+
+    // Keep screen on
+    LaunchedEffect(vm.keepScreenOn) {
+        val window = (context as? Activity)?.window ?: return@LaunchedEffect
+        if (vm.keepScreenOn) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        } else {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+    }
+
+    // Store location every 15 seconds for next startup
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(15_000)
+            val pos = if (locationState.location != null && vm.useGps) {
+                locationState.location!!.position
+            } else {
+                cameraState.position.target
+            }
+            vm.saveLastKnownPosition(pos)
+        }
+    }
+
+    LocationTrackingEffect(
+        locationState = locationState,
+        enabled = vm.isTrackingCamera && hasLocation,
+        trackBearing = !vm.isNorthUp,
+    ) {
+        cameraState.updateFromLocation(
+            updateBearing = if (vm.isNorthUp) BearingUpdate.ALWAYS_NORTH else BearingUpdate.TRACK_LOCATION,
+        )
+    }
+
+    // Derived state
+    val zoomTier by remember {
+        derivedStateOf {
+            when {
+                cameraState.position.zoom >= 16 -> 0
+                cameraState.position.zoom >= 14 -> 1
+                cameraState.position.zoom >= 12 -> 2
+                cameraState.position.zoom >= 10 -> 3
+                cameraState.position.zoom >= 8 -> 4
+                cameraState.position.zoom >= 6 -> 5
+                cameraState.position.zoom >= 4 -> 6
+                else -> 7
+            }
+        }
+    }
+
+    // Push the live location fix into the ViewModel so the dev-only test harness
+    // can observe it over the WebSocket API. The downstream UI reads
+    // `vm.userPosition` (and the accuracy/bearing/speed companions) exactly as
+    // it previously read the local val — production behaviour is unchanged.
+    val locationFix = locationState.location
+    LaunchedEffect(locationFix) {
+        vm.updateUserPosition(
+            pos = locationFix?.position,
+            accuracy = locationFix?.accuracy,
+            bearing = locationFix?.bearing,
+            speed = locationFix?.speed,
+        )
+        vm.setLocalWeatherAnchor(locationFix?.position)
+        if (locationFix != null) vm.maybeAutoAdvance(locationFix.position)
+    }
+    val userPosition = vm.userPosition
+    val bearing = cameraState.position.bearing
+    val ringsCenter = if (hasLocation && userPosition != null) userPosition else cameraState.position.target
+    val radarData = remember(ringsCenter.latitude, ringsCenter.longitude, zoomTier, bearing, vm.useMetric) {
+        buildRadarRingsData(ringsCenter, ringDistancesForZoom(cameraState.position.zoom), bearing, vm.useMetric)
+    }
+
+    val poiInfo = remember(userPosition?.latitude, userPosition?.longitude, vm.poiPosition) {
+        computePoiInfo(
+            userPosition = userPosition,
+            poiPosition = vm.poiPosition,
+        )
+    }
+
+    // Feed camera info to ViewModel for search
+    vm.userPositionForSearch = userPosition
+    vm.screenWidthDp = configuration.screenWidthDp.toDouble()
+    vm.screenHeightDp = configuration.screenHeightDp.toDouble()
+
+    LaunchedEffect(Unit) {
+        try {
+            withTimeout(30_000L) {
+                snapshotFlow { vm.pendingCameraInfo }.filterNotNull().first()
+                vm.tryAutostartPoiPipelineIfNeeded()
+            }
+        } catch (_: TimeoutCancellationException) {
+            // Map never reported camera; user can start POIs from the Places menu.
+        }
+    }
+
+    // Periodic POI cell coverage check (works for both panning and driving)
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(1500)
+            val pos = cameraState.position
+            vm.onCameraSettled(pos.target.latitude, pos.target.longitude, pos.zoom, pos.bearing)
+        }
+    }
+
+    // UI
+    val state = MapScreenState(
+        useMetric = vm.useMetric,
+        useGps = vm.useGps,
+        isTrackingCamera = vm.isTrackingCamera,
+        isNorthUp = vm.isNorthUp,
+        keepScreenOn = vm.keepScreenOn,
+        activeWaypoint = vm.activeWaypoint,
+        activeIndex = vm.activeIndex,
+        waypoints = vm.waypoints,
+        poiPosition = vm.poiPosition,
+        showThemeSelector = vm.showThemeSelector,
+        showLegend = vm.showLegend,
+        showTimeline = vm.showTimeline,
+        radarFramePaths = vm.radarFramePaths,
+        radarFrameTimes = vm.radarFrameTimes,
+        currentFrameIndex = vm.currentFrameIndex,
+        weatherWidgetSize = vm.weatherWidgetSize,
+        windEnabled = vm.windEnabled,
+        openMeteoSnapshot = vm.openMeteoSnapshot,
+        temperatureUnit = vm.temperatureUnit,
+        windSpeedUnit = vm.windSpeedUnit,
+        weatherActive = vm.weatherActive,
+        isWeatherPlaying = vm.isWeatherPlaying,
+        poiPipelineActive = vm.poiPipelineActive,
+        nearbyPoiFeatures = vm.nearbyPoiFeatures,
+        userPositionForSearch = vm.userPositionForSearch,
+        screenWidthDp = vm.screenWidthDp,
+        screenHeightDp = vm.screenHeightDp,
+        speedSize = vm.speedSize,
+        navWidgetSize = vm.navWidgetSize,
+        hasFailedCells = vm.hasFailedCells,
+        gpsIconOpacity = vm.gpsIconOpacity,
+        compassWidgetSize = vm.compassWidgetSize,
+        mapCenterOffsetPortraitFraction = vm.mapCenterOffsetPortraitFraction,
+        mapCenterOffsetLandscapeFraction = vm.mapCenterOffsetLandscapeFraction,
+        userPosition = userPosition,
+        userPositionAccuracy = vm.userPositionAccuracy,
+        bearing = bearing,
+        poiInfo = poiInfo,
+        cameraPadding = cameraPadding,
+    )
+
+    MapScreenContent(
+        state = state,
+        vm = vm,
+        mapStyle = mapStyle,
+        mapStyleUri = mapStyleUri,
+        onStyleChange = onStyleChange,
+        cameraState = cameraState,
+        scope = scope,
+        hasLocation = hasLocation,
+        hasGpsFix = hasGpsFix,
+        locationState = locationState,
+        isLandscape = isLandscape,
+        bearing = bearing,
+        userPosition = userPosition,
+        poiInfo = poiInfo,
+        radarData = radarData,
+        mapOverlaysDark = mapOverlaysDark,
+    )
+
+    // Tutorial-launch effects (VM-side; live with the other VM effects above)
+    LaunchedEffect(Unit) {
+        vm.evaluateWhatsNewChangelog()
+    }
+
+    LaunchedEffect(vm.showTerms, vm.showActionsDrawer) {
+        if (!vm.showTerms && !vm.showActionsDrawer) {
+            vm.startTutorialIfNotCompleted(TutorialGroup.MAP)
+        }
+    }
+
+    LaunchedEffect(
+        vm.waypoints.isNotEmpty(),
+        vm.showTerms,
+        vm.showActionsDrawer,
+        vm.showRouteEditor,
+        vm.tappedPoi,
+    ) {
+        val chipVisible = vm.waypoints.isNotEmpty()
+        val obstructed = vm.showTerms || vm.showActionsDrawer ||
+            vm.showRouteEditor || vm.tappedPoi != null
+        if (chipVisible && !obstructed) {
+            vm.startTutorialIfNotCompleted(TutorialGroup.ROUTE_EDITOR)
+        }
+    }
+
+    SideEffect {
+        vm.pendingCameraInfo = MapViewModel.CameraInfo(
+            lat = cameraState.position.target.latitude,
+            lon = cameraState.position.target.longitude,
+            zoom = cameraState.position.zoom,
+            bearing = cameraState.position.bearing,
+        )
+        vm.updatePoiMapVisibleBounds(cameraState.projection?.queryVisibleBoundingBox())
+    }
+}
+
+/**
+ * The pure-render surface of [MapScreen]. Hosts the `MaplibreMap` and the
+ * full post-map overlay tree (sheets, popups, drawer, etc.).
+ *
+ * **Staging note:** `state` is plumbed in anticipation of a follow-up refactor
+ * that parameterizes the overlay composables over [MapScreenState] + callbacks
+ * instead of reading `vm` directly. Until that lands, the overlays still
+ * consume `vm`; `state` is the testability surface the plan is building toward
+ * and `@Suppress("UNUSED_PARAMETER")` keeps the build clean. The data class
+ * also stays current with `vm`'s public surface — when a field drifts, the
+ * test suite will surface it.
+ *
+ * @param state the [MapScreenState] snapshot — plumbed but not yet consumed
+ *   by the overlay composables; see staging note above.
+ * @param vm the [MapViewModel]; consumed directly by every overlay until the
+ *   follow-up refactor.
+ */
+@SuppressLint("MissingPermission")
+@Composable
+@Suppress("UNUSED_PARAMETER")
+internal fun MapScreenContent(
+    state: MapScreenState,
+    vm: MapViewModel,
+    mapStyle: MapStyle,
+    mapStyleUri: String,
+    onStyleChange: (MapStyle) -> Unit,
+    cameraState: CameraState,
+    scope: CoroutineScope,
+    hasLocation: Boolean,
+    hasGpsFix: Boolean,
+    locationState: UserLocationState,
+    isLandscape: Boolean,
+    bearing: Double,
+    userPosition: Position?,
+    poiInfo: Pair<Length, Double>?,
+    radarData: RadarRingsData,
+    mapOverlaysDark: Boolean,
+) {
+    val tutorialAnchors = rememberTutorialAnchorsState()
+    CompositionLocalProvider(LocalTutorialAnchors provides tutorialAnchors) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        key(mapStyleUri, vm.customThemeVersion) {
+            MaplibreMap(
+                baseStyle = BaseStyle.Uri(mapStyleUri),
+                cameraState = cameraState,
+                modifier = Modifier.fillMaxSize(),
+                options = MapOptions(
+                    ornamentOptions = OrnamentOptions(
+                        isScaleBarEnabled = false,
+                        isCompassEnabled = false,
+                    ),
+                ),
+                onMapLongClick = { position, _ ->
+                    vm.setPoiFromLongPress(position)
+                    ClickResult.Consume
+                },
+                onMapClick = { _, _ ->
+                    ClickResult.Pass
+                },
+            ) {
+                Anchor.Top {
+                if (vm.weatherActive && vm.radarFramePaths.isNotEmpty()) {
+                    WeatherRadarLayers(
+                        radarFramePaths = vm.radarFramePaths,
+                        currentFrameIndex = vm.currentFrameIndex,
+                        radarOpacity = vm.radarOpacity,
+                    )
+                }
+
+                RadarRingsLayers(
+                    radarData = radarData,
+                    isDarkStyle = mapOverlaysDark,
+                )
+
+                PoiLoadBoundsLayer(
+                    bounds = vm.poiLoadBounds,
+                    isDarkStyle = mapOverlaysDark,
+                    visible = vm.poiLoadBounds != null,
+                )
+
+                FailedCellsLayer(
+                    failedBounds = vm.failedCellBounds,
+                    visible = vm.hasFailedCells,
+                )
+
+                if (hasLocation) {
+                    UserLocationPuck(
+                        locationState = locationState,
+                        cameraState = cameraState,
+                    )
+                }
+
+                if (userPosition != null) {
+                    WaypointRouteLineLayer(
+                        waypoints = vm.waypoints,
+                        activeIndex = vm.activeIndex,
+                        userPosition = userPosition,
+                    )
+                }
+
+                val previewOrigin = vm.tappedPoiOrigin
+                val previewPoi = vm.tappedPoi
+                if (previewPoi != null &&
+                    (previewOrigin == MapViewModel.TappedPoiOrigin.LongPress ||
+                        previewOrigin == MapViewModel.TappedPoiOrigin.Search)
+                ) {
+                    TappedPoiPreviewLayer(position = previewPoi.position)
+                }
+
+                NearbyPoiLayers(
+                    vm = vm,
+                    enabledCategories = vm.enabledPoiCategories,
+                    visible = vm.poiLoadBounds != null,
+                    categoriesVersion = vm.poiCategoriesVersion,
+                    onClusterClick = { pos ->
+                        vm.isTrackingCamera = false
+                        scope.launch {
+                            cameraState.animateTo(
+                                cameraState.position.copy(
+                                    target = pos,
+                                    zoom = cameraState.position.zoom + 2,
+                                )
+                            )
+                        }
+                    },
+                )
+
+                WaypointMarkersLayer(
+                    waypoints = vm.waypoints,
+                    activeWaypointId = vm.activeWaypointId,
+                    onClick = { wp -> vm.showWaypointPopup(wp.id) },
+                )
+            }
+            }
+        }
+
+        if (vm.isLoadingPois) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 64.dp),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .background(
+                            MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+                            RoundedCornerShape(8.dp),
+                        )
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            strokeWidth = 2.dp,
+                        )
+                        Text(
+                            stringResource(R.string.loading_areas),
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                    Text(
+                        stringResource(R.string.loading_cells_remaining, vm.cellsRemaining),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+            }
+        }
+
+        val windowInfo = androidx.compose.material3.adaptive.currentWindowAdaptiveInfo()
+        val layoutConfig = remember(windowInfo.windowSizeClass) {
+            LayoutConfig.fromWindow(
+                windowSizeClass = windowInfo.windowSizeClass,
+            )
+        }
+
+        MapOverlay(
+            config = layoutConfig,
+            vm = vm,
+            bearing = bearing,
+            hasLocation = hasLocation,
+            hasGpsFix = hasGpsFix,
+            speedMps = vm.userPositionSpeed ?: 0.0,
+            poiInfo = poiInfo,
+            cameraState = cameraState,
+            scope = scope,
+            isLandscape = isLandscape,
+        )
+
+        ActionsDrawer(
+            vm = vm,
+            mapStyle = mapStyle,
+            onStyleChange = onStyleChange,
+        )
+
+        if (vm.showThemeSelector) {
+            var colorEditorStyle by remember { mutableStateOf<MapStyle?>(null) }
+            ThemeSelectorPanel(
+                vm = vm,
+                currentStyle = mapStyle,
+                onStyleChange = onStyleChange,
+                onEditColors = { style -> colorEditorStyle = style },
+                modifier = androidx.compose.ui.Modifier.align(Alignment.TopCenter),
+            )
+            colorEditorStyle?.let { style ->
+                ColorEditorSheet(
+                    style = style,
+                    vm = vm,
+                    currentStyle = mapStyle,
+                    onStyleChange = onStyleChange,
+                    onDismiss = { colorEditorStyle = null },
+                )
+            }
+        }
+
+        WhatsNewChangelogSheet(
+            visible = vm.showWhatsNewChangelog,
+            releases = vm.whatsNewChangelogReleases,
+            onDismiss = vm::dismissWhatsNewChangelog,
+        )
+        FullChangelogSheet(
+            visible = vm.showFullChangelog,
+            releases = vm.fullChangelogReleases,
+            onDismiss = vm::closeFullChangelog,
+        )
+
+        // Legend detail sheet
+        LegendDetailSheet(visible = vm.showLegendDetail, onClose = vm::closeLegendDetail)
+
+        // POI search dialog
+        PoiSearchDialog(
+            visible = vm.showPoiSearch,
+            onClose = vm::closePoiSearch,
+            query = vm.searchQuery,
+            onQueryChange = vm::updateSearchQuery,
+            isSearching = vm.isSearching,
+            results = vm.searchResults,
+            useMetric = vm.useMetric,
+            onSelectResult = vm::selectSearchResult,
+        )
+
+        // POI category picker
+        PoiCategoryPicker(
+            visible = vm.showPoiCategoryPicker,
+            enabledCategories = vm.enabledPoiCategories,
+            autostartPoiLoadingOnLaunch = vm.autostartPoiLoadingOnLaunch,
+            onAutostartToggle = vm::updateAutostartPoiLoadingOnLaunch,
+            onToggleCategory = vm::togglePoiCategory,
+            onClose = vm::closePoiCategoryPicker,
+            onSearchVisibleArea = {
+                vm.searchVisibleArea()
+                vm.closePoiCategoryPicker()
+            },
+        )
+
+        // Route editor sheet
+        RouteEditorSheet(
+            visible = vm.showRouteEditor,
+            waypoints = vm.waypoints,
+            activeWaypointId = vm.activeWaypointId,
+            onSetActive = vm::setActiveWaypoint,
+            onRemove = vm::removeWaypoint,
+            onMoveCommit = vm::moveWaypoint,
+            onClearRoute = {
+                vm.clearRoute()
+                vm.closeRouteEditor()
+            },
+            onClose = vm::closeRouteEditor,
+        )
+
+        // Tapped POI info popup
+        TappedPoiPopup(
+            poi = vm.tappedPoi,
+            origin = vm.tappedPoiOrigin,
+            waypoints = vm.waypoints,
+            userPosition = vm.userPositionForSearch,
+            useMetric = vm.useMetric,
+            onDismiss = vm::dismissTappedPoi,
+            onBack = vm::tappedPoiBackToSearch,
+            onCenterOnMap = { pos ->
+                vm.dismissTappedPoi()
+                vm.isTrackingCamera = false
+                scope.launch {
+                    cameraState.animateTo(
+                        cameraState.position.copy(target = pos)
+                    )
+                }
+            },
+            onAddWaypoint = vm::addWaypointFromTapped,
+            onRemoveNavigationTarget = vm::removeNavigationTarget,
+        )
+
+        TutorialOverlay(
+            activeGroup = vm.tutorialActiveGroup,
+            stepIndex = vm.tutorialStepIndex,
+            onBack = vm::tutorialBack,
+            onSkip = vm::skipTutorial,
+            onNext = vm::tutorialNext,
+        )
+    }
+    }
+}

@@ -1,0 +1,2251 @@
+item_id,category,repo,file,composable,evidence,snippet,verdict,notes,abs_path,resolve_method,file_found,decl_line,decl_name,decl_confidence,anchor_line,anchor_pattern,anchor_scope,anchor_text,anchor_found,context,imports
+pilot-0021,color_contrast,modelorona__TapLock,modelorona__TapLock/app/src/main/java/com/ah/taplock/SettingsComponents.kt,DoubleTapTestArea,3 hardcoded Color literals with Text,"
+@Composable
+fun DoubleTapTestArea(timeoutMs: Int) {
+    val detector = remember { DoubleTapDetector() }
+    var showSuccess by remember { mutableStateOf(false) }
+    val borderColor = if (showSuccess) Color(0xFF4CAF50) else MaterialTheme.colorScheme.outline
+
+    LaunchedEffect(showSuccess) {
+        if (showSuccess) {
+            delay(1000)
+            showSuccess = false
+        }
+    }
+
+    Box(
+        modifier = Modifier",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/modelorona__TapLock/app/src/main/java/com/ah/taplock/SettingsComponents.kt,exact,True,186,DoubleTapTestArea,1.0,189.0,Color\s*\(\s*0x,body,val borderColor = if (showSuccess) Color(0xFF4CAF50) else MaterialTheme.colorScheme.outline,True,"  177 |                 modifier = Modifier.padding(top = 8.dp),
+  178 |                 verticalArrangement = Arrangement.spacedBy(8.dp),
+  179 |                 content = content
+  180 |             )
+  181 |         }
+  182 |     }
+  183 | }
+  184 | 
+  185 | @Composable
+  186 | fun DoubleTapTestArea(timeoutMs: Int) {
+  187 |     val detector = remember { DoubleTapDetector() }
+  188 |     var showSuccess by remember { mutableStateOf(false) }
+  189 |     val borderColor = if (showSuccess) Color(0xFF4CAF50) else MaterialTheme.colorScheme.outline
+  190 | 
+  191 |     LaunchedEffect(showSuccess) {
+  192 |         if (showSuccess) {
+  193 |             delay(1000)
+  194 |             showSuccess = false
+  195 |         }
+  196 |     }
+  197 | 
+  198 |     Box(
+  199 |         modifier = Modifier
+  200 |             .fillMaxWidth()
+  201 |             .height(80.dp)
+  202 |             .border(
+  203 |                 width = 2.dp,
+  204 |                 color = borderColor,
+  205 |                 shape = RoundedCornerShape(12.dp)
+  206 |             )
+  207 |             .pointerInput(timeoutMs) {
+  208 |                 detectTapGestures {
+  209 |                     if (detector.onTap(timeoutMs)) {
+  210 |                         showSuccess = true
+  211 |                     }
+  212 |                 }
+  213 |             },
+  214 |         contentAlignment = Alignment.Center
+  215 |     ) {
+  216 |         if (showSuccess) {
+  217 |             Row(
+  218 |                 horizontalArrangement = Arrangement.spacedBy(8.dp),
+  219 |                 verticalAlignment = Alignment.CenterVertically
+  220 |             ) {
+  221 |                 Icon(
+  222 |                     Icons.Filled.Check,
+  223 |                     contentDescription = null,
+  224 |                     tint = Color(0xFF4CAF50),
+  225 |                     modifier = Modifier.size(24.dp)
+  226 |                 )
+  227 |                 Text(
+  228 |                     stringResource(R.string.tap_test_success),
+  229 |                     color = Color(0xFF4CAF50),","import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay"
+pilot-0022,color_contrast,RevenueCat__purchases-android,RevenueCat__purchases-android/ui/revenuecatui/src/main/kotlin/com/revenuecat/purchases/ui/revenuecatui/components/LoadedPaywallComponentsPreviews.kt,LoadedPaywallComponents_Preview_CenteredBodyFooter,4 hardcoded Color literals with Text,"@Preview(name = ""CenteredBodyFooter"", showSystemUi = true)
+@Composable
+private fun LoadedPaywallComponents_Preview_CenteredBodyFooter() {
+    val textColor = ColorScheme(light = ColorInfo.Hex(Color(0xFF272727).toArgb()))
+    val backgroundColor = ColorScheme(light = ColorInfo.Hex(Color(0xFFFDFDFD).toArgb()))
+    val footerColor = ColorScheme(light = ColorInfo.Hex(Color(0x99057C5B).toArgb()))
+    val ctaTextColor = ColorScheme(light = ColorInfo.Hex(Color.White.toArgb()))
+    val ctaBackgroundColor = ColorScheme(light = ColorInfo.Hex(Color(0xFF0A3D2E).toArgb()))
+
+    val data = PaywallComponentsData(
+        id = ""preview_centered_body_footer"",
+        templateName = ""template"",
+        assetBaseURL = URL(""https://assets.pawwalls.com""),
+        componentsConfig = ComponentsConfig(
+            base = PaywallComponentsConfig(
+                stack = StackComponent(",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/RevenueCat__purchases-android/ui/revenuecatui/src/main/kotlin/com/revenuecat/purchases/ui/revenuecatui/components/LoadedPaywallComponentsPreviews.kt,exact,True,1224,LoadedPaywallComponents_Preview_CenteredBodyFooter,1.0,1225.0,Color\s*\(\s*0x,body,val textColor = ColorScheme(light = ColorInfo.Hex(Color(0xFF272727).toArgb())),True," 1213 |         modifier = Modifier.fillMaxSize(),
+ 1214 |     )
+ 1215 | }
+ 1216 | 
+ 1217 | /**
+ 1218 |  * A small, vertically centered body with a sticky footer. The body must center within the space
+ 1219 |  * *above* the footer (matching the pre-overlap behavior), not the whole screen.
+ 1220 |  */
+ 1221 | @Suppress(""LongMethod"", ""MagicNumber"")
+ 1222 | @Preview(name = ""CenteredBodyFooter"", showSystemUi = true)
+ 1223 | @Composable
+ 1224 | private fun LoadedPaywallComponents_Preview_CenteredBodyFooter() {
+ 1225 |     val textColor = ColorScheme(light = ColorInfo.Hex(Color(0xFF272727).toArgb()))
+ 1226 |     val backgroundColor = ColorScheme(light = ColorInfo.Hex(Color(0xFFFDFDFD).toArgb()))
+ 1227 |     val footerColor = ColorScheme(light = ColorInfo.Hex(Color(0x99057C5B).toArgb()))
+ 1228 |     val ctaTextColor = ColorScheme(light = ColorInfo.Hex(Color.White.toArgb()))
+ 1229 |     val ctaBackgroundColor = ColorScheme(light = ColorInfo.Hex(Color(0xFF0A3D2E).toArgb()))
+ 1230 | 
+ 1231 |     val data = PaywallComponentsData(
+ 1232 |         id = ""preview_centered_body_footer"",
+ 1233 |         templateName = ""template"",
+ 1234 |         assetBaseURL = URL(""https://assets.pawwalls.com""),
+ 1235 |         componentsConfig = ComponentsConfig(
+ 1236 |             base = PaywallComponentsConfig(
+ 1237 |                 stack = StackComponent(
+ 1238 |                     components = listOf(
+ 1239 |                         TextComponent(
+ 1240 |                             text = LocalizationKey(""title""),
+ 1241 |                             color = textColor,
+ 1242 |                             fontWeight = FontWeight.BOLD,
+ 1243 |                             fontSize = 28,
+ 1244 |                             horizontalAlignment = CENTER,
+ 1245 |                             size = Size(width = Fill(), height = Fit()),
+ 1246 |                             margin = Padding(top = 0.0, bottom = 12.0, leading = 32.0, trailing = 32.0),
+ 1247 |                         ),
+ 1248 |                         TextComponent(
+ 1249 |                             text = LocalizationKey(""subtitle""),
+ 1250 |                             color = textColor,
+ 1251 |                             horizontalAlignment = CENTER,
+ 1252 |                             size = Size(width = Fill(), height = Fit()),
+ 1253 |                             margin = Padding(top = 0.0, bottom = 0.0, leading = 32.0, trailing = 32.0),
+ 1254 |                         ),
+ 1255 |                     ),
+ 1256 |                     dimension = Vertical(alignment = CENTER, distribution = FlexDistribution.CENTER),
+ 1257 |                     size = Size(width = Fill(), height = Fill()),
+ 1258 |                 ),
+ 1259 |                 background = Background.Color(backgroundColor),
+ 1260 |                 stickyFooter = StickyFooterComponent(
+ 1261 |                     stack = StackComponent(
+ 1262 |                         components = listOf(
+ 1263 |                             StackComponent(
+ 1264 |                                 components = listOf(
+ 1265 |                                     TextComponent(","import android.content.res.Configuration
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.tooling.preview.Preview
+import com.emergetools.snapshots.annotations.EmergeSnapshotConfig
+import com.revenuecat.purchases.Offering
+import com.revenuecat.purchases.paywalls.components.ButtonComponent
+import com.revenuecat.purchases.paywalls.components.HeaderComponent
+import com.revenuecat.purchases.paywalls.components.IconComponent
+import com.revenuecat.purchases.paywalls.components.ImageComponent
+import com.revenuecat.purchases.paywalls.components.PackageComponent
+import com.revenuecat.purchases.paywalls.components.PurchaseButtonComponent
+import com.revenuecat.purchases.paywalls.components.StackComponent
+import com.revenuecat.purchases.paywalls.components.StickyFooterComponent
+import com.revenuecat.purchases.paywalls.components.TextComponent
+import com.revenuecat.purchases.paywalls.components.common.Background
+import com.revenuecat.purchases.paywalls.components.common.ComponentsConfig
+import com.revenuecat.purchases.paywalls.components.common.LocaleId
+import com.revenuecat.purchases.paywalls.components.common.LocalizationData
+import com.revenuecat.purchases.paywalls.components.common.LocalizationKey
+import com.revenuecat.purchases.paywalls.components.common.PaywallComponentsConfig
+import com.revenuecat.purchases.paywalls.components.common.PaywallComponentsData
+import com.revenuecat.purchases.paywalls.components.properties.Border
+import com.revenuecat.purchases.paywalls.components.properties.ColorInfo
+import com.revenuecat.purchases.paywalls.components.properties.ColorScheme
+import com.revenuecat.purchases.paywalls.components.properties.CornerRadiuses
+import com.revenuecat.purchases.paywalls.components.properties.Dimension.Horizontal
+import com.revenuecat.purchases.paywalls.components.properties.Dimension.Vertical
+import com.revenuecat.purchases.paywalls.components.properties.Dimension.ZLayer
+import com.revenuecat.purchases.paywalls.components.properties.FitMode
+import com.revenuecat.purchases.paywalls.components.properties.FlexDistribution
+import com.revenuecat.purchases.paywalls.components.properties.FlexDistribution.START
+import com.revenuecat.purchases.paywalls.components.properties.FontWeight
+import com.revenuecat.purchases.paywalls.components.properties.HorizontalAlignment.CENTER
+import com.revenuecat.purchases.paywalls.components.properties.HorizontalAlignment.LEADING
+import com.revenuecat.purchases.paywalls.components.properties.ImageUrls
+import com.revenuecat.purchases.paywalls.components.properties.MaskShape
+import com.revenuecat.purchases.paywalls.components.properties.Padding
+import com.revenuecat.purchases.paywalls.components.properties.Shadow
+import com.revenuecat.purchases.paywalls.components.properties.Shape
+import com.revenuecat.purchases.paywalls.components.properties.Size
+import com.revenuecat.purchases.paywalls.components.properties.SizeConstraint.Fill
+import com.revenuecat.purchases.paywalls.components.properties.SizeConstraint.Fit
+import com.revenuecat.purchases.paywalls.components.properties.SizeConstraint.Fixed
+import com.revenuecat.purchases.paywalls.components.properties.ThemeImageUrls
+import com.revenuecat.purchases.paywalls.components.properties.TwoDimensionalAlignment
+import com.revenuecat.purchases.paywalls.components.properties.TwoDimensionalAlignment.TOP_TRAILING
+import com.revenuecat.purchases.paywalls.components.properties.VerticalAlignment
+import com.revenuecat.purchases.ui.revenuecatui.data.MockPurchasesType
+import com.revenuecat.purchases.ui.revenuecatui.data.testdata.TestData
+import com.revenuecat.purchases.ui.revenuecatui.helpers.ProvidePreviewImageLoader
+import com.revenuecat.purchases.ui.revenuecatui.helpers.getOrThrow
+import com.revenuecat.purchases.ui.revenuecatui.helpers.toComponentsPaywallState
+import java.net.URL
+import java.util.Date"
+pilot-0023,color_contrast,hosizoraru__KeiOS,hosizoraru__KeiOS/app/src/main/java/os/kei/ui/page/main/widget/core/AppOverviewCards.kt,AppOverviewInlineMetricTile,2 hardcoded Color literals with Text,"
+@Composable
+fun AppOverviewInlineMetricTile(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+    labelColor: Color = MiuixTheme.colorScheme.onBackgroundVariant,
+    valueColor: Color = MiuixTheme.colorScheme.onBackground,
+    containerColor: Color? = null,
+    borderColor: Color? = null,
+    labelMaxLines: Int = 2,
+    valueMaxLines: Int = 2,
+    labelWeight: Float = 0.58f,
+    valueWeight: Float = 0.42f,
+    showLabel: Boolean = true,
+    valueTextAlign: TextAlign = TextAlign.End,",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/hosizoraru__KeiOS/app/src/main/java/os/kei/ui/page/main/widget/core/AppOverviewCards.kt,exact,True,221,AppOverviewInlineMetricTile,1.0,241.0,Color\s*\(\s*0x,body,Color(0xFF0F1115).copy(alpha = 0.32f),True,"  221 | fun AppOverviewInlineMetricTile(
+  222 |     label: String,
+  223 |     value: String,
+  224 |     modifier: Modifier = Modifier,
+  225 |     labelColor: Color = MiuixTheme.colorScheme.onBackgroundVariant,
+  226 |     valueColor: Color = MiuixTheme.colorScheme.onBackground,
+  227 |     containerColor: Color? = null,
+  228 |     borderColor: Color? = null,
+  229 |     labelMaxLines: Int = 2,
+  230 |     valueMaxLines: Int = 2,
+  231 |     labelWeight: Float = 0.58f,
+  232 |     valueWeight: Float = 0.42f,
+  233 |     showLabel: Boolean = true,
+  234 |     valueTextAlign: TextAlign = TextAlign.End,
+  235 |     backdrop: Backdrop? = null,
+  236 |     emphasizedValue: Boolean = true,
+  237 | ) {
+  238 |     val isDark = isAppInDarkTheme()
+  239 |     val resolvedContainerColor =
+  240 |         containerColor ?: if (isDark) {
+  241 |             Color(0xFF0F1115).copy(alpha = 0.32f)
+  242 |         } else {
+  243 |             Color.White.copy(alpha = 0.58f)
+  244 |         }
+  245 |     val resolvedOverlayColor =
+  246 |         if (containerColor != null) {
+  247 |             Color.Transparent
+  248 |         } else if (isDark) {
+  249 |             Color.White.copy(alpha = 0.05f)
+  250 |         } else {
+  251 |             Color(0xFFDCEBFF).copy(alpha = 0.22f)
+  252 |         }
+  253 |     val resolvedBorderColor =
+  254 |         borderColor ?: if (isDark) {
+  255 |             Color.White.copy(alpha = 0.17f)
+  256 |         } else {
+  257 |             Color.White.copy(alpha = 0.84f)
+  258 |         }
+  259 |     val cornerRadius = 12.dp
+  260 |     val parentBackdrop = LocalLiquidParentBackdrop.current
+  261 |     val effectiveBackdrop = backdrop ?: parentBackdrop
+  262 |     val tileModifier =
+  263 |         modifier
+  264 |             .then(
+  265 |                 if (effectiveBackdrop == null) {
+  266 |                     Modifier
+  267 |                         .appSquircleBackground(resolvedContainerColor, cornerRadius)
+  268 |                         .appSquircleBackground(resolvedOverlayColor, cornerRadius)
+  269 |                 } else {
+  270 |                     Modifier
+  271 |                 },
+  272 |             ).appSquircleBorder(width = 1.dp, color = resolvedBorderColor, cornerRadius = cornerRadius)
+  273 |     val content: @Composable () -> Unit = {
+  274 |         Row(
+  275 |             modifier =
+  276 |                 Modifier
+  277 |                     .fillMaxWidth()
+  278 |                     .padding(
+  279 |                         horizontal = CardLayoutRhythm.metricCardHorizontalPadding,
+  280 |                         vertical = CardLayoutRhythm.metricCardVerticalPadding,
+  281 |                     ),","import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.kyant.backdrop.Backdrop
+import com.kyant.shapes.RoundedRectangle
+import os.kei.ui.page.main.widget.glass.GlassVariant
+import os.kei.ui.page.main.widget.glass.LiquidSurface
+import os.kei.ui.page.main.widget.glass.LocalLiquidParentBackdrop
+import os.kei.ui.page.main.widget.glass.UiPerformanceBudget
+import os.kei.ui.page.main.widget.glass.resolvedGlassBlurDp
+import os.kei.ui.page.main.widget.glass.resolvedGlassLensDp
+import os.kei.ui.page.main.widget.isAppInDarkTheme
+import os.kei.ui.page.main.widget.shape.appSquircleBackground
+import os.kei.ui.page.main.widget.shape.appSquircleBorder
+import os.kei.ui.page.main.widget.status.AppStatusColors
+import os.kei.ui.page.main.widget.status.StatusPill
+import os.kei.ui.page.main.widget.support.LocalTextCopyExpandedOverride
+import top.yukonga.miuix.kmp.theme.ColorSchemeMode
+import top.yukonga.miuix.kmp.theme.MiuixTheme
+import top.yukonga.miuix.kmp.theme.ThemeController"
+pilot-0024,color_contrast,higorslva__biketrackd,higorslva__biketrackd/app/src/main/java/com/biketrackd/app/ui/screens/StatsScreen.kt,StatsScreen,2 hardcoded Color literals with Text,"
+@Composable
+fun StatsScreen(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val fontScale = LocalFontScale.current
+    val dao = remember { AppDatabase.getInstance(context).pedalSessionDao() }
+
+    val sessions by dao.getAllFlow().collectAsState(initial = emptyList())
+    val sessionCount by dao.getSessionCountFlow().collectAsState(initial = 0)
+    val totalDist by dao.getTotalDistanceFlow().collectAsState(initial = 0f)
+    val totalDur by dao.getTotalDurationFlow().collectAsState(initial = 0L)
+    val overallAvg by dao.getOverallAvgSpeedFlow().collectAsState(initial = 0f)
+
+    val bestDist by dao.getBestDistanceFlow().collectAsState(initial = 0f)
+    val bestDuration by dao.getBestDurationFlow().collectAsState(initial = 0L)
+    val bestAvg by dao.getBestAvgSpeedFlow().collectAsState(initial = 0f)",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/higorslva__biketrackd/app/src/main/java/com/biketrackd/app/ui/screens/StatsScreen.kt,exact,True,66,StatsScreen,1.0,385.0,Color\s*\(\s*0x,body,"color = Color(0xFF4CAF50),",True,"  373 |                             val barCount = data.size
+  374 |                             if (barCount == 0) return@Canvas
+  375 |                             val gap = 8.dp.toPx()
+  376 |                             val barWidth = (size.width - gap * (barCount + 1)) / barCount
+  377 |                             val chartHeight = size.height - 4.dp.toPx()
+  378 | 
+  379 |                             data.forEachIndexed { i, (_, dist) ->
+  380 |                                 val barHeight = if (maxDist > 0) (dist / maxDist) * chartHeight else 0f
+  381 |                                 val x = gap + i * (barWidth + gap)
+  382 |                                 val y = size.height - barHeight
+  383 | 
+  384 |                                 drawRoundRect(
+  385 |                                     color = Color(0xFF4CAF50),
+  386 |                                     topLeft = Offset(x, y),
+  387 |                                     size = Size(barWidth, barHeight),
+  388 |                                     cornerRadius = CornerRadius(4.dp.toPx()),
+  389 |                                 )
+  390 |                             }
+  391 |                         }
+  392 |                     }
+  393 | 
+  394 |                     if (data.isNotEmpty()) {
+  395 |                         Spacer(modifier = Modifier.height(4.dp))
+  396 |                         Row(
+  397 |                             modifier = Modifier.fillMaxWidth(),
+  398 |                             horizontalArrangement = Arrangement.SpaceEvenly,
+  399 |                         ) {
+  400 |                             data.forEach { (label, _) ->
+  401 |                                 val display = if (showWeekly)
+  402 |                                     ""S"" + label.substringAfter(""-"")
+  403 |                                 else
+  404 |                                     label.substringAfter(""-"")
+  405 |                                 Text(
+  406 |                                     text = display,
+  407 |                                     fontSize = (9 * fontScale).sp,
+  408 |                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+  409 |                                 )
+  410 |                             }
+  411 |                         }
+  412 |                     }
+  413 |                 }
+  414 |             }
+  415 |         }
+  416 | 
+  417 |         // === Streak section ===
+  418 |         item { Spacer(modifier = Modifier.height(24.dp)) }
+  419 | 
+  420 |         item {
+  421 |             Text(
+  422 |                 text = stringResource(R.string.section_streak),
+  423 |                 style = MaterialTheme.typography.titleMedium,
+  424 |                 fontWeight = FontWeight.SemiBold,
+  425 |             )","import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.biketrackd.app.R
+import com.biketrackd.app.data.AppDatabase
+import com.biketrackd.app.data.PedalSession
+import com.biketrackd.app.data.UnitFormatter
+import com.biketrackd.app.data.UnitPreferences
+import com.biketrackd.app.ui.LocalFontScale
+import com.biketrackd.app.ui.components.LineChart
+import com.biketrackd.app.ui.components.SessionCard
+import com.biketrackd.app.ui.components.StatRow
+import com.biketrackd.app.ui.components.calcStreak
+import com.biketrackd.app.ui.components.exportSessionsAsJson
+import com.biketrackd.app.ui.components.dateLabel
+import com.biketrackd.app.ui.components.shareJson
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale"
+pilot-0025,color_contrast,iOrchid__android-jetpack-demo,iOrchid__android-jetpack-demo/compose/src/main/java/org/zhiwei/compose/screen/basic/material3/ButtonScreen.kt,Button_Screen,8 hardcoded Color literals with Text," */
+@Composable
+internal fun Button_Screen(modifier: Modifier = Modifier) {
+
+    LazyColumn(modifier.fillMaxSize()) {
+
+        item {
+            Title_Text(title = ""Button"")
+            //1、普通的常规属性
+            Title_Desc_Text(desc = ""1、button 常用属性如圆角，禁用，图标，背景色阴影边框等"")
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(5.dp), horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Button(onClick = {/*点击事件是在这里处理*/ }) {",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/iOrchid__android-jetpack-demo/compose/src/main/java/org/zhiwei/compose/screen/basic/material3/ButtonScreen.kt,exact,True,73,Button_Screen,1.0,205.0,Color\s*\(\s*0x,body,"containerColor = Color(0xFFD2D97A),",True,"  193 |             Row(
+  194 |                 Modifier
+  195 |                     .fillMaxWidth()
+  196 |                     .padding(5.dp), horizontalArrangement = Arrangement.SpaceEvenly
+  197 |             ) {
+  198 |                 Button(
+  199 |                     onClick = {},
+  200 |                     //注意使用colors的方式可以多样，ButtonColors构建，
+  201 |                     // 或者ButtonDefaults对应按钮colors的copy或者构建
+  202 | //                    colors = ButtonDefaults.buttonColors().copy(),
+  203 | //                    colors = ButtonDefaults.buttonColors(),
+  204 |                     colors = ButtonDefaults.buttonColors(
+  205 |                         containerColor = Color(0xFFD2D97A),
+  206 |                         contentColor = Color(0xFFFFFFFF),
+  207 |                         disabledContainerColor = Color(0xFFD2D97A),
+  208 |                         disabledContentColor = Color(0xFFD2D97A)
+  209 |                     ),
+  210 |                     //悬浮高度，可细分为默认，按压下的，禁用时的等
+  211 |                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 5.dp),
+  212 |                     border = BorderStroke(2.dp, Color.Red),//加边框，可用纯色，也可以用brush多色
+  213 |                 ) {
+  214 |                     Text(text = ""槐花黄绿"")
+  215 |                 }
+  216 |                 //其他按钮的elevation、border等属性也是触类旁通，不再逐一演示
+  217 |                 TextButton(
+  218 |                     onClick = {},
+  219 |                     colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF41AE3C))
+  220 |                 ) {
+  221 |                     Text(text = ""宝石绿"")
+  222 |                 }
+  223 |                 //似乎只能通过modifier来实现渐变色背景的按钮；fixme 后续学完graphic等应该会有其他方案。
+  224 |                 Button(
+  225 |                     onClick = { },
+  226 |                     colors = ButtonDefaults.textButtonColors(),
+  227 |                     modifier = Modifier.background(
+  228 |                         Brush.horizontalGradient(
+  229 |                             listOf(
+  230 |                                 Color(0xFFF97D1C),
+  231 |                                 Color(0xFF41AE3C),
+  232 |                                 Color(0xFFBEC936)
+  233 |                             )
+  234 |                         )
+  235 |                     )
+  236 |                 ) {
+  237 |                     Text(text = ""多色毛刷"")
+  238 |                 }
+  239 |             }
+  240 |         }
+  241 | 
+  242 |         item {
+  243 |             Title_Desc_Text(desc = ""2、IconButton"")
+  244 |             Row(
+  245 |                 Modifier","import android.widget.Toast
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.CutCornerShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CrueltyFree
+import androidx.compose.material.icons.filled.DeviceHub
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Hub
+import androidx.compose.material.icons.rounded.ColorLens
+import androidx.compose.material.icons.sharp.BluetoothAudio
+import androidx.compose.material.icons.twotone.DeviceHub
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ElevatedAssistChip
+import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.ElevatedFilterChip
+import androidx.compose.material3.ElevatedSuggestionChip
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FilledIconToggleButton
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconToggleButton
+import androidx.compose.material3.InputChip
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedIconButton
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import org.zhiwei.compose.ui.widget.Title_Desc_Text
+import org.zhiwei.compose.ui.widget.Title_Text"
+pilot-0026,color_contrast,hosizoraru__KeiOS,hosizoraru__KeiOS/app/src/main/java/os/kei/ui/page/main/widget/core/AppOverviewCards.kt,AppOverviewMetricTile,2 hardcoded Color literals with Text,"
+@Composable
+fun AppOverviewMetricTile(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+    labelColor: Color = MiuixTheme.colorScheme.onBackgroundVariant,
+    valueColor: Color = MiuixTheme.colorScheme.onBackground,
+    containerColor: Color? = null,
+    borderColor: Color? = null,
+    backdrop: Backdrop? = null,
+    valueMaxLines: Int = 2,
+    emphasizedValue: Boolean = true,
+) {
+    val isDark = isAppInDarkTheme()
+    val resolvedContainerColor =",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/hosizoraru__KeiOS/app/src/main/java/os/kei/ui/page/main/widget/core/AppOverviewCards.kt,exact,True,117,AppOverviewMetricTile,1.0,132.0,Color\s*\(\s*0x,body,Color(0xFF0F1115).copy(alpha = 0.34f),True,"  117 | fun AppOverviewMetricTile(
+  118 |     label: String,
+  119 |     value: String,
+  120 |     modifier: Modifier = Modifier,
+  121 |     labelColor: Color = MiuixTheme.colorScheme.onBackgroundVariant,
+  122 |     valueColor: Color = MiuixTheme.colorScheme.onBackground,
+  123 |     containerColor: Color? = null,
+  124 |     borderColor: Color? = null,
+  125 |     backdrop: Backdrop? = null,
+  126 |     valueMaxLines: Int = 2,
+  127 |     emphasizedValue: Boolean = true,
+  128 | ) {
+  129 |     val isDark = isAppInDarkTheme()
+  130 |     val resolvedContainerColor =
+  131 |         containerColor ?: if (isDark) {
+  132 |             Color(0xFF0F1115).copy(alpha = 0.34f)
+  133 |         } else {
+  134 |             Color.White.copy(alpha = 0.62f)
+  135 |         }
+  136 |     val resolvedOverlayColor =
+  137 |         if (containerColor != null) {
+  138 |             Color.Transparent
+  139 |         } else if (isDark) {
+  140 |             Color.White.copy(alpha = 0.05f)
+  141 |         } else {
+  142 |             Color(0xFFDCEBFF).copy(alpha = 0.24f)
+  143 |         }
+  144 |     val resolvedBorderColor =
+  145 |         borderColor ?: if (isDark) {
+  146 |             Color.White.copy(alpha = 0.18f)
+  147 |         } else {
+  148 |             Color.White.copy(alpha = 0.86f)
+  149 |         }
+  150 |     val cornerRadius = 12.dp
+  151 |     val parentBackdrop = LocalLiquidParentBackdrop.current
+  152 |     val effectiveBackdrop = backdrop ?: parentBackdrop
+  153 |     val tileModifier =
+  154 |         modifier
+  155 |             .then(
+  156 |                 if (effectiveBackdrop == null) {
+  157 |                     Modifier
+  158 |                         .appSquircleBackground(resolvedContainerColor, cornerRadius)
+  159 |                         .appSquircleBackground(resolvedOverlayColor, cornerRadius)
+  160 |                 } else {
+  161 |                     Modifier
+  162 |                 },
+  163 |             ).appSquircleBorder(width = 1.dp, color = resolvedBorderColor, cornerRadius = cornerRadius)
+  164 |     val content: @Composable () -> Unit = {
+  165 |         Column(
+  166 |             modifier =
+  167 |                 Modifier
+  168 |                     .fillMaxWidth()
+  169 |                     .padding(
+  170 |                         horizontal = CardLayoutRhythm.metricCardHorizontalPadding,
+  171 |                         vertical = CardLayoutRhythm.metricCardVerticalPadding,
+  172 |                     ),","import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.kyant.backdrop.Backdrop
+import com.kyant.shapes.RoundedRectangle
+import os.kei.ui.page.main.widget.glass.GlassVariant
+import os.kei.ui.page.main.widget.glass.LiquidSurface
+import os.kei.ui.page.main.widget.glass.LocalLiquidParentBackdrop
+import os.kei.ui.page.main.widget.glass.UiPerformanceBudget
+import os.kei.ui.page.main.widget.glass.resolvedGlassBlurDp
+import os.kei.ui.page.main.widget.glass.resolvedGlassLensDp
+import os.kei.ui.page.main.widget.isAppInDarkTheme
+import os.kei.ui.page.main.widget.shape.appSquircleBackground
+import os.kei.ui.page.main.widget.shape.appSquircleBorder
+import os.kei.ui.page.main.widget.status.AppStatusColors
+import os.kei.ui.page.main.widget.status.StatusPill
+import os.kei.ui.page.main.widget.support.LocalTextCopyExpandedOverride
+import top.yukonga.miuix.kmp.theme.ColorSchemeMode
+import top.yukonga.miuix.kmp.theme.MiuixTheme
+import top.yukonga.miuix.kmp.theme.ThemeController"
+pilot-0027,color_contrast,jmccoy600__androidCrypt,jmccoy600__androidCrypt/app/src/main/java/com/androidcrypt/app/MainActivity.kt,FileManagerScreen,18 hardcoded Color literals with Text,"
+@Composable
+fun FileManagerScreen() {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    
+    // Mounted volume state
+    var mountedVolumes by remember { mutableStateOf(VolumeMountManager.getMountedVolumes()) }
+    var selectedVolume by remember { mutableStateOf<String?>(null) }
+    var volumeInfo by remember { mutableStateOf<MountedVolumeInfo?>(null) }
+    var usedSpace by remember { mutableStateOf(0L) }
+    var freeSpace by remember { mutableStateOf(0L) }
+    var totalSpace by remember { mutableStateOf(0L) }
+    
+    // UI state
+    var statusMessage by remember { mutableStateOf("""") }",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/jmccoy600__androidCrypt/app/src/main/java/com/androidcrypt/app/MainActivity.kt,exact,True,1472,FileManagerScreen,1.0,1518.0,Color\s*\(\s*0x,body,statusColor = Color(0xFF4CAF50),True," 1506 |                 isCopying = true
+ 1507 |                 copyProgress = ""Exporting: ${fileToExport.name}""
+ 1508 |                 statusMessage = """"
+ 1509 |                 
+ 1510 |                 try {
+ 1511 |                     val reader = VolumeMountManager.getOrCreateFileSystemReader(selectedVolume!!)
+ 1512 |                     if (reader != null) {
+ 1513 |                         withContext(Dispatchers.IO) {
+ 1514 |                             exportFileFromVolume(context, reader, fileToExport, destUri)
+ 1515 |                         }
+ 1516 |                         
+ 1517 |                         statusMessage = ""✓ File exported successfully!""
+ 1518 |                         statusColor = Color(0xFF4CAF50)
+ 1519 |                     }
+ 1520 |                 } catch (e: Exception) {
+ 1521 |                     if (DEBUG_LOGGING) Log.e(""FileManager"", ""Failed to export file"", e)
+ 1522 |                     statusMessage = ""✗ Export failed: ${e.message}""
+ 1523 |                     statusColor = Color.Red
+ 1524 |                 } finally {
+ 1525 |                     isCopying = false
+ 1526 |                     copyProgress = """"
+ 1527 |                     selectedExportFile = null
+ 1528 |                 }
+ 1529 |             }
+ 1530 |         }
+ 1531 |     }
+ 1532 |     
+ 1533 |     // Destination picker for exporting a folder from volume to device
+ 1534 |     val exportFolderDestinationLauncher = rememberLauncherForActivityResult(
+ 1535 |         contract = ActivityResultContracts.OpenDocumentTree()
+ 1536 |     ) { destUri ->
+ 1537 |         if (destUri != null && selectedVolume != null && selectedExportFolder != null) {
+ 1538 |             val folderToExport = selectedExportFolder!!
+ 1539 |             scope.launch {
+ 1540 |                 isCopying = true
+ 1541 |                 copyProgress = ""Counting files...""
+ 1542 |                 statusMessage = """"
+ 1543 |                 
+ 1544 |                 try {
+ 1545 |                     val reader = VolumeMountManager.getOrCreateFileSystemReader(selectedVolume!!)
+ 1546 |                     if (reader != null) {
+ 1547 |                         withContext(Dispatchers.IO) {
+ 1548 |                             // Count files in the folder first
+ 1549 |                             val totalFiles = countFilesInVolumeFolder(reader, folderToExport.path)
+ 1550 |                             val counter = CopyCounter(totalFiles)
+ 1551 |                             
+ 1552 |                             exportFolderFromVolume(context, reader, folderToExport, destUri, counter) { progress ->
+ 1553 |                                 copyProgress = progress
+ 1554 |                             }
+ 1555 |                         }
+ 1556 |                         
+ 1557 |                         statusMessage = ""✓ Folder exported successfully!""
+ 1558 |                         statusColor = Color(0xFF4CAF50)","import android.Manifest
+import android.app.Activity
+import android.content.ClipData
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import android.os.Bundle
+import android.os.Environment
+import android.provider.DocumentsContract
+import android.provider.Settings
+import android.provider.OpenableColumns
+import android.util.Log
+import android.view.WindowManager
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.foundation.text.BasicSecureTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import com.androidcrypt.crypto.VolumeCreator
+import com.androidcrypt.crypto.VolumeMountManager
+import com.androidcrypt.crypto.EncryptionAlgorithm
+import com.androidcrypt.crypto.HashAlgorithm
+import com.androidcrypt.crypto.MountedVolumeInfo
+import com.androidcrypt.crypto.FAT32Reader
+import com.androidcrypt.crypto.FileEntry
+import com.androidcrypt.ui.theme.AndroidCryptTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.ByteArrayInputStream
+import androidx.lifecycle.compose.collectAsStateWithLifecycle"
+pilot-0028,color_contrast,ArcaDone__AwesomeUI,ArcaDone__AwesomeUI/sharedUI/src/commonMain/kotlin/com/arcadone/awesomeui/components/chart/progreessionchart/ProgressionChartDoubleGesture.kt,FullAnalyticsPreview,4 hardcoded Color literals with Text,"@Preview(name = ""Premium Analytics Preview"", showBackground = true)
+@Composable
+fun FullAnalyticsPreview() {
+    val analyticsData = listOf(
+        ChartDataPoint(45f, ""Jan 01""),
+        ChartDataPoint(52f, ""Jan 05""),
+        ChartDataPoint(48f, ""Jan 10""),
+        ChartDataPoint(65f, ""Jan 15""),
+        ChartDataPoint(82f, ""Jan 20""),
+        ChartDataPoint(78f, ""Jan 25""),
+        ChartDataPoint(95f, ""Jan 30""),
+    )
+
+    var currentRange by remember {
+        mutableStateOf<RangeSelectionData?>(RangeSelectionData(65f, 78f, ""Jan 15"", ""Jan 25"", 13f))
+    }",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/ArcaDone__AwesomeUI/sharedUI/src/commonMain/kotlin/com/arcadone/awesomeui/components/chart/progreessionchart/ProgressionChartDoubleGesture.kt,exact,True,613,FullAnalyticsPreview,1.0,629.0,Color\s*\(\s*0x,body,"modifier = Modifier.fillMaxSize().background(Color(0xFF0B0D0F)).padding(16.dp),",True,"  613 | fun FullAnalyticsPreview() {
+  614 |     val analyticsData = listOf(
+  615 |         ChartDataPoint(45f, ""Jan 01""),
+  616 |         ChartDataPoint(52f, ""Jan 05""),
+  617 |         ChartDataPoint(48f, ""Jan 10""),
+  618 |         ChartDataPoint(65f, ""Jan 15""),
+  619 |         ChartDataPoint(82f, ""Jan 20""),
+  620 |         ChartDataPoint(78f, ""Jan 25""),
+  621 |         ChartDataPoint(95f, ""Jan 30""),
+  622 |     )
+  623 | 
+  624 |     var currentRange by remember {
+  625 |         mutableStateOf<RangeSelectionData?>(RangeSelectionData(65f, 78f, ""Jan 15"", ""Jan 25"", 13f))
+  626 |     }
+  627 | 
+  628 |     Column(
+  629 |         modifier = Modifier.fillMaxSize().background(Color(0xFF0B0D0F)).padding(16.dp),
+  630 |     ) {
+  631 |         Text(""Performance Report"", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, modifier = Modifier.padding(bottom = 24.dp))
+  632 | 
+  633 |         Box(
+  634 |             modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(Color(0xFF1A1D24)).padding(20.dp),
+  635 |         ) {
+  636 |             Column {
+  637 |                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+  638 |                     Column {
+  639 |                         Text(
+  640 |                             text = if (currentRange != null) ""SELECTED RANGE"" else ""OVERVIEW"",
+  641 |                             color = ProgressionGlowColors.LinePurple.copy(0.8f),
+  642 |                             fontSize = 11.sp,
+  643 |                             fontWeight = FontWeight.Bold,
+  644 |                         )
+  645 |                         Text(
+  646 |                             text = currentRange?.let { ""${it.startLabel} — ${it.endLabel}"" } ?: ""Last 30 days"",
+  647 |                             color = Color.White,
+  648 |                             fontSize = 18.sp,
+  649 |                             fontWeight = FontWeight.Bold,
+  650 |                         )
+  651 |                     }
+  652 | 
+  653 |                     if (currentRange != null) {
+  654 |                         val isPos = currentRange!!.deltaValue >= 0
+  655 |                         Column(horizontalAlignment = Alignment.End) {
+  656 |                             Text(""Growth"", color = Color.Gray, fontSize = 10.sp)
+  657 |                             Text(
+  658 |                                 ""${if (isPos) ""+"" else """"}${currentRange!!.deltaValue.toInt()}%"",
+  659 |                                 color = if (isPos) Color(0xFF10B981) else Color(0xFFEF4444),
+  660 |                                 fontSize = 22.sp,
+  661 |                                 fontWeight = FontWeight.Black,
+  662 |                             )
+  663 |                         }
+  664 |                     }
+  665 |                 }
+  666 | 
+  667 |                 Spacer(modifier = Modifier.height(24.dp))
+  668 | 
+  669 |                 ProgressionChartGlow(","import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.TrendingDown
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.arcadone.awesomeui.components.chart.line.ChartDataPoint"
+pilot-0029,color_contrast,Dev-Aditya-More__PokeVerse,Dev-Aditya-More__PokeVerse/app/src/main/java/com/aditya1875/pokeverse/feature/core/ui/components/NeuromorphicButton.kt,NeuromorphicButton,4 hardcoded Color literals with Text,"
+@Composable
+fun NeuromorphicButton(
+    text: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    val isDark = isSystemInDarkTheme()
+    val backgroundColor = if (isDark) Color(0xFF1F1F1F) else Color(0xFFE0E0E0)
+    val lightShadow = if (isDark) Color(0xFF2A2A2A) else Color.White
+    val darkShadow = if (isDark) Color.Black else Color(0xFFB0B0B0)
+
+    var isPressed by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
+    val scale by animateFloatAsState(",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/Dev-Aditya-More__PokeVerse/app/src/main/java/com/aditya1875/pokeverse/feature/core/ui/components/NeuromorphicButton.kt,exact,True,34,NeuromorphicButton,1.0,40.0,Color\s*\(\s*0x,body,val backgroundColor = if (isDark) Color(0xFF1F1F1F) else Color(0xFFE0E0E0),True,"   28 | import androidx.compose.ui.unit.dp
+   29 | import androidx.compose.ui.unit.sp
+   30 | import kotlinx.coroutines.delay
+   31 | import kotlinx.coroutines.launch
+   32 | 
+   33 | @Composable
+   34 | fun NeuromorphicButton(
+   35 |     text: String,
+   36 |     modifier: Modifier = Modifier,
+   37 |     onClick: () -> Unit
+   38 | ) {
+   39 |     val isDark = isSystemInDarkTheme()
+   40 |     val backgroundColor = if (isDark) Color(0xFF1F1F1F) else Color(0xFFE0E0E0)
+   41 |     val lightShadow = if (isDark) Color(0xFF2A2A2A) else Color.White
+   42 |     val darkShadow = if (isDark) Color.Black else Color(0xFFB0B0B0)
+   43 | 
+   44 |     var isPressed by remember { mutableStateOf(false) }
+   45 |     val scope = rememberCoroutineScope()
+   46 | 
+   47 |     val scale by animateFloatAsState(
+   48 |         targetValue = if (isPressed) 0.96f else 1f,
+   49 |         animationSpec = tween(150),
+   50 |         label = ""scaleAnim""
+   51 |     )
+   52 | 
+   53 |     Box(
+   54 |         modifier = modifier
+   55 |             .graphicsLayer {
+   56 |                 scaleX = scale
+   57 |                 scaleY = scale
+   58 |             }
+   59 |             .clip(RoundedCornerShape(16.dp))
+   60 |             .background(backgroundColor)
+   61 |             .drawBehind {
+   62 |                 val cornerRadius = 16.dp.toPx()
+   63 |                 drawRoundRect(
+   64 |                     color = darkShadow,
+   65 |                     topLeft = Offset(6f, 6f),
+   66 |                     size = size,
+   67 |                     cornerRadius = CornerRadius(cornerRadius, cornerRadius),
+   68 |                     alpha = 0.4f
+   69 |                 )
+   70 |                 drawRoundRect(
+   71 |                     color = lightShadow,
+   72 |                     topLeft = Offset(-6f, -6f),
+   73 |                     size = size,
+   74 |                     cornerRadius = CornerRadius(cornerRadius, cornerRadius),
+   75 |                     alpha = 0.8f
+   76 |                 )
+   77 |             }
+   78 |             .clickable(
+   79 |                 indication = null,
+   80 |                 interactionSource = remember { MutableInteractionSource() }","import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch"
+pilot-0030,color_contrast,alexandr7035__Banking-App-Mock-Compose,alexandr7035__Banking-App-Mock-Compose/app/src/main/java/by/alexandr7035/banking/ui/components/Buttons.kt,MenuButton,2 hardcoded Color literals with Text,"
+@Composable
+fun MenuButton(
+    modifier: Modifier,
+    icon: Painter,
+    text: String,
+    showArrow: Boolean = true,
+    iconTint: Color? = MaterialTheme.colorScheme.primary,
+    onClick: () -> Unit,
+) {
+    PrimaryCard(
+        modifier = modifier,
+        onClick = onClick,
+        paddingValues = PaddingValues(16.dp)
+    ) {
+",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/alexandr7035__Banking-App-Mock-Compose/app/src/main/java/by/alexandr7035/banking/ui/components/Buttons.kt,exact,True,120,MenuButton,1.0,142.0,Color\s*\(\s*0x,body,"color = Color(0xFFF1EDFF),",True,"  120 | fun MenuButton(
+  121 |     modifier: Modifier,
+  122 |     icon: Painter,
+  123 |     text: String,
+  124 |     showArrow: Boolean = true,
+  125 |     iconTint: Color? = MaterialTheme.colorScheme.primary,
+  126 |     onClick: () -> Unit,
+  127 | ) {
+  128 |     PrimaryCard(
+  129 |         modifier = modifier,
+  130 |         onClick = onClick,
+  131 |         paddingValues = PaddingValues(16.dp)
+  132 |     ) {
+  133 | 
+  134 |         Row(
+  135 |             verticalAlignment = Alignment.CenterVertically,
+  136 |         ) {
+  137 | 
+  138 |             Box(
+  139 |                 modifier = Modifier
+  140 |                     .size(40.dp)
+  141 |                     .background(
+  142 |                         color = Color(0xFFF1EDFF),
+  143 |                         shape = CircleShape
+  144 |                     )
+  145 |                     .padding(8.dp)
+  146 |             ) {
+  147 |                 Image(
+  148 |                     painter = icon,
+  149 |                     contentDescription = null,
+  150 |                     colorFilter = iconTint?.let {  ColorFilter.tint(it) }
+  151 |                 )
+  152 |             }
+  153 | 
+  154 |             Spacer(modifier = Modifier.width(16.dp))
+  155 | 
+  156 |             Text(
+  157 |                 text = text,
+  158 |                 style = TextStyle(
+  159 |                     fontSize = 14.sp,
+  160 |                     lineHeight = 20.sp,
+  161 |                     fontFamily = primaryFontFamily,
+  162 |                     fontWeight = FontWeight(500),
+  163 |                     color = Color(0xFF666666),
+  164 |                 ),
+  165 |                 maxLines = 2,
+  166 |                 overflow = TextOverflow.Ellipsis
+  167 |             )
+  168 | 
+  169 |             if (showArrow) {
+  170 |                 Spacer(modifier = Modifier.weight(1f))
+  171 | 
+  172 |                 Image(
+  173 |                     modifier = Modifier.size(20.dp),
+  174 |                     painter = painterResource(id = R.drawable.ic_arrow),
+  175 |                     contentDescription = null
+  176 |                 )
+  177 |             }
+  178 |         }
+  179 |     }
+  180 | }
+  181 | 
+  182 | @Composable","import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import by.alexandr7035.banking.R
+import by.alexandr7035.banking.ui.components.cards.PrimaryCard
+import by.alexandr7035.banking.ui.components.modifiers.dashedBorder
+import by.alexandr7035.banking.ui.theme.BankingAppTheme
+import by.alexandr7035.banking.ui.theme.primaryFontFamily"
+pilot-0031,color_contrast,nemoXdev__CryptoSafe,nemoXdev__CryptoSafe/app/src/main/java/com/cryptosafe/app/screens/CreateBoxScreen.kt,CreateBoxScreen,3 hardcoded Color literals with Text,"
+@Composable
+fun CreateBoxScreen(
+    database: AppDatabase,
+    onBack: () -> Unit
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var boxName by remember { mutableStateOf("""") }
+    var password by remember { mutableStateOf("""") }
+    var confirmPassword by remember { mutableStateOf("""") }
+    var showPassword by remember { mutableStateOf(false) }
+    var autoDeleteHours by remember { mutableIntStateOf(0) }
+    var lockMode by remember { mutableStateOf(""always"") }
+    var lockTimeoutMinutes by remember { mutableIntStateOf(5) }
+",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/nemoXdev__CryptoSafe/app/src/main/java/com/cryptosafe/app/screens/CreateBoxScreen.kt,exact,True,79,CreateBoxScreen,1.0,98.0,Color\s*\(\s*0x,body,"""weak"" -> Color(0xFFEF4444)",True,"   79 | fun CreateBoxScreen(
+   80 |     database: AppDatabase,
+   81 |     onBack: () -> Unit
+   82 | ) {
+   83 |     val context = LocalContext.current
+   84 |     val scope = rememberCoroutineScope()
+   85 |     var boxName by remember { mutableStateOf("""") }
+   86 |     var password by remember { mutableStateOf("""") }
+   87 |     var confirmPassword by remember { mutableStateOf("""") }
+   88 |     var showPassword by remember { mutableStateOf(false) }
+   89 |     var autoDeleteHours by remember { mutableIntStateOf(0) }
+   90 |     var lockMode by remember { mutableStateOf(""always"") }
+   91 |     var lockTimeoutMinutes by remember { mutableIntStateOf(5) }
+   92 | 
+   93 |     val strength = remember(password) {
+   94 |         CryptoEngine.checkPasswordStrength(password.toCharArray())
+   95 |     }
+   96 | 
+   97 |     val strengthColor = when (strength.second) {
+   98 |         ""weak"" -> Color(0xFFEF4444)
+   99 |         ""medium"" -> Color(0xFFF59E0B)
+  100 |         else -> Color(0xFF10B981)
+  101 |     }
+  102 | 
+  103 |     val autoDeleteOptions = listOf(
+  104 |         0 to LocalizationManager.getString(""auto_delete_never""),
+  105 |         1 to LocalizationManager.getString(""auto_delete_1h""),
+  106 |         6 to LocalizationManager.getString(""auto_delete_6h""),
+  107 |         12 to LocalizationManager.getString(""auto_delete_12h""),
+  108 |         24 to LocalizationManager.getString(""auto_delete_1d""),
+  109 |         168 to LocalizationManager.getString(""auto_delete_7""),
+  110 |         720 to LocalizationManager.getString(""auto_delete_30""),
+  111 |         2160 to LocalizationManager.getString(""auto_delete_90"")
+  112 |     )
+  113 | 
+  114 |     val lockModeOptions = listOf(
+  115 |         ""always"" to LocalizationManager.getString(""lock_mode_always""),
+  116 |         ""timed"" to LocalizationManager.getString(""lock_mode_timed""),
+  117 |         ""never"" to LocalizationManager.getString(""lock_mode_never""),
+  118 |         ""permanent"" to LocalizationManager.getString(""lock_mode_permanent"")
+  119 |     )
+  120 | 
+  121 |     val lockTimeoutOptions = listOf(
+  122 |         1 to LocalizationManager.getString(""lock_timeout_1m""),
+  123 |         5 to LocalizationManager.getString(""lock_timeout_5m""),
+  124 |         15 to LocalizationManager.getString(""lock_timeout_15m""),
+  125 |         60 to LocalizationManager.getString(""lock_timeout_60m"")
+  126 |     )
+  127 | 
+  128 |     Column(
+  129 |         modifier = Modifier
+  130 |             .fillMaxSize()
+  131 |             .verticalScroll(rememberScrollState())
+  132 |             .padding(16.dp)
+  133 |     ) {
+  134 |         OutlinedTextField(
+  135 |             value = boxName,
+  136 |             onValueChange = { boxName = it },
+  137 |             label = { Text(LocalizationManager.getString(""box_name"")) },
+  138 |             modifier = Modifier.fillMaxWidth(),","import android.widget.Toast
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.cryptosafe.app.CryptoEngine
+import com.cryptosafe.app.LocalizationManager
+import com.cryptosafe.app.components.FlashButton
+import com.cryptosafe.app.components.RandomNameButton
+import com.cryptosafe.app.data.AppDatabase
+import com.cryptosafe.app.data.Box
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch"
+pilot-0032,color_contrast,Abhay-cloud__Fixed-Deposit-Tracker,Abhay-cloud__Fixed-Deposit-Tracker/app/src/main/java/dev/abhaycloud/fdtracker/presentation/ui/components/FixedDepositItem.kt,FixedDepositItem,3 hardcoded Color literals with Text,"
+@Composable
+fun FixedDepositItem(
+    modifier: Modifier,
+    fixedDeposit: FixedDeposit,
+    onClick: (FixedDeposit) -> Unit
+) {
+    var completedDays by rememberSaveable {
+        mutableIntStateOf(0)
+    }
+    var remainingDays by rememberSaveable {
+        mutableIntStateOf(0)
+    }
+    LaunchedEffect(key1 = fixedDeposit) {
+        completedDays = System.currentTimeMillis().getDifferenceBetweenDays(fixedDeposit.startDate.time)
+        remainingDays = fixedDeposit.maturityDate.time.getDifferenceBetweenDays(System.currentTimeMillis())",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/Abhay-cloud__Fixed-Deposit-Tracker/app/src/main/java/dev/abhaycloud/fdtracker/presentation/ui/components/FixedDepositItem.kt,exact,True,47,FixedDepositItem,1.0,88.0,Color\s*\(\s*0x,body,"Color(0xff001F3F),",True,"   76 | //    val progress = fixedDeposit.tenure.toDouble().getFraction(completedDays.toDouble())
+   77 | 
+   78 |     Box(
+   79 |         modifier = modifier
+   80 |             .fillMaxWidth()
+   81 |             .clip(RoundedCornerShape(10.dp))
+   82 |             .clickable {
+   83 |                 onClick.invoke(fixedDeposit)
+   84 |             }
+   85 |             .background(
+   86 |                 brush = Brush.horizontalGradient(
+   87 |                     listOf(
+   88 |                         Color(0xff001F3F),
+   89 |                         Color(0xe5001F3F)
+   90 |                     ),
+   91 |                 )
+   92 |             )
+   93 |     ) {
+   94 |         ImageWrapper(
+   95 |             resource = R.drawable.icon_fd_card,
+   96 |             modifier = Modifier
+   97 |                 .height(84.dp)
+   98 |                 .align(Alignment.TopEnd)
+   99 |                 .offset(y = (-24).dp)
+  100 |         )
+  101 |         Column(
+  102 |             modifier = Modifier
+  103 |                 .fillMaxWidth()
+  104 |                 .padding(16.dp)
+  105 |         ) {
+  106 |             Text(
+  107 |                 text = fixedDeposit.bankName,
+  108 |                 fontSize = 20.sp,
+  109 |                 fontWeight = FontWeight.SemiBold,
+  110 |                 color = Color.White
+  111 |             )
+  112 |             Spacer(modifier = Modifier.height(8.dp))
+  113 |             Row(modifier = Modifier.fillMaxWidth()) {
+  114 |                 Column {
+  115 |                     AmountItem(
+  116 |                         title = ""Principle Amount"",
+  117 |                         value = ""₹${fixedDeposit.principalAmount.toIndianFormat(includeDecimal = true)}""
+  118 |                     )
+  119 |                     Spacer(modifier = Modifier.height(16.dp))
+  120 |                     AmountItem(
+  121 |                         title = ""Annual Interest Rate"",
+  122 |                         value = ""${fixedDeposit.interestRate}%""
+  123 |                     )
+  124 |                 }
+  125 |                 Spacer(modifier = Modifier.width(32.dp))
+  126 |                 Column {
+  127 |                     AmountItem(
+  128 |                         title = ""Maturity Amount"",","import android.util.Log
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import dev.abhaycloud.fdtracker.R
+import dev.abhaycloud.fdtracker.domain.model.FixedDeposit
+import dev.abhaycloud.fdtracker.utils.DateUtils.getDifferenceBetweenDays
+import dev.abhaycloud.fdtracker.utils.DateUtils.toDateString
+import dev.abhaycloud.fdtracker.utils.Utils.getFraction
+import dev.abhaycloud.fdtracker.utils.Utils.toIndianFormat"
+pilot-0033,color_contrast,kursatkumsuz__movie,kursatkumsuz__movie/core/component/src/main/java/com/kursatkumsuz/component/AuthPasswordText.kt,AuthPasswordText,6 hardcoded Color literals with Text,"@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AuthPasswordText(onInput: (String) -> Unit) {
+
+    var passwordState by remember { mutableStateOf("""") }
+    var passwordVisibility by remember { mutableStateOf(false) }
+
+
+    val icon = if (passwordVisibility) {
+        painterResource(id = R.drawable.ic_visible)
+    } else {
+        painterResource(id = R.drawable.ic_invisible)
+    }
+
+    TextField(
+        value = passwordState,",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/kursatkumsuz__movie/core/component/src/main/java/com/kursatkumsuz/component/AuthPasswordText.kt,exact,True,18,AuthPasswordText,1.0,56.0,Color\s*\(\s*0x,body,"focusedTextColor = Color(0xFF95A6C5),",True,"   44 |                     tint = MaterialTheme.colorScheme.onBackground
+   45 |                 )
+   46 |             }
+   47 |         },
+   48 |         visualTransformation = if (passwordVisibility)
+   49 |             VisualTransformation.None
+   50 |         else PasswordVisualTransformation(),
+   51 |         modifier = Modifier
+   52 |             .fillMaxWidth()
+   53 |             .height(60.dp)
+   54 |             .padding(horizontal = 30.dp),
+   55 |         colors = TextFieldDefaults.colors(
+   56 |             focusedTextColor = Color(0xFF95A6C5),
+   57 |             unfocusedTextColor = Color(0xFF95A6C5),
+   58 |             focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+   59 |             unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+   60 |             disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+   61 |             focusedIndicatorColor = Color.Transparent,
+   62 |             unfocusedIndicatorColor = Color.Transparent,
+   63 |             disabledIndicatorColor = Color.Transparent,
+   64 |             focusedLeadingIconColor = Color(0xFF58647C),
+   65 |             unfocusedLeadingIconColor = Color(0xFF58647C),
+   66 |             focusedTrailingIconColor = Color(0xFF58647C),
+   67 |             unfocusedTrailingIconColor = Color(0xFF58647C),
+   68 |         ),
+   69 |         shape = RoundedCornerShape(15.dp)
+   70 |     )
+   71 | }","import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp"
+pilot-0034,color_contrast,crome1394__point-forecast,crome1394__point-forecast/forecast-point/app/src/main/java/com/crome/forecastpoint/ui/screens/SunMoonScreen.kt,AltitudeChart,4 hardcoded Color literals with Text,"
+@Composable
+private fun AltitudeChart(
+    altitudes: List<Float>,
+    pathColor: Color,
+    fillColor: Color,
+    modifier: Modifier = Modifier,
+) {
+    if (altitudes.size < 2) return
+
+    val minA = min(-10f, altitudes.minOrNull() ?: -10f)
+    val maxA = max(60f, altitudes.maxOrNull() ?: 60f)
+    val peakAlt = altitudes.maxOrNull() ?: 0f
+    val peakIdx = altitudes.indices.maxByOrNull { altitudes[it] } ?: 12
+    val range = (maxA - minA).coerceAtLeast(1f)
+    // Y ticks: max, horizon (0°) if in range, min",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/crome1394__point-forecast/forecast-point/app/src/main/java/com/crome/forecastpoint/ui/screens/SunMoonScreen.kt,exact,True,480,AltitudeChart,1.0,515.0,Color\s*\(\s*0x,body,"color = if (tick == 0f) Color(0xFF90A4AE) else OnSurfaceMuted,",True,"  480 | private fun AltitudeChart(
+  481 |     altitudes: List<Float>,
+  482 |     pathColor: Color,
+  483 |     fillColor: Color,
+  484 |     modifier: Modifier = Modifier,
+  485 | ) {
+  486 |     if (altitudes.size < 2) return
+  487 | 
+  488 |     val minA = min(-10f, altitudes.minOrNull() ?: -10f)
+  489 |     val maxA = max(60f, altitudes.maxOrNull() ?: 60f)
+  490 |     val peakAlt = altitudes.maxOrNull() ?: 0f
+  491 |     val peakIdx = altitudes.indices.maxByOrNull { altitudes[it] } ?: 12
+  492 |     val range = (maxA - minA).coerceAtLeast(1f)
+  493 |     // Y ticks: max, horizon (0°) if in range, min
+  494 |     val yTicks = buildList {
+  495 |         add(maxA)
+  496 |         if (minA < -1f && maxA > 5f) add(0f)
+  497 |         add(minA)
+  498 |     }.distinctBy { (it * 10).toInt() }
+  499 | 
+  500 |     fun fracFromTop(a: Float): Float = (1f - (a - minA) / range).coerceIn(0f, 1f)
+  501 | 
+  502 |     Row(modifier = modifier) {
+  503 |         // Y-axis: altitude in degrees (aligned to plot scale)
+  504 |         BoxWithConstraints(
+  505 |             Modifier
+  506 |                 .fillMaxHeight()
+  507 |                 .padding(end = 4.dp, bottom = 22.dp)
+  508 |                 .width(44.dp),
+  509 |         ) {
+  510 |             val plotH = maxHeight
+  511 |             yTicks.forEach { tick ->
+  512 |                 val yDp = plotH * fracFromTop(tick)
+  513 |                 Text(
+  514 |                     text = if (tick == 0f) ""0°"" else ""${tick.toInt()}°"",
+  515 |                     color = if (tick == 0f) Color(0xFF90A4AE) else OnSurfaceMuted,
+  516 |                     fontSize = 10.sp,
+  517 |                     modifier = Modifier
+  518 |                         .align(Alignment.TopEnd)
+  519 |                         .offset(y = yDp - 7.dp),
+  520 |                 )
+  521 |             }
+  522 |         }
+  523 | 
+  524 |         Column(Modifier.weight(1f).fillMaxHeight()) {
+  525 |             Box(Modifier.weight(1f).fillMaxWidth()) {
+  526 |                 Canvas(Modifier.fillMaxSize()) {
+  527 |                     val w = size.width
+  528 |                     val h = size.height
+  529 | 
+  530 |                     fun xAt(i: Int): Float = w * i / (altitudes.size - 1).toFloat()
+  531 |                     fun yAt(a: Float): Float = h * (1f - (a - minA) / range)
+  532 | 
+  533 |                     val y0 = yAt(0f)
+  534 |                     if (0f in minA..maxA) {
+  535 |                         drawLine(
+  536 |                             color = Color(0xFF546E7A),
+  537 |                             start = Offset(0f, y0),
+  538 |                             end = Offset(w, y0),
+  539 |                             strokeWidth = 1.5f,
+  540 |                         )
+  541 |                     }
+  542 |                     drawLine(Color(0x22455A64), Offset(0f, 0f), Offset(w, 0f), strokeWidth = 1f)
+  543 |                     drawLine(Color(0x22455A64), Offset(0f, h), Offset(w, h), strokeWidth = 1f)
+  544 | 
+  545 |                     val path = Path()
+  546 |                     val fill = Path()
+  547 |                     altitudes.forEachIndexed { i, a ->
+  548 |                         val x = xAt(i)
+  549 |                         val y = yAt(a)
+  550 |                         if (i == 0) {
+  551 |                             path.moveTo(x, y)
+  552 |                             fill.moveTo(x, y0.coerceIn(0f, h))
+  553 |                             fill.lineTo(x, y)
+  554 |                         } else {
+  555 |                             path.lineTo(x, y)","import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerDefaults
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.NightsStay
+import androidx.compose.material.icons.filled.WbSunny
+import androidx.compose.material.icons.filled.WbTwilight
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.crome.forecastpoint.data.EarthquakeService
+import com.crome.forecastpoint.data.SavedLocation
+import com.crome.forecastpoint.data.SevereWeatherService
+import com.crome.forecastpoint.data.SpaceWeatherService
+import com.crome.forecastpoint.ui.theme.OnSurfaceMuted
+import com.crome.forecastpoint.ui.theme.PrimaryBlue
+import com.crome.forecastpoint.ui.theme.SurfaceDark
+import com.crome.forecastpoint.util.CelestialCalculator
+import com.crome.forecastpoint.util.LocationTimeZone
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
+import java.util.TimeZone
+import kotlin.math.max
+import kotlin.math.min
+import kotlinx.coroutines.launch"
+pilot-0035,color_contrast,kursatkumsuz__movie,kursatkumsuz__movie/feature/search/src/main/java/com/kursatkumsuz/search/presentation/component/SearchBar.kt,SearchBar,3 hardcoded Color literals with Text,"
+@Composable
+fun SearchBar(
+    hint: String = """",
+    onSearch: (String) -> Unit
+) {
+    var text by remember {
+        mutableStateOf("""")
+    }
+    var isHintDisplayed by remember {
+        mutableStateOf(hint != """")
+    }
+
+    Box(modifier = Modifier.padding(10.dp)) {
+
+        TextField(",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/kursatkumsuz__movie/feature/search/src/main/java/com/kursatkumsuz/search/presentation/component/SearchBar.kt,exact,True,28,SearchBar,1.0,51.0,Color\s*\(\s*0x,body,"textStyle = TextStyle(color = Color(0xFF7D8597)),",True,"   28 | fun SearchBar(
+   29 |     hint: String = """",
+   30 |     onSearch: (String) -> Unit
+   31 | ) {
+   32 |     var text by remember {
+   33 |         mutableStateOf("""")
+   34 |     }
+   35 |     var isHintDisplayed by remember {
+   36 |         mutableStateOf(hint != """")
+   37 |     }
+   38 | 
+   39 |     Box(modifier = Modifier.padding(10.dp)) {
+   40 | 
+   41 |         TextField(
+   42 |             value = text,
+   43 |             keyboardActions = KeyboardActions(onDone = {
+   44 |                 onSearch(text)
+   45 |             }),
+   46 |             onValueChange = {
+   47 |                 text = it
+   48 |             },
+   49 |             maxLines = 1,
+   50 |             singleLine = true,
+   51 |             textStyle = TextStyle(color = Color(0xFF7D8597)),
+   52 |             colors = TextFieldDefaults.colors(
+   53 |                 focusedTextColor = MaterialTheme.colorScheme.primaryContainer,
+   54 |                 focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+   55 |                 unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+   56 |                 disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+   57 |                 focusedIndicatorColor = Color.Transparent,
+   58 |                 unfocusedIndicatorColor = Color.Transparent,
+   59 |                 disabledIndicatorColor = Color.Transparent,
+   60 |                 focusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+   61 |                 unfocusedLeadingIconColor = MaterialTheme.colorScheme.primaryContainer,
+   62 |                 focusedTrailingIconColor = Color(0xFF58647C),
+   63 |                 unfocusedTrailingIconColor = Color(0xFF58647C),
+   64 |             ),
+   65 |             trailingIcon = {
+   66 |                 IconButton(onClick = {
+   67 |                     onSearch(text)
+   68 |                 }) {
+   69 |                     Icon(
+   70 |                         imageVector = Icons.Outlined.Search,
+   71 |                         contentDescription = ""Search Icon""
+   72 |                     )
+   73 |                 }
+   74 |             },
+   75 |             modifier = Modifier
+   76 |                 .fillMaxWidth()
+   77 |                 .clip(RoundedCornerShape(12.dp))
+   78 |                 .shadow(15.dp, spotColor = Color.White)
+   79 |                 .background(MaterialTheme.colorScheme.primaryContainer)
+   80 |                 .padding(horizontal = 20.dp)
+   81 |                 .onFocusChanged {
+   82 |                     isHintDisplayed = it.isFocused != true && text.isEmpty()
+   83 |                 }
+   84 |         )
+   85 |         if (isHintDisplayed) {
+   86 |             Text(
+   87 |                 text = hint,
+   88 |                 color = Color.LightGray,
+   89 |                 modifier = Modifier
+   90 |                     .padding(horizontal = 20.dp, vertical = 12.dp)
+   91 |             )","import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp"
+pilot-0036,color_contrast,crome1394__point-forecast,crome1394__point-forecast/forecast-point/app/src/main/java/com/crome/forecastpoint/ui/screens/HourlyScreen.kt,HourlyTable,3 hardcoded Color literals with Text,"
+@Composable
+private fun HourlyTable(
+    headers: List<String>,
+    rows: List<HourlyTableRow>,
+) {
+    Column(Modifier.fillMaxSize()) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .background(HeaderBg)
+                .height(HeaderHeight),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                Modifier",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/crome1394__point-forecast/forecast-point/app/src/main/java/com/crome/forecastpoint/ui/screens/HourlyScreen.kt,exact,True,655,HourlyTable,1.0,672.0,Color\s*\(\s*0x,body,".border(width = 0.5.dp, color = Color(0xFF37474F)),",True,"  655 | private fun HourlyTable(
+  656 |     headers: List<String>,
+  657 |     rows: List<HourlyTableRow>,
+  658 | ) {
+  659 |     Column(Modifier.fillMaxSize()) {
+  660 |         Row(
+  661 |             Modifier
+  662 |                 .fillMaxWidth()
+  663 |                 .background(HeaderBg)
+  664 |                 .height(HeaderHeight),
+  665 |             verticalAlignment = Alignment.CenterVertically,
+  666 |         ) {
+  667 |             Box(
+  668 |                 Modifier
+  669 |                     .width(TimeColWidth)
+  670 |                     .fillMaxHeight()
+  671 |                     .background(HeaderBg)
+  672 |                     .border(width = 0.5.dp, color = Color(0xFF37474F)),
+  673 |             )
+  674 |             headers.forEach { h ->
+  675 |                 Text(
+  676 |                     text = h,
+  677 |                     style = HeaderStyle,
+  678 |                     maxLines = 2,
+  679 |                     overflow = TextOverflow.Ellipsis,
+  680 |                     modifier = Modifier
+  681 |                         .weight(1f)
+  682 |                         .padding(horizontal = 2.dp),
+  683 |                 )
+  684 |             }
+  685 |         }
+  686 |         HorizontalDivider(color = Color(0xFF37474F), thickness = 1.dp)
+  687 | 
+  688 |         LazyColumn(Modifier.fillMaxSize()) {
+  689 |             itemsIndexed(
+  690 |                 items = rows,
+  691 |                 key = { index, _ -> index },
+  692 |                 contentType = { _, _ -> ""hourly_row"" },
+  693 |             ) { index, row ->
+  694 |                 val dataBg = if (index % 2 == 0) RowBgEven else RowBgOdd
+  695 |                 val timeBg = if (index % 2 == 0) TimeColumnBg else TimeColumnBgAlt
+  696 |                 Row(
+  697 |                     Modifier
+  698 |                         .fillMaxWidth()
+  699 |                         .height(RowHeight)
+  700 |                         .background(dataBg),
+  701 |                     verticalAlignment = Alignment.CenterVertically,
+  702 |                 ) {
+  703 |                     Box(
+  704 |                         Modifier
+  705 |                             .width(TimeColWidth)
+  706 |                             .fillMaxHeight()
+  707 |                             .background(timeBg)
+  708 |                             .border(width = 0.5.dp, color = Color(0xFFCFD8DC)),
+  709 |                         contentAlignment = Alignment.Center,
+  710 |                     ) {
+  711 |                         Text(
+  712 |                             text = row.time,","import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerDefaults
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.crome.forecastpoint.data.HourlyRow
+import com.crome.forecastpoint.data.HourlyTabConfigItem
+import com.crome.forecastpoint.data.SpaceWeatherService
+import com.crome.forecastpoint.data.TideInfo
+import com.crome.forecastpoint.ui.theme.PrimaryBlue
+import com.crome.forecastpoint.util.WeatherMath
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone"
+pilot-0037,color_contrast,DaKlok__BibleLockScreen,DaKlok__BibleLockScreen/app/src/main/java/com/daklok/biblelockscreen/VerseDatabaseScreen.kt,CustomDbRow,3 hardcoded Color literals with Text,"
+@Composable
+private fun CustomDbRow(
+    strings: AppStrings,
+    db: CustomVerseDb,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
+    // Fired when the user taps ""Use"". Null = button hidden.
+    onUse: (() -> Unit)? = null,
+    // True when this DB is the currently-active custom source — swaps
+    // the ""Use"" button for a non-interactive ""✓ Active"" badge.
+    isActive: Boolean = false
+) {
+    val haptic = LocalHapticFeedback.current
+    Row(
+        modifier = Modifier",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/DaKlok__BibleLockScreen/app/src/main/java/com/daklok/biblelockscreen/VerseDatabaseScreen.kt,exact,True,455,CustomDbRow,1.0,507.0,Color\s*\(\s*0x,body,"color = Color(0xFF4CAF50).copy(alpha = 0.16f),",True,"  495 |             Text(
+  496 |                 strings.vdbCustomLabel,
+  497 |                 style = MaterialTheme.typography.bodySmall,
+  498 |                 color = MaterialTheme.colorScheme.onSurfaceVariant
+  499 |             )
+  500 |         }
+  501 |         // Use / Active badge — the discoverability fix. Lets the user
+  502 |         // activate a custom DB directly from the manager screen instead
+  503 |         // of hunting for it in Settings → Verse Language.
+  504 |         if (isActive) {
+  505 |             Surface(
+  506 |                 shape = RoundedCornerShape(10.dp),
+  507 |                 color = Color(0xFF4CAF50).copy(alpha = 0.16f),
+  508 |                 modifier = Modifier.height(34.dp)
+  509 |             ) {
+  510 |                 Row(
+  511 |                     modifier = Modifier.padding(horizontal = 10.dp),
+  512 |                     verticalAlignment = Alignment.CenterVertically,
+  513 |                     horizontalArrangement = Arrangement.spacedBy(4.dp)
+  514 |                 ) {
+  515 |                     Icon(
+  516 |                         Icons.Default.Check, null,
+  517 |                         tint = Color(0xFF4CAF50),
+  518 |                         modifier = Modifier.size(14.dp)
+  519 |                     )
+  520 |                     Text(
+  521 |                         strings.vdbUsed,
+  522 |                         style = MaterialTheme.typography.labelMedium,
+  523 |                         fontWeight = FontWeight.SemiBold,
+  524 |                         color = Color(0xFF388E3C)
+  525 |                     )
+  526 |                 }
+  527 |             }
+  528 |         } else if (onUse != null) {
+  529 |             FilledTonalButton(
+  530 |                 onClick = {
+  531 |                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+  532 |                     onUse()
+  533 |                 },
+  534 |                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+  535 |                 modifier = Modifier.height(34.dp),
+  536 |                 shape = RoundedCornerShape(10.dp)
+  537 |             ) {
+  538 |                 Icon(Icons.Default.PlayArrow, null, modifier = Modifier.size(14.dp))
+  539 |                 Spacer(Modifier.width(4.dp))
+  540 |                 Text(strings.vdbUse, style = MaterialTheme.typography.labelMedium)
+  541 |             }
+  542 |         }
+  543 |         // Edit
+  544 |         IconButton(onClick = onEdit, modifier = Modifier.size(36.dp)) {
+  545 |             Icon(
+  546 |                 Icons.Default.Edit, ""Edit"",
+  547 |                 tint = MaterialTheme.colorScheme.primary,","import com.daklok.biblelockscreen.strings.*
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.LibraryBooks
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch"
+pilot-0038,color_contrast,kursatkumsuz__crypto-portfolio-jetpack-compose,kursatkumsuz__crypto-portfolio-jetpack-compose/feature/portfolio/src/main/java/com/kursatkumsuz/portfolio/PortfolioScreen.kt,CurrentBalanceCard,2 hardcoded Color literals with Text,"
+@Composable
+fun CurrentBalanceCard(
+    lastBalance: Double,
+    buyingPrice: Double,
+    profit: Double,
+) {
+    val formattedLastBalance = formatPrice(lastBalance)
+    val formattedBuyingPrice = formatPrice(buyingPrice)
+
+    Card(
+        modifier = Modifier
+            .size(340.dp, 180.dp),
+        shape = RoundedCornerShape(16.dp),
+    ) {
+        Column(",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/kursatkumsuz__crypto-portfolio-jetpack-compose/feature/portfolio/src/main/java/com/kursatkumsuz/portfolio/PortfolioScreen.kt,exact,True,84,CurrentBalanceCard,1.0,103.0,Color\s*\(\s*0x,body,"Color(0xFF393444),",True,"   84 | fun CurrentBalanceCard(
+   85 |     lastBalance: Double,
+   86 |     buyingPrice: Double,
+   87 |     profit: Double,
+   88 | ) {
+   89 |     val formattedLastBalance = formatPrice(lastBalance)
+   90 |     val formattedBuyingPrice = formatPrice(buyingPrice)
+   91 | 
+   92 |     Card(
+   93 |         modifier = Modifier
+   94 |             .size(340.dp, 180.dp),
+   95 |         shape = RoundedCornerShape(16.dp),
+   96 |     ) {
+   97 |         Column(
+   98 |             modifier = Modifier
+   99 |                 .fillMaxSize()
+  100 |                 .background(
+  101 |                     Brush.horizontalGradient(
+  102 |                         colors = listOf(
+  103 |                             Color(0xFF393444),
+  104 |                             Color(0xFF2A2633),
+  105 |                         )
+  106 |                     )
+  107 |                 ),
+  108 |             verticalArrangement = Arrangement.Center,
+  109 |             horizontalAlignment = Alignment.CenterHorizontally
+  110 |         ) {
+  111 | 
+  112 |             Text(text = ""Current Balance"", color = Color.LightGray, fontSize = 16.sp)
+  113 |             Text(text = ""$$formattedLastBalance"", color = Color.White, fontSize = 26.sp)
+  114 | 
+  115 |             Box(
+  116 |                 modifier = Modifier
+  117 |                     .fillMaxWidth()
+  118 |                     .padding(20.dp)
+  119 |             ) {
+  120 |                 Column(modifier = Modifier.align(Alignment.BottomStart)) {
+  121 |                     Text(text = ""Total Buying Price"", color = Color.LightGray, fontSize = 16.sp)
+  122 |                     Text(text = ""$$formattedBuyingPrice"", color = Color.White, fontSize = 14.sp)
+  123 |                 }
+  124 | 
+  125 |                 Column(modifier = Modifier.align(Alignment.BottomEnd)) {
+  126 |                     Text(text = ""Profit/Loss"", color = Color.LightGray, fontSize = 16.sp)
+  127 |                     Text(
+  128 |                         text = ""%${String.format(""%.2f"", profit)}"",
+  129 |                         color = if (profit > 0) Color.Green else Color.Red,
+  130 |                         fontSize = 14.sp
+  131 |                     )
+  132 |                 }
+  133 |             }
+  134 |         }
+  135 |     }
+  136 | }
+  137 | 
+  138 | 
+  139 | @Composable
+  140 | fun CustomTableRow(
+  141 |     lastBalance: Double,
+  142 |     buyingPrice: Double,
+  143 |     profit: Double,","import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabPosition
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.kursatkumsuz.portfolio.component.PieChart
+import com.kursatkumsuz.portfolio.component.PortfolioListView
+import com.kursatkumsuz.ui.components.LoadingCircularProgress
+import com.kursatkumsuz.util.FormatCoinPrice.Companion.formatPrice
+import kotlinx.coroutines.delay"
+pilot-0039,color_contrast,GetStream__meeting-room-compose,GetStream__meeting-room-compose/app/src/main/kotlin/io/getstream/meeting/room/compose/ui/component/StreamButton.kt,StreamButton,2 hardcoded Color literals with Text,"
+@Composable
+fun StreamButton(
+  modifier: Modifier = Modifier,
+  text: String,
+  enabled: Boolean = true,
+  onClick: () -> Unit,
+) {
+  Button(
+    modifier = modifier.clip(RoundedCornerShape(8.dp)),
+    enabled = enabled,
+    onClick = onClick,
+    colors = ButtonDefaults.buttonColors(
+      backgroundColor = VideoTheme.colors.primaryAccent,
+      contentColor = VideoTheme.colors.primaryAccent,
+      disabledBackgroundColor = Color(0xFF979797),",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/GetStream__meeting-room-compose/app/src/main/kotlin/io/getstream/meeting/room/compose/ui/component/StreamButton.kt,exact,True,32,StreamButton,1.0,45.0,Color\s*\(\s*0x,body,"disabledBackgroundColor = Color(0xFF979797),",True,"   32 | fun StreamButton(
+   33 |   modifier: Modifier = Modifier,
+   34 |   text: String,
+   35 |   enabled: Boolean = true,
+   36 |   onClick: () -> Unit,
+   37 | ) {
+   38 |   Button(
+   39 |     modifier = modifier.clip(RoundedCornerShape(8.dp)),
+   40 |     enabled = enabled,
+   41 |     onClick = onClick,
+   42 |     colors = ButtonDefaults.buttonColors(
+   43 |       backgroundColor = VideoTheme.colors.primaryAccent,
+   44 |       contentColor = VideoTheme.colors.primaryAccent,
+   45 |       disabledBackgroundColor = Color(0xFF979797),
+   46 |       disabledContentColor = Color(0xFF979797),
+   47 |     ),
+   48 |   ) {
+   49 |     Text(
+   50 |       text = text,
+   51 |       color = Color.White,
+   52 |     )
+   53 |   }
+   54 | }
+   55 | 
+   56 | @Preview
+   57 | @Composable
+   58 | private fun StreamButtonPreview() {
+   59 |   VideoTheme {
+   60 |     StreamButton(text = ""Sign In with Email"", onClick = {})
+   61 |   }
+   62 | }","import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import io.getstream.video.android.compose.theme.VideoTheme"
+pilot-0040,color_contrast,eslamfaisal__android-compose-clean-architecture-sample,eslamfaisal__android-compose-clean-architecture-sample/features/recipe-details/src/main/java/com/eslam/bakingapp/features/recipe_details/presentation/RecipeDetailScreen.kt,DifficultyBadge,3 hardcoded Color literals with Text,"
+@Composable
+private fun DifficultyBadge(
+    difficulty: Difficulty,
+    modifier: Modifier = Modifier
+) {
+    val backgroundColor = when (difficulty) {
+        Difficulty.EASY -> Color(0xFF4CAF50)
+        Difficulty.MEDIUM -> Color(0xFFFFC107)
+        Difficulty.HARD -> Color(0xFFFF5722)
+    }
+    
+    Box(
+        modifier = modifier
+            .background(
+                color = backgroundColor,",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/eslamfaisal__android-compose-clean-architecture-sample/features/recipe-details/src/main/java/com/eslam/bakingapp/features/recipe_details/presentation/RecipeDetailScreen.kt,exact,True,391,DifficultyBadge,1.0,396.0,Color\s*\(\s*0x,body,Difficulty.EASY -> Color(0xFF4CAF50),True,"  384 |             style = MaterialTheme.typography.bodySmall,
+  385 |             color = Color.White
+  386 |         )
+  387 |     }
+  388 | }
+  389 | 
+  390 | @Composable
+  391 | private fun DifficultyBadge(
+  392 |     difficulty: Difficulty,
+  393 |     modifier: Modifier = Modifier
+  394 | ) {
+  395 |     val backgroundColor = when (difficulty) {
+  396 |         Difficulty.EASY -> Color(0xFF4CAF50)
+  397 |         Difficulty.MEDIUM -> Color(0xFFFFC107)
+  398 |         Difficulty.HARD -> Color(0xFFFF5722)
+  399 |     }
+  400 |     
+  401 |     Box(
+  402 |         modifier = modifier
+  403 |             .background(
+  404 |                 color = backgroundColor,
+  405 |                 shape = RoundedCornerShape(12.dp)
+  406 |             )
+  407 |             .padding(horizontal = 12.dp, vertical = 6.dp)
+  408 |     ) {
+  409 |         Text(
+  410 |             text = difficulty.toDisplayString(),
+  411 |             style = MaterialTheme.typography.labelMedium,
+  412 |             color = Color.White
+  413 |         )
+  414 |     }
+  415 | }
+  416 | 
+  417 | @Composable
+  418 | private fun IngredientItem(
+  419 |     ingredient: Ingredient,
+  420 |     modifier: Modifier = Modifier
+  421 | ) {
+  422 |     Card(
+  423 |         modifier = modifier.fillMaxWidth(),
+  424 |         colors = CardDefaults.cardColors(
+  425 |             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+  426 |         )
+  427 |     ) {
+  428 |         Row(
+  429 |             modifier = Modifier
+  430 |                 .fillMaxWidth()
+  431 |                 .padding(12.dp),
+  432 |             verticalAlignment = Alignment.CenterVertically
+  433 |         ) {
+  434 |             Box(
+  435 |                 modifier = Modifier
+  436 |                     .size(8.dp)","import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
+import com.eslam.bakingapp.core.ui.components.ErrorView
+import com.eslam.bakingapp.core.ui.components.ErrorType
+import com.eslam.bakingapp.core.ui.components.FullScreenLoading
+import com.eslam.bakingapp.core.ui.theme.BakingAppTheme
+import com.eslam.bakingapp.features.home.domain.model.Difficulty
+import com.eslam.bakingapp.features.home.domain.model.Ingredient
+import com.eslam.bakingapp.features.home.domain.model.Recipe
+import com.eslam.bakingapp.features.home.domain.model.Step"

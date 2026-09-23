@@ -1,0 +1,7 @@
+model,n,changed_mind,toward_gold,away_from_gold,abstain,brier_after
+claude-sonnet,135,14,8,6,2,0.411
+gemini-flash,135,8,7,1,2,0.291
+gemma3-1b,132,37,15,22,51,0.445
+gpt-mini,135,13,8,5,8,0.354
+mistral,134,11,8,3,0,0.411
+qwen-coder,135,44,19,25,0,0.475

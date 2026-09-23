@@ -1,0 +1,368 @@
+package com.cvc953.localplayer.ui.screens
+
+import android.app.Application
+import android.graphics.Bitmap
+import com.cvc953.localplayer.util.ArtworkLoader
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.cvc953.localplayer.R
+import com.cvc953.localplayer.model.SongRepository
+import com.cvc953.localplayer.ui.SongItem
+import com.cvc953.localplayer.ui.components.DraggableSwipeRow
+import com.cvc953.localplayer.ui.components.MultiSongSelectionBar
+import com.cvc953.localplayer.ui.components.NativeSearchBar
+import com.cvc953.localplayer.ui.extendedColors
+import com.cvc953.localplayer.ui.headers.ArtistHeader
+import com.cvc953.localplayer.viewmodel.ArtistViewModel
+import com.cvc953.localplayer.viewmodel.PlaybackViewModel
+import com.cvc953.localplayer.viewmodel.PlaylistViewModel
+import com.cvc953.localplayer.viewmodel.SongViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+@Suppress("ktlint:standard:function-naming")
+@Composable
+fun ArtistDetailScreen(
+    artistViewModel: ArtistViewModel,
+    playbackViewModel: PlaybackViewModel,
+    playlistViewModel: PlaylistViewModel,
+    songViewModel: SongViewModel = viewModel(),
+    artistName: String,
+    onAlbumClick: (albumName: String, artistName: String) -> Unit,
+    onViewAllSongs: () -> Unit,
+    onBack: () -> Unit,
+) {
+    val repo = remember { SongRepository(artistViewModel.getApplication<Application>()) }
+    val allSongs = remember { repo.loadSongs() }
+    val playerState by playbackViewModel.playerState.collectAsState()
+    val playlists by playlistViewModel.playlists.collectAsState()
+    val artistSongs =
+        remember(allSongs, artistName) {
+            allSongs.filter { song ->
+                normalizeArtistName(song.artist).any {
+                    it.equals(
+                        artistName,
+                        ignoreCase = true,
+                    )
+                }
+            }
+        }
+    val artistSongsSorted =
+        remember(artistSongs) {
+            artistSongs.sortedWith(
+                compareBy(
+                    { it.album },
+                    { it.discNumber },
+                    { it.trackNumber },
+                ),
+            )
+        }
+    val context = LocalContext.current
+    var selectedSongIds by remember { mutableStateOf(emptySet<Long>()) }
+    val isSelectionMode = selectedSongIds.isNotEmpty()
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+    var showSearchBar by rememberSaveable { mutableStateOf(false) }
+
+    BackHandler { onBack() }
+
+    Column(
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            IconButton(onClick = onBack) {
+                Icon(
+                    Icons.Default.ArrowBack,
+                    contentDescription = stringResource(R.string.action_go_back),
+                    tint = MaterialTheme.colorScheme.onBackground,
+                )
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = artistName,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            IconButton(
+                onClick = {
+                    showSearchBar = !showSearchBar
+                    if (!showSearchBar) searchQuery = ""
+                },
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = stringResource(R.string.action_search),
+                    tint = MaterialTheme.colorScheme.onBackground,
+                )
+            }
+        }
+
+        if (showSearchBar) {
+            NativeSearchBar(
+                query = searchQuery,
+                onQueryChange = { searchQuery = it },
+                placeholder = stringResource(R.string.search_songs_placeholder),
+            )
+        }
+
+        if (isSelectionMode) {
+            Row(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+            ) {
+                MultiSongSelectionBar(
+                    selectedSongIds = selectedSongIds,
+                    songs = artistSongsSorted,
+                    playlists = playlists,
+                    onClearSelection = { selectedSongIds = emptySet() },
+                    onCreatePlaylist = { name -> playlistViewModel.createPlaylist(name) },
+                    onAddSongToPlaylist = { playlistName, songId ->
+                        playlistViewModel.addSongToPlaylist(playlistName, songId)
+                    },
+                    onAddToQueueNextAll = { songList ->
+                        playbackViewModel.addToQueueNextAll(songList)
+                    },
+                    onAddToQueueEndAll = { songList ->
+                        playbackViewModel.addToQueueEndAll(songList)
+                    },
+                )
+            }
+        }
+
+        val maxItems = 6
+        val visibleSongs =
+            remember(artistSongsSorted, searchQuery) {
+                val q = searchQuery.trim().lowercase()
+                val filtered =
+                    if (q.isEmpty()) {
+                        artistSongsSorted
+                    } else {
+                        artistSongsSorted.filter { song ->
+                            song.title.lowercase().contains(q) ||
+                                song.album.lowercase().contains(q) ||
+                                song.artist.lowercase().contains(q)
+                        }
+                    }
+                if (q.isEmpty()) filtered.take(maxItems) else filtered
+            }
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            item {
+                ArtistHeader(
+                    artistViewModel,
+                    artistName,
+                    playbackViewModel,
+                    Modifier.padding(16.dp),
+                    onViewAllSongs,
+                )
+            }
+            items(visibleSongs) { song ->
+                val isCurrent = playerState.currentSong?.id == song.id
+                val addedNextMsg = stringResource(R.string.toast_added_next)
+                val addedQueueEndMsg = stringResource(R.string.toast_added_queue_end)
+
+                DraggableSwipeRow(
+                    onSwipeThreshold = {
+                        playbackViewModel.addToQueueNext(song)
+                        Toast.makeText(context, addedNextMsg, Toast.LENGTH_SHORT).show()
+                    },
+                    onSwipeLeftThreshold = {
+                        playbackViewModel.addToQueueEnd(song)
+                        Toast.makeText(context, addedQueueEndMsg, Toast.LENGTH_SHORT).show()
+                    },
+                ) {
+                    SongItem(
+                        song = song,
+                        isPlaying = isCurrent,
+                        isSelectionMode = isSelectionMode,
+                        isSelected = selectedSongIds.contains(song.id),
+                        onClick = {
+                            if (isSelectionMode) {
+                                selectedSongIds =
+                                    if (selectedSongIds.contains(song.id)) {
+                                        selectedSongIds - song.id
+                                    } else {
+                                        selectedSongIds + song.id
+                                    }
+                            } else {
+                                playbackViewModel.setShuffle(false)
+                                playbackViewModel.playArtist(artistName, artistSongsSorted, allSongs)
+                                playbackViewModel.updateDisplayOrder(artistSongsSorted)
+                                playbackViewModel.play(song)
+                            }
+                        },
+                        onLongClick = {
+                            selectedSongIds =
+                                if (selectedSongIds.contains(song.id)) {
+                                    selectedSongIds - song.id
+                                } else {
+                                    selectedSongIds + song.id
+                                }
+                        },
+                        onQueueNext = {
+                            playbackViewModel.addToQueueNext(song)
+                            Toast.makeText(context, addedNextMsg, Toast.LENGTH_SHORT).show()
+                        },
+                        onQueueEnd = {
+                            playbackViewModel.addToQueueEnd(song)
+                            Toast.makeText(context, addedQueueEndMsg, Toast.LENGTH_SHORT).show()
+                        },
+                        playlists = playlists,
+                        onAddToPlaylist = { playlistName, songId ->
+                            playlistViewModel.addSongToPlaylist(playlistName, songId)
+                            Toast.makeText(context, context.getString(R.string.toast_added_to_playlist, playlistName), Toast.LENGTH_SHORT).show()
+                        },
+                        onDelete = { song ->
+                            songViewModel.deleteSong(
+                                song,
+                                onSuccess = {
+                                    Toast.makeText(context, context.getString(R.string.toast_song_deleted), Toast.LENGTH_SHORT).show()
+                                },
+                                onError = { msg ->
+                                    Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                                },
+                            )
+                        },
+                    )
+                }
+            }
+
+            // LazyRow de álbumes del artista
+            item {
+                val unknownLabel = stringResource(R.string.unknown)
+                val albums =
+                    remember(artistSongs, unknownLabel) {
+                        artistSongs
+                            .groupBy { it.album.ifBlank { unknownLabel } }
+                            .filterKeys { it.isNotBlank() }
+                            .toList()
+                    }
+                if (albums.isNotEmpty()) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            text = stringResource(R.string.albums_title),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier =
+                                Modifier.padding(
+                                    start = 8.dp,
+                                    top = 8.dp,
+                                    bottom = 8.dp,
+                                ),
+                        )
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            items(albums) { (albumName, albumSongs) ->
+                                val representativeSong = albumSongs.firstOrNull()
+                                var albumArt by remember(representativeSong?.uri) {
+                                    mutableStateOf<Bitmap?>(null)
+                                }
+                                LaunchedEffect(representativeSong?.uri, representativeSong?.filePath) {
+                                    albumArt = ArtworkLoader.loadThumbnail(context, representativeSong?.uri, representativeSong?.filePath, 256)
+                                }
+                                Column(
+                                    modifier =
+                                        Modifier
+                                            .width(120.dp)
+                                            .clickable { onAlbumClick(albumName, artistName) },
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                ) {
+                                    Image(
+                                        painter =
+                                            albumArt?.let { BitmapPainter(it.asImageBitmap()) }
+                                                ?: painterResource(R.drawable.ic_default_album),
+                                        contentDescription = null,
+                                        modifier =
+                                            Modifier
+                                                .size(100.dp)
+                                                .clip(RoundedCornerShape(8.dp)),
+                                        contentScale = ContentScale.Crop,
+                                    )
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                    Text(
+                                        text = albumName,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        fontSize = 14.sp,
+                                        maxLines = 1,
+                                        textAlign = TextAlign.Center,
+                                        overflow = TextOverflow.Ellipsis,
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.songs_count, albumSongs.size),
+                                        color = MaterialTheme.extendedColors.textSecondary,
+                                        fontSize = 12.sp,
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

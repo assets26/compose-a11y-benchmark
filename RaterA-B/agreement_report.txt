@@ -1,0 +1,25 @@
+rows compared: 40
+
+VERDICT   agreement=0.750  kappa=0.581
+DEFECT?   agreement=0.789  kappa=0.575  (n=38, UNSURE dropped)
+CATEGORY  agreement=0.824  kappa=0.799  (n=17, primary category, both ISSUE)
+CATEGORY  any-overlap agreement=0.882
+
+PER DETECTOR CATEGORY (verdict kappa / n):
+  clickable_icon_not_iconbutton    agree=1.00  kappa=   nan  n=4
+  color_contrast                   agree=1.00  kappa= 1.000  n=2
+  decorative_mislabeled            agree=1.00  kappa= 1.000  n=4
+  error_state_no_semantics         agree=0.00  kappa= 0.000  n=2
+  missing_content_description      agree=1.00  kappa=   nan  n=1
+  missing_heading_semantics        agree=0.75  kappa= 0.500  n=4
+  missing_merge_descendants        agree=1.00  kappa=   nan  n=3
+  missing_semantics_role           agree=1.00  kappa=   nan  n=3
+  missing_state_description        agree=0.50  kappa= 0.333  n=2
+  pointerinput_no_semantics        agree=0.75  kappa= 0.429  n=4
+  progress_no_semantics            agree=0.20  kappa= 0.167  n=5
+  text_truncation_scaling          agree=0.50  kappa= 0.000  n=2
+  textfield_no_label               agree=1.00  kappa=   nan  n=1
+  touch_target_size                agree=1.00  kappa= 1.000  n=3
+
+disagreements to adjudicate: 16  -> disagreements.csv
+derived precision per category -> derived_precision.csv

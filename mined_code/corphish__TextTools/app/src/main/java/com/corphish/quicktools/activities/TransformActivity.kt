@@ -1,0 +1,470 @@
+package com.corphish.quicktools.activities
+
+import android.content.Intent
+import android.content.res.Configuration
+import android.os.Bundle
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.corphish.quicktools.R
+import com.corphish.quicktools.data.Constants
+import com.corphish.quicktools.ui.common.CustomTopAppBar
+import com.corphish.quicktools.ui.common.InputAndPreviewTextField
+import com.corphish.quicktools.ui.common.ListDialog
+import com.corphish.quicktools.ui.common.MarqueeText
+import com.corphish.quicktools.ui.theme.BrandFontFamily
+import com.corphish.quicktools.ui.theme.QuickToolsTheme
+import com.corphish.quicktools.ui.theme.TypographyV2
+import com.corphish.quicktools.viewmodels.TextTransformViewModel
+import dagger.hilt.android.AndroidEntryPoint
+
+@AndroidEntryPoint
+class TransformActivity : ComponentActivity() {
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        if (intent.hasExtra(Intent.EXTRA_PROCESS_TEXT)) {
+            val readonly = intent.getBooleanExtra(Intent.EXTRA_PROCESS_TEXT_READONLY, true)
+            val forceCopy = intent.getBooleanExtra(Constants.INTENT_FORCE_COPY, false)
+
+            val text = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT).toString()
+
+            setContent {
+                QuickToolsTheme {
+                    Scaffold(
+                        topBar = {
+                            CustomTopAppBar(
+                                id = R.string.transform_long,
+                                onNavigationClick = { finish() })
+                        }
+                    ) {
+                        TextTransformUI(
+                            textToTransform = text,
+                            paddingValues = it,
+                            allowApply = if (forceCopy) false else !readonly,
+                            allowCopy = true,
+                            onNext = { text ->
+                                val nextIntent = Intent(this, TextActionActivity::class.java)
+                                nextIntent.putExtra(Intent.EXTRA_PROCESS_TEXT, text)
+                                nextIntent.putExtra(
+                                    Intent.EXTRA_PROCESS_TEXT_READONLY, intent.getBooleanExtra(
+                                        Intent.EXTRA_PROCESS_TEXT_READONLY, true
+                                    )
+                                )
+                                nextIntent.putExtra(Constants.INTENT_FORCE_COPY, forceCopy)
+                                startActivity(nextIntent)
+                                finish()
+                            },
+                        )
+                    }
+                }
+            }
+        } else {
+            finish()
+        }
+
+        // Do not finish or else the dialog will go away
+        // return false
+    }
+}
+
+@Composable
+fun TextTransformUI(
+    textToTransform: String,
+    paddingValues: PaddingValues,
+    allowApply: Boolean,
+    allowCopy: Boolean,
+    onNext: (String) -> Unit = {},
+) {
+    val viewModel: TextTransformViewModel = hiltViewModel()
+    val inputText by viewModel.mainText.collectAsState()
+    val previewText by viewModel.previewText.collectAsState()
+
+    val selectedPrimaryIndex by viewModel.selectedPrimaryIndex.collectAsState()
+    val secondaryList by viewModel.secondaryOptionList.collectAsState()
+
+    var primaryFunctionExpanded by remember { mutableStateOf(false) }
+    var secondaryFunctionExpanded by remember { mutableStateOf(false) }
+
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    var landscapeOptionsVisible by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+
+    LaunchedEffect(true) {
+        viewModel.initializeText(textToTransform)
+
+        viewModel.decorateTextErrorFlow.collect {
+            if (it) {
+                Toast.makeText(context, R.string.generic_error, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+    ) {
+        if (isLandscape) {
+            Row(modifier = Modifier.fillMaxSize()) {
+                InputAndPreviewTextField(
+                    inputText = inputText,
+                    onInputTextChanged = { viewModel.initializeText(it) },
+                    previewText = previewText,
+                    showInput = !landscapeOptionsVisible,
+                    showPreview = true,
+                    isLandscape = true,
+                    modifier = Modifier.weight(1f)
+                )
+
+                if (landscapeOptionsVisible) {
+                    Card(
+                        shape = RoundedCornerShape(
+                            topStart = 16.dp,
+                            bottomStart = 16.dp
+                        ),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        ),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                        modifier = Modifier
+                            .width(320.dp)
+                            .fillMaxHeight()
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(end = 8.dp)
+                        ) {
+                            TransformOptionsHeader()
+                            Spacer(modifier = Modifier.weight(1f))
+                            IconButton(onClick = { landscapeOptionsVisible = false }) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_arrow_left),
+                                    contentDescription = stringResource(R.string.previous),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                        TransformOptionsBody(
+                            viewModel = viewModel,
+                            allowApply = allowApply,
+                            allowCopy = allowCopy,
+                            onNext = onNext,
+                            previewText = previewText,
+                            onPrimaryClick = { primaryFunctionExpanded = true },
+                            onSecondaryClick = { secondaryFunctionExpanded = true },
+                            isLandscape = true
+                        )
+                    }
+                } else {
+                    IconButton(
+                        onClick = { landscapeOptionsVisible = true },
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                            .padding(16.dp)
+                            .background(MaterialTheme.colorScheme.primary, CircleShape)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_text_transform),
+                            contentDescription = stringResource(R.string.transform),
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                }
+            }
+        } else {
+            ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+                val (inputAndPreviewTextField, functionSheet) = createRefs()
+
+                InputAndPreviewTextField(
+                    inputText = inputText,
+                    onInputTextChanged = { viewModel.initializeText(it) },
+                    previewText = previewText,
+                    modifier = Modifier.constrainAs(inputAndPreviewTextField) {
+                        top.linkTo(parent.top, margin = 16.dp)
+                        bottom.linkTo(functionSheet.top, margin = 8.dp)
+                        start.linkTo(parent.start, margin = 8.dp)
+                        end.linkTo(parent.end, margin = 8.dp)
+                        height = Dimension.fillToConstraints
+                        width = Dimension.fillToConstraints
+                    }
+                )
+
+                Card(
+                    shape = RoundedCornerShape(
+                        topStart = 16.dp,
+                        topEnd = 16.dp,
+                        bottomEnd = 0.dp,
+                        bottomStart = 0.dp
+                    ),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                    modifier = Modifier
+                        .animateContentSize()
+                        .constrainAs(functionSheet) {
+                            bottom.linkTo(parent.bottom)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                            width = Dimension.matchParent
+                        }
+                ) {
+                    TransformOptionsHeader()
+                    TransformOptionsBody(
+                        viewModel = viewModel,
+                        allowApply = allowApply,
+                        allowCopy = allowCopy,
+                        onNext = onNext,
+                        previewText = previewText,
+                        onPrimaryClick = { primaryFunctionExpanded = true },
+                        onSecondaryClick = { secondaryFunctionExpanded = true },
+                        isLandscape = false
+                    )
+                }
+            }
+        }
+    }
+
+    if (primaryFunctionExpanded) {
+        ListDialog(
+            title = stringResource(R.string.transform_long),
+            message = "",
+            list = TextTransformViewModel.transformOptions,
+            onItemSelected = {
+                viewModel.selectPrimaryIndex(it)
+                primaryFunctionExpanded = false
+            },
+            stringSelector = { stringResource(it) },
+            iconSelector = { R.drawable.ic_text_transform },
+            onBackPressed = { primaryFunctionExpanded = false },
+            dismissible = true,
+            onDismissRequest = { primaryFunctionExpanded = false }
+        )
+    }
+
+    if (secondaryFunctionExpanded) {
+        ListDialog(
+            title = stringResource(TextTransformViewModel.transformOptions[selectedPrimaryIndex]),
+            message = "",
+            list = secondaryList,
+            onItemSelected = {
+                viewModel.selectSecondaryIndex(it)
+                secondaryFunctionExpanded = false
+            },
+            stringSelector = { stringResource(it) },
+            iconSelector = { R.drawable.ic_text_transform },
+            onBackPressed = { secondaryFunctionExpanded = false },
+            dismissible = true,
+            onDismissRequest = { secondaryFunctionExpanded = false }
+        )
+    }
+}
+
+@Composable
+fun TransformOptionsHeader() {
+    Row(
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_text_transform),
+            contentDescription = stringResource(R.string.transform),
+            tint = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier.background(MaterialTheme.colorScheme.primary, CircleShape)
+        )
+        Text(
+            text = stringResource(id = R.string.transform),
+            style = TypographyV2.labelSmall,
+            color = MaterialTheme.colorScheme.primary,
+            fontFamily = BrandFontFamily,
+            modifier = Modifier.padding(start = 8.dp)
+        )
+    }
+}
+
+@Composable
+fun TransformOptionsBody(
+    viewModel: TextTransformViewModel,
+    allowApply: Boolean,
+    allowCopy: Boolean,
+    onNext: (String) -> Unit,
+    previewText: String,
+    onPrimaryClick: () -> Unit,
+    onSecondaryClick: () -> Unit,
+    isLandscape: Boolean = false,
+) {
+    val selectedPrimaryIndex by viewModel.selectedPrimaryIndex.collectAsState()
+    val selectedSecondaryIndex by viewModel.selectedSecondaryIndex.collectAsState()
+    val secondaryList by viewModel.secondaryOptionList.collectAsState()
+
+    val secondaryFunctionText by viewModel.secondaryFunctionText.collectAsState()
+    val secondaryFunctionTextLabel by viewModel.secondaryFunctionTextLabel.collectAsState()
+    val secondaryFunctionTextInputType by viewModel.secondaryFunctionTextInputType.collectAsState()
+    val secondaryFunctionTextEnabled by viewModel.secondaryFunctionTextEnabled.collectAsState()
+    val secondaryFunctionTextVisible by viewModel.secondaryFunctionTextVisible.collectAsState()
+
+    Column {
+        Column(
+            modifier = Modifier.verticalScroll(rememberScrollState())
+        ) {
+            // Function 1
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                        shape = RoundedCornerShape(size = 4.dp)
+                    )
+                    .clickable { onPrimaryClick() },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painterResource(R.drawable.ic_auto_fix_high),
+                    contentDescription = stringResource(R.string.transform),
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+                        .size(24.dp)
+                )
+
+                Text(
+                    stringResource(TextTransformViewModel.transformOptions[selectedPrimaryIndex]),
+                    style = LocalTextStyle.current.copy(
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.onSurface
+                    ),
+                    modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+                )
+            }
+
+            if (secondaryList.isNotEmpty()) {
+                // Function 2
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 4.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                            shape = RoundedCornerShape(size = 4.dp)
+                        )
+                        .clickable { onSecondaryClick() },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painterResource(R.drawable.ic_auto_awesome),
+                        contentDescription = stringResource(R.string.transform),
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+                            .size(24.dp)
+                    )
+
+                    Text(
+                        stringResource(secondaryList[selectedSecondaryIndex]),
+                        style = LocalTextStyle.current.copy(
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onSurface
+                        ),
+                        modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+                    )
+                }
+            }
+
+            if (secondaryFunctionTextVisible) {
+                OutlinedTextField(
+                    value = secondaryFunctionText,
+                    enabled = secondaryFunctionTextEnabled,
+                    onValueChange = { viewModel.setSecondaryText(it) },
+                    keyboardOptions = KeyboardOptions(keyboardType = secondaryFunctionTextInputType),
+                    label = { Text(stringResource(id = secondaryFunctionTextLabel)) },
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .fillMaxWidth()
+                )
+            }
+        }
+
+        if (isLandscape) {
+            Spacer(modifier = Modifier.weight(1f))
+        }
+
+        Button(
+            onClick = { onNext(previewText) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+        ) {
+            MarqueeText(
+                text = stringResource(id = R.string.next),
+                fontFamily = BrandFontFamily
+            )
+        }
+    }
+}
+
+@Composable
+@Preview
+fun TextTransformUIPreview() {
+    TextTransformUI(
+        textToTransform = "Text to transform",
+        allowCopy = true,
+        allowApply = true,
+        paddingValues = PaddingValues(all = 0.dp)
+    )
+}

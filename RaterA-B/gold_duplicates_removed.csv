@@ -1,0 +1,718 @@
+item_id,rater_row_id,repo,file,anchor_line,decl_name,detector_category,gold_verdict,gold_category,gold_source,detector_result,rater_A_verdict,rater_A_category,rater_B_verdict,rater_B_category,other_issues,adjudicator_notes,anchor_text,context
+pilot-0220,r0200,DaKlok__BibleLockScreen,DaKlok__BibleLockScreen/app/src/main/java/com/daklok/biblelockscreen/ColorPickerDialog.kt,186.0,ColorPickerDialog,pointerinput_no_semantics,ISSUE,pointerinput_no_semantics,agreed,TP,ISSUE,pointerinput_no_semantics,ISSUE,pointerinput_no_semantics,,,detectTapGestures { handle(it) },"  174 |                         modifier = Modifier
+  175 |                             .size(160.dp)
+  176 |                             .clip(CircleShape)
+  177 |                             .pointerInput(valueState) {
+  178 |                                 val sz = size.width.toFloat()
+  179 |                                 val cx = sz / 2f; val r = sz / 2f
+  180 |                                 fun handle(pos: Offset) {
+  181 |                                     val dx = pos.x - cx; val dy = pos.y - cx
+  182 |                                     val dist = sqrt(dx * dx + dy * dy).coerceAtMost(r)
+  183 |                                     val h = ((atan2(dy, dx) * 180f / PI.toFloat()) + 360f) % 360f
+  184 |                                     setHsv(h, dist / r, valueState, fromWheel = true)
+  185 |                                 }
+  186 |                                 detectTapGestures { handle(it) }
+  187 |                             }
+  188 |                             .pointerInput(valueState) {
+  189 |                                 val sz = size.width.toFloat()
+  190 |                                 val cx = sz / 2f; val r = sz / 2f
+  191 |                                 detectDragGestures { change, _ ->
+  192 |                                     val pos = change.position
+  193 |                                     val dx  = pos.x - cx; val dy = pos.y - cx
+  194 |                                     val dist = sqrt(dx * dx + dy * dy).coerceAtMost(r)
+  195 |                                     val h = ((atan2(dy, dx) * 180f / PI.toFloat()) + 360f) % 360f
+  196 |                                     setHsv(h, dist / r, valueState, fromWheel = true)
+  197 |                                 }
+  198 |                             }
+  199 |                     ) {
+  200 |                         Canvas(modifier = Modifier.fillMaxSize()) {
+  201 |                             drawColorWheel(valueState)
+  202 |                             // cursor
+  203 |                             val cx2  = size.width  / 2f
+  204 |                             val cy2  = size.height / 2f
+  205 |                             val r2   = minOf(cx2, cy2)
+  206 |                             val ang  = hueState * PI.toFloat() / 180f
+  207 |                             val dotX = cx2 + satState * r2 * cos(ang)
+  208 |                             val dotY = cy2 + satState * r2 * sin(ang)
+  209 |                             drawCircle(Color.White,        radius = 10f, center = Offset(dotX, dotY))
+  210 |                             drawCircle(currentColor,       radius = 7f,  center = Offset(dotX, dotY))
+  211 |                         }
+  212 |                     }
+  213 | 
+  214 |                     Column(
+  215 |                         modifier            = Modifier.weight(1f),
+  216 |                         verticalArrangement = Arrangement.spacedBy(8.dp)
+  217 |                     ) {
+  218 |                         // Swatch
+  219 |                         Box(
+  220 |                             modifier = Modifier
+  221 |                                 .fillMaxWidth()
+  222 |                                 .height(44.dp)
+  223 |                                 .clip(RoundedCornerShape(10.dp))
+  224 |                                 .background(currentColor)
+  225 |                                 .border(
+  226 |                                     0.5.dp,"
+pilot-0284,r0130,GetStream__whatsApp-clone-compose,GetStream__whatsApp-clone-compose/features/chats/src/main/kotlin/io/getstream/whatsappclone/chats/messages/WhatsAppMessageTopBar.kt,55.0,WhatsAppMessageTopBar,touch_target_size,ISSUE,clickable_icon_not_iconbutton,adjudicated,TP_OTHER,ISSUE,clickable_icon_not_iconbutton,ISSUE,touch_target_size,"missing_content_description,missing_semantics_role,touch_target_size",CATEGORY ONLY: both agree on verdict; pick category,.size(26.dp),"   43 | 
+   44 | @Composable
+   45 | fun WhatsAppMessageTopBar(
+   46 |   messageUiState: WhatsAppMessageUiState,
+   47 |   navigateToVideoCall: (Boolean) -> Unit,
+   48 |   onBackClick: () -> Unit
+   49 | ) {
+   50 |   TopAppBar(
+   51 |     modifier = Modifier.fillMaxWidth(),
+   52 |     navigationIcon = {
+   53 |       Icon(
+   54 |         modifier = Modifier
+   55 |           .size(26.dp)
+   56 |           .clickable {
+   57 |             onBackClick()
+   58 |           },
+   59 |         imageVector = WhatsAppIcons.ArrowBack,
+   60 |         tint = MaterialTheme.colorScheme.tertiary,
+   61 |         contentDescription = null
+   62 |       )
+   63 |     },
+   64 |     title = {
+   65 |       WhatsAppMessageUserInfo(messageUiState = messageUiState)
+   66 |     },
+   67 |     actions = {
+   68 |       Icon(
+   69 |         modifier = Modifier
+   70 |           .size(26.dp)
+   71 |           .clickable {
+   72 |             navigateToVideoCall(true)
+   73 |           },
+   74 |         imageVector = WhatsAppIcons.Video,
+   75 |         tint = MaterialTheme.colorScheme.tertiary,
+   76 |         contentDescription = null
+   77 |       )
+   78 | 
+   79 |       Spacer(modifier = Modifier.size(16.dp))
+   80 | 
+   81 |       Icon(
+   82 |         modifier = Modifier
+   83 |           .size(26.dp)
+   84 |           .clickable {
+   85 |             navigateToVideoCall(false)
+   86 |           },
+   87 |         imageVector = WhatsAppIcons.Call,
+   88 |         tint = MaterialTheme.colorScheme.tertiary,
+   89 |         contentDescription = null
+   90 |       )
+   91 | 
+   92 |       Spacer(modifier = Modifier.size(16.dp))
+   93 | 
+   94 |       Icon(
+   95 |         modifier = Modifier.size(26.dp),"
+pilot-0012,r0196,IacobIonut01__ReFra,IacobIonut01__ReFra/app/src/main/kotlin/com/dot/gallery/cloud/ui/people/PeopleListScreen.kt,254.0,PersonGridItem,clickable_icon_not_iconbutton,ISSUE,missing_semantics_role,adjudicated,FP_DETECTOR,ISSUE,missing_semantics_role,NO_ISSUE,none,missing_content_description,R2 missing Role.Button on clickable container,".clickable(onClick = onClick),","  239 | private fun PersonGridItem(
+  240 |     person: PersonInfo,
+  241 |     onClick: () -> Unit
+  242 | ) {
+  243 |     Column(
+  244 |         horizontalAlignment = Alignment.CenterHorizontally,
+  245 |         verticalArrangement = Arrangement.spacedBy(16.dp)
+  246 |     ) {
+  247 |         if (person.thumbnailUrl != null) {
+  248 |             GlideImage(
+  249 |                 model = person.thumbnailUrl.toUri(),
+  250 |                 contentDescription = person.name,
+  251 |                 modifier = Modifier
+  252 |                     .size(100.dp)
+  253 |                     .clip(CircleShape)
+  254 |                     .clickable(onClick = onClick),
+  255 |                 contentScale = ContentScale.Crop
+  256 |             )
+  257 |         } else {
+  258 |             Box(
+  259 |                 modifier = Modifier
+  260 |                     .size(100.dp)
+  261 |                     .clip(CircleShape)
+  262 |                     .background(MaterialTheme.colorScheme.surfaceVariant)
+  263 |                     .clickable(onClick = onClick),
+  264 |                 contentAlignment = Alignment.Center
+  265 |             ) {
+  266 |                 Icon(
+  267 |                     Icons.Outlined.Person, null,
+  268 |                     modifier = Modifier.size(48.dp),
+  269 |                     tint = MaterialTheme.colorScheme.onSurfaceVariant
+  270 |                 )
+  271 |             }
+  272 |         }
+  273 |         Text(
+  274 |             text = person.name.ifBlank { stringResource(R.string.cloud_people_unknown) },
+  275 |             style = MaterialTheme.typography.bodyLarge,
+  276 |             textAlign = TextAlign.Center,
+  277 |             maxLines = 1,
+  278 |             overflow = TextOverflow.Ellipsis
+  279 |         )
+  280 |     }
+  281 | }"
+pilot-0138,r0131,OMGSoundboard__android-app,OMGSoundboard__android-app/app/src/main/java/audio/omgsoundboard/presentation/composables/AboutItem.kt,20.0,AboutItem,missing_interaction_semantics,ISSUE,missing_semantics_role,adjudicated,FP_DETECTOR,ISSUE,missing_semantics_role,NO_ISSUE,none,touch_target_size,R2 missing Role.Button on clickable container,".clickable { onClick() },","    8 | import androidx.compose.ui.Alignment
+    9 | import androidx.compose.ui.Modifier
+   10 | import androidx.compose.ui.res.painterResource
+   11 | import androidx.compose.ui.res.stringResource
+   12 | import androidx.compose.ui.unit.dp
+   13 | 
+   14 | 
+   15 | @Composable
+   16 | fun AboutItem(icon: Int, title: Int, onClick: () -> Unit){
+   17 |     Row(
+   18 |         modifier = Modifier
+   19 |             .padding(horizontal = 16.dp, vertical = 12.dp)
+   20 |             .clickable { onClick() },
+   21 |         horizontalArrangement = Arrangement.Start,
+   22 |         verticalAlignment = Alignment.CenterVertically
+   23 |     ) {
+   24 | 
+   25 |         Icon(
+   26 |             painter = painterResource(id = icon),
+   27 | 
+   28 |             contentDescription = null
+   29 |         )
+   30 |         Spacer(modifier = Modifier.width(16.dp))
+   31 |         Text(
+   32 |             text = stringResource(id = title),
+   33 |         )
+   34 | 
+   35 |     }
+   36 | }"
+pilot-0133,r0111,Pool-Of-Tears__Myne,Pool-Of-Tears__Myne/app/src/main/java/com/starry/myne/ui/screens/settings/composables/AboutScreen.kt,199.0,LinkButton,missing_interaction_semantics,ISSUE,missing_semantics_role,adjudicated,FP_DETECTOR,ISSUE,missing_semantics_role,NO_ISSUE,none,touch_target_size,R2 missing Role.Button on clickable container,.clickable { onClick() },"  187 | 
+  188 | }
+  189 | 
+  190 | @Composable
+  191 | private fun LinkButton(
+  192 |     text: String,
+  193 |     icon: ImageVector,
+  194 |     onClick: () -> Unit,
+  195 | ) {
+  196 |     Row(
+  197 |         verticalAlignment = Alignment.CenterVertically,
+  198 |         modifier = Modifier
+  199 |             .clickable { onClick() }
+  200 |             .padding(all = 4.dp),
+  201 |     ) {
+  202 |         Icon(
+  203 |             imageVector = icon,
+  204 |             contentDescription = null,
+  205 |             modifier = Modifier.size(size = 18.dp),
+  206 |             tint = MaterialTheme.colorScheme.onSurface
+  207 |         )
+  208 | 
+  209 |         Text(
+  210 |             text = text.uppercase(),
+  211 |             fontWeight = FontWeight.SemiBold,
+  212 |             fontFamily = poppinsFont,
+  213 |             color = MaterialTheme.colorScheme.onSurface,
+  214 |             modifier = Modifier.padding(start = 4.dp),
+  215 |         )
+  216 |     }
+  217 | }
+  218 | 
+  219 | @Composable
+  220 | private fun AppInfoCard() {
+  221 |     Card(
+  222 |         modifier = Modifier
+  223 |             .fillMaxWidth()
+  224 |             .padding(start = 14.dp, end = 14.dp),
+  225 |         colors = CardDefaults.cardColors(
+  226 |             containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
+  227 |                 4.dp
+  228 |             )
+  229 |         ),
+  230 |     ) {
+  231 |         Box(
+  232 |             modifier = Modifier
+  233 |                 .fillMaxWidth()
+  234 |                 .height(245.dp)
+  235 |         ) {
+  236 |             AsyncImage(
+  237 |                 model = R.drawable.about_screen_bg,
+  238 |                 contentDescription = null,
+  239 |                 alpha = 0.35f,"
+pilot-0230,r0048,RisorseArtificiali__anti-vocale,RisorseArtificiali__anti-vocale/app/src/main/java/com/antivocale/app/ui/components/ModelVariantCard.kt,365.0,DownloadProgressView,progress_no_semantics,HANDLED,none,adjudicated,FP,HANDLED,progress_no_semantics,HANDLED,none,,CATEGORY ONLY: both agree on verdict; pick category,LinearProgressIndicator(,"  341 | internal fun DownloadProgressView(
+  342 |     downloadState: DownloadState,
+  343 |     downloadProgress: Float,
+  344 |     showExtractingFileSize: Boolean = false
+  345 | ) {
+  346 |     when (val state = downloadState) {
+  347 |         is DownloadState.Downloading -> {
+  348 |             // TASK-384: talkback reads the same percentage the sighted UI shows
+  349 |             val percentText = ""${(downloadProgress * 100).toInt()}%""
+  350 |             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+  351 |                 Row(
+  352 |                     modifier = Modifier.fillMaxWidth(),
+  353 |                     horizontalArrangement = Arrangement.SpaceBetween
+  354 |                 ) {
+  355 |                     // Locale-safe: weight + ellipsis keeps the percentage anchored (TASK-345)
+  356 |                     Text(
+  357 |                         stringResource(R.string.download_status_downloading),
+  358 |                         style = MaterialTheme.typography.bodySmall,
+  359 |                         maxLines = 1,
+  360 |                         overflow = TextOverflow.Ellipsis,
+  361 |                         modifier = Modifier.weight(1f)
+  362 |                     )
+  363 |                     Text(percentText, style = MaterialTheme.typography.bodySmall)
+  364 |                 }
+  365 |                 LinearProgressIndicator(
+  366 |                     progress = { downloadProgress },
+  367 |                     modifier = Modifier.fillMaxWidth().semantics { stateDescription = percentText }
+  368 |                 )
+  369 |                 Text(
+  370 |                     text = formatFileSize(state.bytesDownloaded) +
+  371 |                         if (state.totalBytes > 0) "" / ${formatFileSize(state.totalBytes)}"" else """",
+  372 |                     style = MaterialTheme.typography.labelSmall,
+  373 |                     color = MaterialTheme.colorScheme.onSurfaceVariant
+  374 |                 )
+  375 |                 DownloadRateEta(state)
+  376 |             }
+  377 |         }
+  378 |         is DownloadState.Extracting -> {
+  379 |             // TASK-384: talkback reads the same status label the sighted UI shows
+  380 |             val extractingLabel =
+  381 |                 state.fileName.takeIf { it.isNotEmpty() }
+  382 |                     ?: stringResource(R.string.download_status_extracting_files)
+  383 |             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+  384 |                 LinearProgressIndicator(
+  385 |                     progress = { downloadProgress },
+  386 |                     modifier = Modifier.fillMaxWidth().semantics { stateDescription = extractingLabel }
+  387 |                 )
+  388 |                 if (showExtractingFileSize && state.currentFileSize > 0) {
+  389 |                     Row(
+  390 |                         modifier = Modifier.fillMaxWidth(),
+  391 |                         horizontalArrangement = Arrangement.SpaceBetween
+  392 |                     ) {
+  393 |                         // Locale-safe: weight + ellipsis keeps the byte counter anchored (TASK-345)
+  394 |                         Text(
+  395 |                             stringResource(R.string.download_status_extracting, state.fileName.takeIf { it.isNotEmpty() } ?: stringResource(R.string.download_status_file_progress, state.fileIndex, state.totalFiles)),
+  396 |                             style = MaterialTheme.typography.bodySmall,
+  397 |                             maxLines = 1,
+  398 |                             overflow = TextOverflow.Ellipsis,
+  399 |                             modifier = Modifier.weight(1f)
+  400 |                         )
+  401 |                         Text(
+  402 |                             ""${formatFileSize(state.bytesExtracted)} / ${formatFileSize(state.currentFileSize)}"",
+  403 |                             style = MaterialTheme.typography.labelSmall,
+  404 |                             color = MaterialTheme.colorScheme.onSurfaceVariant
+  405 |                         )"
+pilot-0055,r0271,UmairKhalid786__ComposeTv,UmairKhalid786__ComposeTv/app/src/main/java/com/techlads/composetv/features/details/ProductDetailsScreen.kt,278.0,UserRatingsSection,decorative_mislabeled,ISSUE,decorative_mislabeled,adjudicated,TP,ISSUE,decorative_mislabeled,ISSUE,none,,R5 localization is out of scope; A label stands,"contentDescription = ""92%"",","  266 |                         ),
+  267 |                     ) {
+  268 |                         Text(
+  269 |                             text = ""Rotten Tomatoes"",
+  270 |                             style = MaterialTheme.typography.bodyMedium.copy(
+  271 |                                 fontWeight = FontWeight.Bold
+  272 |                             ),
+  273 |                             color = MaterialTheme.colorScheme.onSurface
+  274 |                         )
+  275 |                         Row(verticalAlignment = Alignment.CenterVertically) {
+  276 |                             Icon(
+  277 |                                 Icons.Default.Fastfood,
+  278 |                                 contentDescription = ""92%"",
+  279 |                                 modifier = Modifier.size(32.dp)
+  280 |                             )
+  281 |                             Spacer(Modifier.size(8.dp))
+  282 |                             Text(
+  283 |                                 text = ""92%"", style = MaterialTheme.typography.headlineMedium.copy(
+  284 |                                     fontWeight = FontWeight.Bold
+  285 |                                 ), color = MaterialTheme.colorScheme.onBackground
+  286 |                             )
+  287 |                         }
+  288 |                     }
+  289 |                 }
+  290 |             }
+  291 |             item {
+  292 |                 RatingCard(
+  293 |                     modifier = Modifier
+  294 |                         .width(cardWidthPx)
+  295 |                         .height(cardWidthPx),
+  296 |                 ) {
+  297 |                     Column(
+  298 |                         modifier = Modifier
+  299 |                             .fillMaxHeight()
+  300 |                             .padding(16.dp),
+  301 |                         verticalArrangement = Arrangement.spacedBy(
+  302 |                             16.dp, Alignment.CenterVertically
+  303 |                         ),
+  304 |                     ) {
+  305 |                         Text(
+  306 |                             text = ""IMDb"", style = MaterialTheme.typography.bodyMedium.copy(
+  307 |                                 fontWeight = FontWeight.Bold
+  308 |                             ), color = MaterialTheme.colorScheme.onSurface
+  309 |                         )
+  310 |                         Row(verticalAlignment = Alignment.CenterVertically) {
+  311 |                             Icon(
+  312 |                                 Icons.Default.Star,
+  313 |                                 contentDescription = ""Rating"",
+  314 |                                 modifier = Modifier.size(32.dp)
+  315 |                             )
+  316 |                             Spacer(Modifier.size(8.dp))
+  317 |                             Text(
+  318 |                                 text = ""8.3/10"","
+pilot-0169,r0133,Waboodoo__HTTP-Shortcuts,Waboodoo__HTTP-Shortcuts/HTTPShortcuts/app/src/main/kotlin/ch/rmy/android/http_shortcuts/activities/documentation/DocumentationScreen.kt,200.0,SearchBar,missing_semantics_role,ISSUE,clickable_icon_not_iconbutton,adjudicated,TP_OTHER,ISSUE,clickable_icon_not_iconbutton,NO_ISSUE,none,"missing_semantics_role,touch_target_size",R3 named but roleless raw .clickable; confirm <48dp if downgrading,.clickable(,"  188 |                 text = ""$current/$total"",
+  189 |                 maxLines = 1,
+  190 |                 fontSize = FontSize.SMALL,
+  191 |             )
+  192 |         }
+  193 | 
+  194 |         Row(modifier = Modifier.padding(end = Spacing.SMALL)) {
+  195 |             val enabled = results?.second?.let { it > 1 } == true
+  196 |             Icon(
+  197 |                 painterResource(R.drawable.outline_keyboard_arrow_up_24),
+  198 |                 contentDescription = stringResource(R.string.accessibility_search_go_to_previous),
+  199 |                 modifier = Modifier
+  200 |                     .clickable(
+  201 |                         interactionSource = remember { MutableInteractionSource() },
+  202 |                         indication = ripple(bounded = false),
+  203 |                         enabled = enabled,
+  204 |                         onClick = {
+  205 |                             onNext(SearchDirection.PREVIOUS)
+  206 |                         },
+  207 |                     )
+  208 |                     .padding(horizontal = Spacing.SMALL)
+  209 |                     .runIf(!enabled) {
+  210 |                         alpha(0.3f)
+  211 |                     },
+  212 |             )
+  213 |             Icon(
+  214 |                 painterResource(R.drawable.outline_keyboard_arrow_down_24),
+  215 |                 contentDescription = stringResource(R.string.accessibility_search_go_to_next),
+  216 |                 modifier = Modifier
+  217 |                     .clickable(
+  218 |                         interactionSource = remember { MutableInteractionSource() },
+  219 |                         indication = ripple(bounded = false),
+  220 |                         enabled = enabled,
+  221 |                         onClick = {
+  222 |                             onNext(SearchDirection.NEXT)
+  223 |                         },
+  224 |                     )
+  225 |                     .padding(horizontal = Spacing.SMALL)
+  226 |                     .runIf(!enabled) {
+  227 |                         alpha(0.3f)
+  228 |                     },
+  229 |             )
+  230 |         }
+  231 | 
+  232 |         LaunchedEffect(Unit) {
+  233 |             focusRequester.requestFocus()
+  234 |             delay(50.milliseconds)
+  235 |             keyboard?.show()
+  236 |         }
+  237 |     }
+  238 | }"
+pilot-0042,r0174,gininaba__AIPOSPasswordManager,gininaba__AIPOSPasswordManager/app/src/main/java/com/aipos/aipospm/ui/screens/PasswordGeneratorScreen.kt,106.0,PasswordGeneratorScreen,decorative_mislabeled,NO_ISSUE,none,adjudicated,FP,NO_ISSUE,none,ISSUE,none,,R5 localization is out of scope; A label stands,"Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = ""Back"")","   94 |             PasswordStrength.STRONG -> SecurityGreen
+   95 |         },
+   96 |         animationSpec = tween(400),
+   97 |         label = ""strengthColor""
+   98 |     )
+   99 | 
+  100 |     Scaffold(
+  101 |         topBar = {
+  102 |             TopAppBar(
+  103 |                 title = { Text(""Password Generator"", fontWeight = FontWeight.Bold) },
+  104 |                 navigationIcon = {
+  105 |                     IconButton(onClick = onNavigateBack) {
+  106 |                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = ""Back"")
+  107 |                     }
+  108 |                 },
+  109 |                 colors = TopAppBarDefaults.topAppBarColors(
+  110 |                     containerColor = MaterialTheme.colorScheme.surface
+  111 |                 )
+  112 |             )
+  113 |         },
+  114 |         snackbarHost = { SnackbarHost(snackbarHostState) }
+  115 |     ) { padding ->
+  116 |         Column(
+  117 |             modifier = Modifier
+  118 |                 .fillMaxSize()
+  119 |                 .padding(padding)
+  120 |                 .padding(horizontal = 16.dp)
+  121 |                 .verticalScroll(rememberScrollState())
+  122 |         ) {
+  123 |             Spacer(modifier = Modifier.height(16.dp))
+  124 | 
+  125 |             // Generated password display
+  126 |             Card(
+  127 |                 modifier = Modifier.fillMaxWidth(),
+  128 |                 shape = RoundedCornerShape(16.dp),
+  129 |                 colors = CardDefaults.cardColors(
+  130 |                     containerColor = MaterialTheme.colorScheme.primaryContainer
+  131 |                 )
+  132 |             ) {
+  133 |                 Column(
+  134 |                     modifier = Modifier.padding(20.dp),
+  135 |                     horizontalAlignment = Alignment.CenterHorizontally
+  136 |                 ) {
+  137 |                     Text(
+  138 |                         text = uiState.generatedPassword,
+  139 |                         style = MaterialTheme.typography.titleLarge.copy(
+  140 |                             fontFamily = FontFamily.Monospace,
+  141 |                             fontSize = 18.sp,
+  142 |                             letterSpacing = 1.sp
+  143 |                         ),
+  144 |                         color = MaterialTheme.colorScheme.onPrimaryContainer,
+  145 |                         textAlign = TextAlign.Center,
+  146 |                         modifier = Modifier.fillMaxWidth()"
+pilot-0004,r0250,jordond__MaterialKolor,jordond__MaterialKolor/builder/shared/src/commonMain/kotlin/com/materialkolor/builder/ui/home/components/ContrastSelector.kt,85.0,ContrastButton,clickable_icon_not_iconbutton,ISSUE,missing_semantics_role,adjudicated,FP_DETECTOR,ISSUE,missing_semantics_role,NO_ISSUE,none,"missing_state_description,touch_target_size",R2 missing Role.Button on clickable container,".clickable(enabled = !isSelected, onClick = onClick),","   63 | private fun ContrastButton(
+   64 |     contrast: Contrast,
+   65 |     isSelected: Boolean,
+   66 |     onClick: () -> Unit,
+   67 |     modifier: Modifier = Modifier,
+   68 | ) {
+   69 |     val containerColor by animateColorAsState(
+   70 |         if (isSelected) MaterialTheme.colorScheme.tertiary
+   71 |         else MaterialTheme.colorScheme.tertiaryContainer,
+   72 |     )
+   73 | 
+   74 |     val contentColor by animateColorAsState(
+   75 |         if (isSelected) MaterialTheme.colorScheme.onTertiary
+   76 |         else MaterialTheme.colorScheme.onTertiaryContainer,
+   77 |     )
+   78 | 
+   79 |     Box(
+   80 |         contentAlignment = Alignment.Center,
+   81 |         modifier = modifier
+   82 |             .size(42.dp)
+   83 |             .clip(CircleShape)
+   84 |             .background(containerColor)
+   85 |             .clickable(enabled = !isSelected, onClick = onClick),
+   86 |     ) {
+   87 |         Icon(
+   88 |             imageVector = contrast.icon(),
+   89 |             contentDescription = contrast.name(),
+   90 |             tint = contentColor,
+   91 |             modifier = Modifier.padding(6.dp),
+   92 |         )
+   93 |     }
+   94 | }
+   95 | 
+   96 | @Composable
+   97 | private fun Contrast.icon(): ImageVector = remember(this) {
+   98 |     when (this) {
+   99 |         Contrast.Default -> Icons.Outlined.BrightnessLow
+  100 |         Contrast.Medium -> Icons.Outlined.BrightnessMedium
+  101 |         Contrast.High -> Icons.Outlined.BrightnessHigh
+  102 |         Contrast.Reduced -> Icons.Default.KeyboardArrowDown
+  103 |     }
+  104 | }
+  105 | 
+  106 | @Composable
+  107 | private fun Contrast.name(): String = remember(this) {
+  108 |     when (this) {
+  109 |         Contrast.Default -> ""Standard""
+  110 |         Contrast.Medium -> ""Medium""
+  111 |         Contrast.High -> ""High""
+  112 |         Contrast.Reduced -> ""Reduced""
+  113 |     }
+  114 | }"
+pilot-0075,r0148,maximilian-schwaerzler__Do-It,maximilian-schwaerzler__Do-It/app/src/main/java/at/co/schwaerzler/maximilian/doit/ui/navigation/screen/EditTodoScreen.kt,367.0,EditTodoScreenContent,error_state_no_semantics,HANDLED,none,adjudicated,FP,HANDLED,error_state_no_semantics,HANDLED,none,,CATEGORY ONLY: both agree on verdict; pick category,"isError = uiState.titleError != null,","  355 |                     onValueChange = onTitleChange,
+  356 |                     Modifier
+  357 |                         .fillMaxWidth()
+  358 |                         .padding(bottom = 8.dp)
+  359 |                         .focusRequester(titleFocusRequester),
+  360 |                     singleLine = true,
+  361 |                     label = {
+  362 |                         Text(stringResource(R.string.title))
+  363 |                     },
+  364 |                     supportingText = {
+  365 |                         Text(uiState.titleError ?: stringResource(R.string.required))
+  366 |                     },
+  367 |                     isError = uiState.titleError != null,
+  368 |                     leadingIcon = {
+  369 |                         Icon(painterResource(R.drawable.title_24px), contentDescription = null)
+  370 |                     },
+  371 |                     textStyle = LocalTextStyle.current.copy(
+  372 |                         fontWeight = FontWeight.Bold
+  373 |                     )
+  374 |                 )
+  375 | 
+  376 |                 OutlinedTextField(
+  377 |                     uiState.description,
+  378 |                     onValueChange = onDescriptionChange,
+  379 |                     Modifier.fillMaxWidth(),
+  380 |                     label = {
+  381 |                         Text(stringResource(R.string.description))
+  382 |                     },
+  383 |                     minLines = 5,
+  384 |                     supportingText = {
+  385 |                         Text(uiState.descriptionError ?: stringResource(R.string.optional))
+  386 |                     },
+  387 |                     isError = uiState.descriptionError != null
+  388 |                 )
+  389 | 
+  390 |                 val deadlineSet = uiState.deadline != null
+  391 | 
+  392 |                 Row(
+  393 |                     verticalAlignment = Alignment.CenterVertically,
+  394 |                     modifier = Modifier.padding(top = 4.dp)
+  395 |                 ) {
+  396 |                     Checkbox(
+  397 |                         checked = deadlineSet,
+  398 |                         onCheckedChange = { checked ->
+  399 |                             if (checked) {
+  400 |                                 showDatePicker = true
+  401 |                             } else {
+  402 |                                 onDeadlineChange(null)
+  403 |                             }
+  404 |                         }
+  405 |                     )
+  406 |                     Text(stringResource(R.string.set_deadline))
+  407 |                 }"
+pilot-0013,r0163,maximilian-schwaerzler__Do-It,maximilian-schwaerzler__Do-It/app/src/main/java/at/co/schwaerzler/maximilian/doit/ui/navigation/screen/SettingsScreen.kt,175.0,SettingsScreenContent,clickable_icon_not_iconbutton,ISSUE,missing_semantics_role,adjudicated,FP_DETECTOR,ISSUE,missing_semantics_role,NO_ISSUE,none,,R2 missing Role.Button on clickable container,modifier = Modifier.clickable { showThemeDialog = true },"  163 |             ) {
+  164 |                 SettingsSectionHeader(stringResource(R.string.settings_section_general))
+  165 |                 ListItem(
+  166 |                     headlineContent = {
+  167 |                         Text(stringResource(R.string.theme))
+  168 |                     },
+  169 |                     supportingContent = {
+  170 |                         Text(stringResource(themeMode.labelRes))
+  171 |                     },
+  172 |                     leadingContent = {
+  173 |                         Icon(painterResource(themeMode.iconRes), contentDescription = null)
+  174 |                     },
+  175 |                     modifier = Modifier.clickable { showThemeDialog = true }
+  176 |                 )
+  177 | 
+  178 |                 ListItem(
+  179 |                     headlineContent = {
+  180 |                         Text(stringResource(R.string.dynamic_color_setting_label))
+  181 |                     },
+  182 |                     leadingContent = {
+  183 |                         Icon(painterResource(R.drawable.colors_24px), contentDescription = null)
+  184 |                     },
+  185 |                     trailingContent = { Switch(useDynamicColors, { onSetUseDynamicColors(it) }) }
+  186 |                 )
+  187 | 
+  188 |                 ListItem(
+  189 |                     headlineContent = {
+  190 |                         Text(stringResource(R.string.settings_language))
+  191 |                     },
+  192 |                     supportingContent = {
+  193 |                         Text(currentLanguageDisplay)
+  194 |                     },
+  195 |                     leadingContent = {
+  196 |                         Icon(painterResource(R.drawable.language_24px), contentDescription = null)
+  197 |                     },
+  198 |                     modifier = Modifier.clickable { showLanguageDialog = true }
+  199 |                 )
+  200 | 
+  201 |                 ListItem(
+  202 |                     headlineContent = {
+  203 |                         Text(stringResource(R.string.settings_notif_lead_time))
+  204 |                     },
+  205 |                     supportingContent = {
+  206 |                         ExposedDropdownMenuBox(
+  207 |                             expanded = notifLeadTimeExpanded,
+  208 |                             onExpandedChange = { notifLeadTimeExpanded = it },
+  209 |                             modifier = Modifier.fillMaxWidth()
+  210 |                         ) {
+  211 |                             OutlinedTextField(
+  212 |                                 value = stringResource(notificationLeadTime.labelRes),
+  213 |                                 onValueChange = {},
+  214 |                                 readOnly = true,
+  215 |                                 trailingIcon = {"
+pilot-0001,r0182,maximilian-schwaerzler__Do-It,maximilian-schwaerzler__Do-It/app/src/main/java/at/co/schwaerzler/maximilian/doit/ui/navigation/screen/SettingsScreen.kt,175.0,SettingsScreenContent,clickable_icon_not_iconbutton,ISSUE,missing_semantics_role,adjudicated,FP_DETECTOR,ISSUE,missing_semantics_role,NO_ISSUE,none,,R2 missing Role.Button on clickable container,modifier = Modifier.clickable { showThemeDialog = true },"  163 |             ) {
+  164 |                 SettingsSectionHeader(stringResource(R.string.settings_section_general))
+  165 |                 ListItem(
+  166 |                     headlineContent = {
+  167 |                         Text(stringResource(R.string.theme))
+  168 |                     },
+  169 |                     supportingContent = {
+  170 |                         Text(stringResource(themeMode.labelRes))
+  171 |                     },
+  172 |                     leadingContent = {
+  173 |                         Icon(painterResource(themeMode.iconRes), contentDescription = null)
+  174 |                     },
+  175 |                     modifier = Modifier.clickable { showThemeDialog = true }
+  176 |                 )
+  177 | 
+  178 |                 ListItem(
+  179 |                     headlineContent = {
+  180 |                         Text(stringResource(R.string.dynamic_color_setting_label))
+  181 |                     },
+  182 |                     leadingContent = {
+  183 |                         Icon(painterResource(R.drawable.colors_24px), contentDescription = null)
+  184 |                     },
+  185 |                     trailingContent = { Switch(useDynamicColors, { onSetUseDynamicColors(it) }) }
+  186 |                 )
+  187 | 
+  188 |                 ListItem(
+  189 |                     headlineContent = {
+  190 |                         Text(stringResource(R.string.settings_language))
+  191 |                     },
+  192 |                     supportingContent = {
+  193 |                         Text(currentLanguageDisplay)
+  194 |                     },
+  195 |                     leadingContent = {
+  196 |                         Icon(painterResource(R.drawable.language_24px), contentDescription = null)
+  197 |                     },
+  198 |                     modifier = Modifier.clickable { showLanguageDialog = true }
+  199 |                 )
+  200 | 
+  201 |                 ListItem(
+  202 |                     headlineContent = {
+  203 |                         Text(stringResource(R.string.settings_notif_lead_time))
+  204 |                     },
+  205 |                     supportingContent = {
+  206 |                         ExposedDropdownMenuBox(
+  207 |                             expanded = notifLeadTimeExpanded,
+  208 |                             onExpandedChange = { notifLeadTimeExpanded = it },
+  209 |                             modifier = Modifier.fillMaxWidth()
+  210 |                         ) {
+  211 |                             OutlinedTextField(
+  212 |                                 value = stringResource(notificationLeadTime.labelRes),
+  213 |                                 onValueChange = {},
+  214 |                                 readOnly = true,
+  215 |                                 trailingIcon = {"
+pilot-0253,r0281,nemoXdev__CryptoSafe,nemoXdev__CryptoSafe/app/src/main/java/com/cryptosafe/app/MainActivity.kt,360.0,CryptoSafeApp,text_truncation_scaling,ISSUE,text_truncation_scaling,agreed,TP,ISSUE,text_truncation_scaling,ISSUE,text_truncation_scaling,,,"overflow = TextOverflow.Ellipsis,","  348 |                 title = {
+  349 |                     val isBoxes = vm.selectedTab == 1 && isMainScreen
+  350 |                     val isCreateBox = vm.mode == Screen.CreateBox
+  351 |                     val isSettings = vm.mode == Screen.Settings
+  352 |                     val isBoxSettings = vm.mode == Screen.BoxSettings
+  353 |                     if (vm.mode == Screen.Chat) {
+  354 |                         
+  355 |                         Row(verticalAlignment = Alignment.CenterVertically) {
+  356 |                             Text(
+  357 |                                 chatBox?.name.orEmpty(),
+  358 |                                 fontWeight = FontWeight.Bold,
+  359 |                                 maxLines = 1,
+  360 |                                 overflow = TextOverflow.Ellipsis,
+  361 |                                 modifier = Modifier.weight(1f, fill = false)
+  362 |                             )
+  363 |                             Text(
+  364 |                                 "" (${chatMessageCount} ${LocalizationManager.getString(""messages"")})"",
+  365 |                                 fontWeight = FontWeight.Bold
+  366 |                             )
+  367 |                         }
+  368 |                     } else if (isBoxes || isCreateBox || isSettings || isBoxSettings) {
+  369 |                         Row(verticalAlignment = Alignment.CenterVertically) {
+  370 |                             Icon(
+  371 |                                 painter = painterResource(
+  372 |                                     when {
+  373 |                                         isCreateBox -> com.cryptosafe.app.R.drawable.ic_add_box
+  374 |                                         isBoxSettings || isSettings -> com.cryptosafe.app.R.drawable.ic_settings
+  375 |                                         else -> com.cryptosafe.app.R.drawable.ic_box
+  376 |                                     }
+  377 |                                 ),
+  378 |                                 contentDescription = null,
+  379 |                                 modifier = Modifier.size(24.dp),
+  380 |                                 tint = Color.Unspecified
+  381 |                             )
+  382 |                             Spacer(Modifier.width(6.dp))
+  383 |                             Text(
+  384 |                                 screenTitle,
+  385 |                                 fontWeight = FontWeight.Bold,
+  386 |                                 maxLines = 1,
+  387 |                                 overflow = TextOverflow.Ellipsis
+  388 |                             )
+  389 |                         }
+  390 |                     } else {
+  391 |                         Text(
+  392 |                             screenTitle,
+  393 |                             fontWeight = FontWeight.Bold,
+  394 |                             maxLines = 1,
+  395 |                             overflow = TextOverflow.Ellipsis
+  396 |                         )
+  397 |                     }
+  398 |                 },
+  399 |                 navigationIcon = {
+  400 |                     if (!isMainScreen) {"

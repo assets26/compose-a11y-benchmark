@@ -1,0 +1,726 @@
+package app.marmalade.tts.ui.screen
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import app.marmalade.tts.R
+import app.marmalade.tts.engine.EnginePhaseTimings
+import app.marmalade.tts.perf.SystemStats
+import app.marmalade.tts.perf.SystemStatsSnapshot
+import app.marmalade.tts.ui.MarmaladeFilterChip
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
+
+// -----------------------------------------------------------------------------
+// Data flow
+// -----------------------------------------------------------------------------
+//   BenchmarkScreen
+//     │
+//     ├── reads  ◄── BenchmarkViewModel.state (BenchmarkState)
+//     │              .text                — current input string
+//     │              .selectedEngines     — engineNames opted in for this run
+//     │              .results             — per-engine outcomes
+//     │              .running / .currentlyRunning
+//     │
+//     └── writes ──► setText / toggleEngine / runBenchmark()
+//                                 │
+//                                 ▼
+//                          For each selected engine:
+//                            engine.synthesizeWithTimings(text, defaultVoiceId, 1.0f)
+//                              ──► EnginePhaseTimings appended to results
+//
+//   No audio playback. The purpose is timing, and AudioTrack init +
+//   buffer-drain latency would confound the numbers.
+// -----------------------------------------------------------------------------
+
+/** Debug-only benchmark surface — reachable from Settings → Benchmark (debug builds). */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BenchmarkScreen(
+    onBack: () -> Unit,
+    viewModel: BenchmarkViewModel = hiltViewModel(),
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
+    // Refresh installed-engine selection every time the screen opens —
+    // the user may have just installed/uninstalled via the Engines tab.
+    LaunchedEffect(Unit) { viewModel.refreshInstalled() }
+
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        contentWindowInsets = WindowInsets(0),
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text(stringResource(R.string.bench_title)) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.engines_back))
+                    }
+                },
+                windowInsets = WindowInsets(0),
+                scrollBehavior = scrollBehavior,
+            )
+        },
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            InputSection(
+                text = state.text,
+                onTextChange = viewModel::setText,
+            )
+
+            EngineSelectorSection(
+                profiles = viewModel.engineProfiles,
+                selectedEngines = state.selectedEngines,
+                onToggle = viewModel::toggleEngine,
+            )
+
+            SystemStatsBar()
+
+            Button(
+                onClick = viewModel::runBenchmark,
+                enabled = !state.running && state.text.isNotBlank() &&
+                    state.selectedEngines.isNotEmpty(),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                if (state.running) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                    )
+                    Spacer(Modifier.size(8.dp))
+                    Text(stringResource(R.string.bench_running, state.currentlyRunning ?: "…"))
+                } else {
+                    Text(stringResource(R.string.bench_run))
+                }
+            }
+
+            if (state.results.isNotEmpty()) {
+                ResultsSection(results = state.results)
+            }
+
+            HorizontalDivider()
+
+            KokoroQuantSection(
+                running = state.quantRunning,
+                status = state.quantStatus,
+                results = state.quantResults,
+                error = state.quantError,
+                onRun = viewModel::runQuantBench,
+            )
+
+            HorizontalDivider()
+
+            PocketQuantSection(
+                running = state.pocketQuantRunning,
+                status = state.pocketQuantStatus,
+                results = state.pocketQuantResults,
+                error = state.pocketQuantError,
+                onRun = viewModel::runPocketQuantBench,
+            )
+        }
+    }
+}
+
+/**
+ * Pocket flow_lm_main precision-variant bench. Same independent side-load
+ * pattern as [KokoroQuantSection]; see [PocketQuantBench] for paths and
+ * what the AR-step timing isolates.
+ */
+@Composable
+private fun PocketQuantSection(
+    running: Boolean,
+    status: String?,
+    results: List<PocketQuantBench.VariantResult>,
+    error: String?,
+    onRun: () -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = stringResource(R.string.pocket_bench_title),
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.semantics { heading() },
+        )
+        Text(
+            text = stringResource(R.string.pocket_bench_desc),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Button(
+            onClick = onRun,
+            enabled = !running,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            if (running) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(18.dp),
+                    strokeWidth = 2.dp,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                )
+                Spacer(Modifier.size(8.dp))
+                Text(status ?: stringResource(R.string.bench_quant_running))
+            } else {
+                Text(stringResource(R.string.pocket_bench_run))
+            }
+        }
+        if (error != null) {
+            Text(
+                text = error,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
+        for (r in results) {
+            PocketQuantResultCard(r)
+        }
+    }
+}
+
+@Composable
+private fun PocketQuantResultCard(result: PocketQuantBench.VariantResult) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        ),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(result.label, style = MaterialTheme.typography.titleMedium)
+                Box(modifier = Modifier.weight(1f))
+                if (result.status == "ok") {
+                    Text(
+                        text = stringResource(R.string.pocket_bench_ar_ms, result.arMedianMs),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
+            Text(
+                text = if (result.sizeMb > 0) {
+                    stringResource(R.string.bench_quant_file_size, result.fileName, result.sizeMb)
+                } else {
+                    result.fileName
+                },
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            if (result.status != "ok") {
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = result.status,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (result.status.startsWith("FAILED")) {
+                        MaterialTheme.colorScheme.error
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
+                )
+            } else {
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = stringResource(
+                        R.string.pocket_bench_detail,
+                        result.arP90Ms, result.arSteps, result.condMs,
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Kokoro precision-variant bench. Independent of the engine bench above —
+ * it measures side-loaded ONNX files through ORT directly, so there's no
+ * engine or voice selection. See [KokoroQuantBench] for the side-load paths.
+ */
+@Composable
+private fun KokoroQuantSection(
+    running: Boolean,
+    status: String?,
+    results: List<KokoroQuantBench.VariantResult>,
+    error: String?,
+    onRun: () -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = stringResource(R.string.bench_quant_title),
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.semantics { heading() },
+        )
+        Text(
+            text = stringResource(R.string.bench_quant_desc),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Button(
+            onClick = onRun,
+            enabled = !running,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            if (running) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(18.dp),
+                    strokeWidth = 2.dp,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                )
+                Spacer(Modifier.size(8.dp))
+                Text(status ?: stringResource(R.string.bench_quant_running))
+            } else {
+                Text(stringResource(R.string.bench_quant_run))
+            }
+        }
+        if (error != null) {
+            Text(
+                text = error,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
+        for (r in results) {
+            QuantResultCard(r)
+        }
+    }
+}
+
+@Composable
+private fun QuantResultCard(result: KokoroQuantBench.VariantResult) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        ),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(result.label, style = MaterialTheme.typography.titleMedium)
+                Box(modifier = Modifier.weight(1f))
+                if (result.status == "ok") {
+                    Text(
+                        text = stringResource(R.string.bench_quant_mean_rtf, result.meanRtf),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
+            Text(
+                text = if (result.sizeMb > 0) {
+                    stringResource(R.string.bench_quant_file_size, result.fileName, result.sizeMb)
+                } else {
+                    result.fileName
+                },
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            if (result.status != "ok") {
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = result.status,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (result.status.startsWith("FAILED")) {
+                        MaterialTheme.colorScheme.error
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
+                )
+                return@Column
+            }
+            Spacer(Modifier.height(8.dp))
+            for (t in result.timings) {
+                TimingRow(
+                    label = stringResource(R.string.bench_quant_timing_label, t.textName, t.tokenCount),
+                    value = stringResource(R.string.bench_ms, t.medianMs),
+                    detail = stringResource(R.string.bench_quant_timing_detail, t.audioSeconds, t.rtf),
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Live device-load overlay. Polls [SystemStats] every ~1.5 s while the
+ * benchmark screen is open. The headline figures are free RAM + zram-in-use:
+ * a memory-bandwidth-bound AR loop tanks once the phone starts swapping
+ * weights into zram, so a "slow" benchmark is usually a loaded phone, not
+ * the engine. CPU busy% shows contention from other apps; thermal is mostly
+ * a sanity check (the Tensor G3 rarely throttles at these temps).
+ */
+@Composable
+private fun SystemStatsBar() {
+    val context = LocalContext.current
+    var snap by remember { mutableStateOf<SystemStatsSnapshot?>(null) }
+    LaunchedEffect(Unit) {
+        var prev: SystemStats.CpuCounters? = null
+        while (true) {
+            val (s, counters) = withContext(Dispatchers.IO) { SystemStats.sample(context, prev) }
+            prev = counters
+            snap = s
+            delay(1500)
+        }
+    }
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Text(stringResource(R.string.bench_device_load), style = MaterialTheme.typography.labelLarge)
+            val s = snap
+            if (s == null) {
+                Text(stringResource(R.string.bench_sampling), style = MaterialTheme.typography.bodySmall)
+            } else {
+                // Memory is the figure that usually explains a slow run; flag it
+                // in the error colour when free RAM is low / zram is heavily used.
+                val pressured = s.ramAvailMb in 1..800 || s.zramUsedMb > 500
+                Text(
+                    text = stringResource(
+                        R.string.bench_ram,
+                        s.ramAvailMb,
+                        s.ramTotalMb,
+                        s.zramUsedMb,
+                        s.zramTotalMb,
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (pressured) {
+                        MaterialTheme.colorScheme.error
+                    } else {
+                        MaterialTheme.colorScheme.onSurface
+                    },
+                )
+                Text(
+                    stringResource(R.string.bench_cpu_busy, s.cpuBusyPct),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+                if (s.cores.isNotEmpty()) {
+                    Text(
+                        text = s.cores.joinToString(" ") { "c${it.core}:${it.busyPct}".padEnd(6) },
+                        style = MaterialTheme.typography.bodySmall,
+                        fontFamily = FontFamily.Monospace,
+                    )
+                }
+                val temps = if (s.clusterTemps.isNotEmpty()) {
+                    stringResource(
+                        R.string.bench_thermal_temps,
+                        s.clusterTemps.joinToString(" ") {
+                            "${it.first}=${"%.0f".format(it.second)}°"
+                        },
+                    )
+                } else {
+                    ""
+                }
+                val headroom = s.thermalHeadroom
+                    ?.let { stringResource(R.string.bench_thermal_headroom, "%.2f".format(it)) }
+                    ?: ""
+                Text(
+                    text = stringResource(R.string.bench_thermal, s.thermalStatus, headroom, temps),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun InputSection(
+    text: String,
+    onTextChange: (String) -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = stringResource(R.string.bench_input),
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.semantics { heading() },
+        )
+        OutlinedTextField(
+            value = text,
+            onValueChange = onTextChange,
+            modifier = Modifier.fillMaxWidth(),
+            placeholder = { Text(stringResource(R.string.bench_input_placeholder)) },
+            minLines = 2,
+            maxLines = 5,
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            PresetChip(
+                label = stringResource(R.string.bench_preset_short),
+                onClick = { onTextChange(DEFAULT_TEXT_SHORT) },
+            )
+            PresetChip(
+                label = stringResource(R.string.bench_preset_medium),
+                onClick = { onTextChange(DEFAULT_TEXT_MEDIUM) },
+            )
+            PresetChip(
+                label = stringResource(R.string.bench_preset_long),
+                onClick = { onTextChange(DEFAULT_TEXT_LONG) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun PresetChip(label: String, onClick: () -> Unit) {
+    MarmaladeFilterChip(
+        selected = false,
+        onClick = onClick,
+        label = { Text(label) },
+    )
+}
+
+@Composable
+private fun EngineSelectorSection(
+    profiles: List<EngineProfile>,
+    selectedEngines: Set<String>,
+    onToggle: (String) -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = stringResource(R.string.bench_engines),
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.semantics { heading() },
+        )
+        Text(
+            text = stringResource(R.string.bench_engines_hint),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            for (p in profiles) {
+                val installed = p.engine.isInstalled()
+                MarmaladeFilterChip(
+                    selected = p.engineName in selectedEngines && installed,
+                    onClick = { if (installed) onToggle(p.engineName) },
+                    enabled = installed,
+                    label = {
+                        Text(
+                            if (installed) {
+                                p.displayName
+                            } else {
+                                stringResource(R.string.bench_engine_not_installed, p.displayName)
+                            },
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ResultsSection(results: List<BenchmarkResult>) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text(
+            text = stringResource(R.string.bench_results),
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.semantics { heading() },
+        )
+        for (r in results) {
+            ResultCard(result = r)
+        }
+    }
+}
+
+@Composable
+private fun ResultCard(result: BenchmarkResult) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        ),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = result.engineDisplayName,
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Spacer(Modifier.size(8.dp))
+                Box(modifier = Modifier.weight(1f))
+                if (result.error == null) {
+                    RealtimeRatioBadge(result.realtimeRatio)
+                }
+            }
+
+            if (result.error != null) {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = stringResource(R.string.bench_failed, result.error),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                return@Column
+            }
+
+            // For streaming runs, show TTFA prominently — it's the
+            // headline metric that streaming is meant to improve.
+            if (result.timeToFirstAudioMs != null) {
+                Spacer(Modifier.height(4.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = stringResource(R.string.bench_first_audio, result.timeToFirstAudioMs),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    Spacer(Modifier.size(8.dp))
+                    if (result.chunkCount != null && result.chunkCount > 0) {
+                        Text(
+                            text = pluralStringResource(
+                                R.plurals.bench_chunk_count,
+                                result.chunkCount,
+                                result.chunkCount,
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(8.dp))
+            TimingsTable(result.timings, audioSeconds = result.audioSeconds)
+        }
+    }
+}
+
+@Composable
+private fun RealtimeRatioBadge(ratio: Double) {
+    val color = when {
+        ratio >= 1.5 -> Color(0xFF2E7D32) // green — comfortably faster than realtime
+        ratio >= 1.0 -> Color(0xFFEF6C00) // amber — at-realtime
+        else -> Color(0xFFC62828) // red — slower than realtime
+    }
+    Text(
+        text = stringResource(R.string.bench_realtime_ratio, ratio),
+        color = color,
+        style = MaterialTheme.typography.labelMedium,
+    )
+}
+
+@Composable
+private fun TimingsTable(timings: EnginePhaseTimings, audioSeconds: Double) {
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        if (timings.loadMs > 0) {
+            TimingRow(
+                stringResource(R.string.bench_model_load),
+                stringResource(R.string.bench_ms, timings.loadMs),
+            )
+        }
+        // Header row showing the wall-clock total + audio duration.
+        TimingRow(
+            label = stringResource(R.string.bench_total),
+            value = stringResource(R.string.bench_ms, timings.totalMs),
+            detail = stringResource(R.string.bench_audio_duration, audioSeconds),
+            bold = true,
+        )
+        if (timings.phases.isNotEmpty()) {
+            Spacer(Modifier.height(4.dp))
+            HorizontalDivider()
+            Spacer(Modifier.height(4.dp))
+            for (p in timings.phases) {
+                TimingRow(
+                    label = p.name,
+                    value = stringResource(R.string.bench_ms, p.ms),
+                    detail = p.detail,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun TimingRow(
+    label: String,
+    value: String,
+    detail: String? = null,
+    bold: Boolean = false,
+) {
+    Column {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = label,
+                style = if (bold) {
+                    MaterialTheme.typography.bodyMedium
+                } else {
+                    MaterialTheme.typography.bodySmall
+                },
+                color = if (bold) {
+                    MaterialTheme.colorScheme.onSurface
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                },
+                modifier = Modifier.weight(1f),
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodySmall,
+                fontFamily = FontFamily.Monospace,
+                textAlign = TextAlign.End,
+            )
+        }
+        if (detail != null) {
+            Text(
+                text = detail,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(start = 8.dp, bottom = 2.dp),
+            )
+        }
+    }
+}

@@ -1,0 +1,16 @@
+detector_category,n,TP,TP_OTHER,FP_DETECTOR,FP,precision_strict,precision_lenient
+clickable_icon_not_iconbutton,16,6,0,9,1,0.375,0.375
+color_contrast,10,3,0,0,7,0.3,0.3
+decorative_mislabeled,18,10,0,0,8,0.556,0.556
+error_state_no_semantics,14,0,0,0,14,0.0,0.0
+missing_content_description,20,1,0,1,18,0.05,0.05
+missing_heading_semantics,20,15,0,1,4,0.75,0.75
+missing_interaction_semantics,18,3,0,13,2,0.167,0.167
+missing_merge_descendants,20,2,0,0,18,0.1,0.1
+missing_semantics_role,19,8,5,4,2,0.421,0.684
+missing_state_description,19,1,0,12,6,0.053,0.053
+pointerinput_no_semantics,19,15,0,0,4,0.789,0.789
+progress_no_semantics,19,0,0,0,19,0.0,0.0
+text_truncation_scaling,19,12,0,0,7,0.632,0.632
+textfield_no_label,20,16,0,0,4,0.8,0.8
+touch_target_size,19,1,4,2,12,0.053,0.263

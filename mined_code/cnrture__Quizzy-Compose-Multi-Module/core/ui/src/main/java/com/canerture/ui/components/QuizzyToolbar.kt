@@ -1,0 +1,142 @@
+package com.canerture.ui.components
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.dp
+import com.canerture.core.ui.R
+import com.canerture.ui.theme.QuizAppTheme
+
+@Composable
+fun QuizzyToolbar(
+    testTag: String,
+    title: String? = null,
+    titleSpan: String? = null,
+    titleStyle: TextStyle = QuizAppTheme.typography.heading2,
+    endIcon: ImageVector? = null,
+    onBackClick: (() -> Unit)? = null,
+    onEndIconClick: (() -> Unit)? = null,
+    content: (@Composable () -> Unit)? = null,
+) {
+    Box(
+        modifier = Modifier
+            .testTag(testTag)
+            .fillMaxWidth()
+            .padding(horizontal = 32.dp, vertical = 24.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        onBackClick?.let {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .testTag("$testTag.back")
+                    .size(24.dp)
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) { onBackClick() },
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    modifier = Modifier.size(28.dp),
+                    imageVector = QuizAppTheme.icons.arrowLeft,
+                    tint = QuizAppTheme.colors.onBackground,
+                    contentDescription = stringResource(R.string.back_icon)
+                )
+            }
+        }
+        title?.let {
+            if (titleSpan != null) {
+                QuizzyText(
+                    modifier = Modifier.align(Alignment.CenterStart),
+                    testTag = "$testTag.title",
+                    fullText = title,
+                    spanTexts = listOf(titleSpan),
+                    style = titleStyle,
+                )
+            } else {
+                QuizzyText(
+                    modifier = Modifier.align(Alignment.CenterStart),
+                    testTag = "$testTag.title",
+                    text = title,
+                    style = titleStyle,
+                )
+            }
+        }
+        content?.let {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.Center)
+            ) {
+                content()
+            }
+        }
+        endIcon?.let {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .testTag("$testTag.endIcon")
+                    .size(24.dp)
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) { onEndIconClick?.invoke() },
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    modifier = Modifier.size(28.dp),
+                    imageVector = endIcon,
+                    tint = QuizAppTheme.colors.onBackground,
+                    contentDescription = null
+                )
+            }
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun QuizzyToolbarPreview() {
+    Column {
+        QuizzyToolbar(
+            testTag = "preview.toolbar1",
+            onBackClick = { },
+            endIcon = QuizAppTheme.icons.settings,
+            onEndIconClick = { },
+        )
+        QuizzySpacer(12.dp)
+        QuizzyToolbar(
+            testTag = "preview.toolbar2",
+            title = "Title",
+            endIcon = QuizAppTheme.icons.settings,
+            onEndIconClick = { },
+        )
+        QuizzySpacer(12.dp)
+        QuizzyToolbar(
+            testTag = "preview.toolbar3",
+            title = "Title",
+            content = {
+                Row {
+                    QuizzyText(testTag = "preview.toolbar3.content", text = "Content")
+                }
+            },
+            endIcon = QuizAppTheme.icons.settings,
+            onEndIconClick = { },
+        )
+    }
+}

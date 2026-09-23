@@ -1,0 +1,326 @@
+package com.cvc953.localplayer.ui.screens
+
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.GraphicEq
+import androidx.compose.material.icons.filled.RestartAlt
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.cvc953.localplayer.R
+import com.cvc953.localplayer.ui.components.VerticalSlider
+import com.cvc953.localplayer.ui.theme.LocalExtendedColors
+import com.cvc953.localplayer.viewmodel.EqualizerViewModel
+import kotlin.math.abs
+
+@Suppress("ktlint:standard:function-naming")
+@Composable
+fun EqualizerScreen(
+    viewModel: EqualizerViewModel,
+    onClose: () -> Unit,
+) {
+    val bandCount by viewModel.bandCount.collectAsState()
+    val bandFreqs by viewModel.bandFreqs.collectAsState()
+    val bandLevels by viewModel.bandLevels.collectAsState()
+    val bandLevelRange by viewModel.bandLevelRange.collectAsState()
+    val equalizerPresets by viewModel.equalizerPresets.collectAsState()
+    val userPresets by viewModel.userPresets.collectAsState()
+    val selectedPreset by viewModel.selectedPresetIndex.collectAsState()
+    val selectedPresetName by viewModel.selectedPresetName.collectAsState()
+
+    var expandedPresets by remember { mutableStateOf(false) }
+
+    val combinedPresets =
+        remember(equalizerPresets, userPresets) {
+            val systemPresets = equalizerPresets.map { it to false }
+            val customPresets = userPresets.map { it.first to true }
+            systemPresets + customPresets
+        }
+
+    BackHandler(onBack = onClose)
+
+    Surface(
+        modifier = Modifier.Companion.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background,
+    ) {
+        val scrollState = rememberScrollState()
+        Column(
+            modifier =
+                Modifier.Companion
+                    .fillMaxSize()
+                    .statusBarsPadding()
+                    .navigationBarsPadding()
+                    .verticalScroll(scrollState)
+                    .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            Row(
+                modifier = Modifier.Companion.fillMaxWidth(),
+                verticalAlignment = Alignment.Companion.CenterVertically,
+            ) {
+                Column(modifier = Modifier.Companion.weight(1f)) {
+                    Text(
+                        stringResource(R.string.equalizer_title),
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.Companion.Bold,
+                    )
+                    Text(
+                        stringResource(R.string.equalizer_subtitle),
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.68f),
+                        fontSize = 13.sp,
+                    )
+                }
+                IconButton(onClick = onClose) {
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = stringResource(R.string.action_close),
+                        tint = MaterialTheme.colorScheme.onBackground,
+                    )
+                }
+            }
+
+            EqualizerSectionCard(
+                title = stringResource(R.string.equalizer_section_presets_title),
+                subtitle = stringResource(R.string.equalizer_section_presets_subtitle),
+            ) {
+                if (combinedPresets.isEmpty()) {
+                    Text(
+                        stringResource(R.string.no_presets_available),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 13.sp,
+                    )
+                } else {
+                    Row(
+                        modifier = Modifier.Companion.fillMaxWidth(),
+                        verticalAlignment = Alignment.Companion.CenterVertically,
+                    ) {
+                        Column(modifier = Modifier.Companion.weight(1f)) {
+                            Text(stringResource(R.string.preset_activo), color = MaterialTheme.colorScheme.onSurface)
+                            Text(
+                                text =
+                                    selectedPresetName
+                                        ?: if (selectedPreset in equalizerPresets.indices) {
+                                            equalizerPresets[selectedPreset]
+                                        } else {
+                                            stringResource(R.string.select_option)
+                                        },
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontSize = 12.sp,
+                            )
+                        }
+                        OutlinedButton(onClick = { expandedPresets = true }) {
+                            Icon(Icons.Default.GraphicEq, contentDescription = null)
+                            Spacer(modifier = Modifier.Companion.width(8.dp))
+                            Text(stringResource(R.string.cambiar))
+                        }
+                        DropdownMenu(
+                            expanded = expandedPresets,
+                            onDismissRequest = { expandedPresets = false },
+                            shape = RoundedCornerShape(14.dp),
+                            containerColor = MaterialTheme.colorScheme.surface,
+                        ) {
+                            combinedPresets.forEachIndexed { index, (name, isUserPreset) ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(
+                                            text = if (isUserPreset) "$name${stringResource(R.string.user_suffix)}" else name,
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                        )
+                                    },
+                                    onClick = {
+                                        if (isUserPreset) {
+                                            viewModel.applyUserPreset(name)
+                                        } else {
+                                            viewModel.setEqualizerPreset(index)
+                                        }
+                                        expandedPresets = false
+                                    },
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            EqualizerSectionCard(
+                title = stringResource(R.string.equalizer_section_bands_title),
+                subtitle = stringResource(R.string.equalizer_section_bands_subtitle),
+            ) {
+                if (bandCount > 0) {
+                    Row(
+                        modifier = Modifier.Companion.fillMaxWidth().height(300.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.Companion.CenterVertically,
+                    ) {
+                        for (i in 0 until bandCount) {
+                            val freq = if (i < bandFreqs.size) bandFreqs[i] / 1000 else 0
+                            val level = if (i < bandLevels.size) bandLevels[i] else 0
+                            BandSliderCard(
+                                modifier = Modifier.Companion.weight(1f),
+                                label = "${formatWithK(freq)}Hz",
+                                initialLevel = level,
+                                range = bandLevelRange,
+                                onLevelChange = { viewModel.setBandLevel(i, it) },
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.Companion.height(10.dp))
+                    FilledTonalButton(
+                        modifier = Modifier.Companion.fillMaxWidth(),
+                        onClick = { viewModel.resetBandLevels() },
+                    ) {
+                        Icon(Icons.Default.RestartAlt, contentDescription = null)
+                        Spacer(modifier = Modifier.Companion.width(8.dp))
+                        Text(stringResource(R.string.resetear_bandas))
+                    }
+                } else {
+                    Text(
+                        stringResource(R.string.no_equalizer_available),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 13.sp,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun EqualizerSectionCard(
+    title: String,
+    subtitle: String,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    ElevatedCard(
+        modifier = Modifier.Companion.fillMaxWidth(),
+        colors = CardDefaults.elevatedCardColors(containerColor = LocalExtendedColors.current.surfaceSheet),
+    ) {
+        Column(
+            modifier = Modifier.Companion.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
+            Text(
+                title,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Companion.SemiBold,
+            )
+            Text(subtitle, color = LocalExtendedColors.current.textSecondary, fontSize = 12.sp)
+            Spacer(modifier = Modifier.Companion.height(12.dp))
+            content()
+        }
+    }
+}
+
+@Composable
+private fun BandSliderCard(
+    modifier: Modifier = Modifier.Companion,
+    label: String,
+    initialLevel: Int,
+    range: Pair<Int, Int>,
+    onLevelChange: (Int) -> Unit,
+) {
+    var sliderPos by remember { mutableStateOf(initialLevel.toFloat()) }
+
+    LaunchedEffect(initialLevel) {
+        sliderPos = initialLevel.toFloat()
+    }
+
+    ElevatedCard(
+        modifier = modifier,
+        colors = CardDefaults.elevatedCardColors(containerColor = LocalExtendedColors.current.surfaceSheet),
+    ) {
+        Column(
+            modifier = Modifier.Companion.padding(horizontal = 8.dp, vertical = 10.dp),
+            horizontalAlignment = Alignment.Companion.CenterHorizontally,
+        ) {
+            Text(label, color = MaterialTheme.colorScheme.onSurface, fontSize = 11.sp)
+            Spacer(modifier = Modifier.Companion.height(8.dp))
+            Box(
+                modifier = Modifier.Companion.height(208.dp),
+                contentAlignment = Alignment.Companion.Center,
+            ) {
+                VerticalSlider(
+                    value = sliderPos,
+                    onValueChange = {
+                        sliderPos = it
+                        onLevelChange(it.toInt())
+                    },
+                    valueRange = range.first.toFloat()..range.second.toFloat(),
+                    modifier = Modifier.Companion.fillMaxHeight().width(60.dp),
+                    trackWidth = 2.dp,
+                    thumbRadius = 9.dp,
+                    activeColor = MaterialTheme.colorScheme.primary,
+                    inactiveColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f),
+                    backgroundColor = Color.Companion.Transparent,
+                )
+            }
+            Spacer(modifier = Modifier.Companion.height(8.dp))
+            Text(
+                formatWithK(sliderPos.toInt()),
+                color = MaterialTheme.colorScheme.onSurface,
+                fontSize = 11.sp,
+            )
+            Text(stringResource(R.string.mb), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 10.sp)
+        }
+    }
+}
+
+private fun formatWithK(n: Int): String {
+    val sign = if (n < 0) "-" else ""
+    val absn = abs(n)
+    return if (absn >= 1000) {
+        val whole = absn / 1000
+        val rem = absn % 1000
+        if (rem == 0) {
+            "${sign}${whole}k"
+        } else {
+            val decimal = rem / 100
+            "${sign}$whole.${decimal}k"
+        }
+    } else {
+        "${sign}$absn"
+    }
+}

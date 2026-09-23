@@ -1,0 +1,323 @@
+package app.hypostats.ui.hypo
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedIconButton
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import app.hypostats.R
+import app.hypostats.ui.model.CarbIcon
+import app.hypostats.ui.model.HypoUiState
+import kotlinx.coroutines.launch
+
+@Composable
+fun HypoScreen(
+    viewModel: HypoViewModel = hiltViewModel(),
+    snackbarHostState: SnackbarHostState,
+) {
+    val context = LocalContext.current
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
+
+    HypoScreenContent(
+        state = state,
+        onEvent = { event ->
+            when (event) {
+                HypoEvent.AddCarbs -> viewModel.addCarbs()
+                HypoEvent.AddOffset -> viewModel.addOffset()
+                HypoEvent.Reset -> viewModel.resetTreatment()
+                HypoEvent.Submit -> {
+                    viewModel.saveTreatment()
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            message = context.getString(R.string.treatment_saved),
+                            duration = SnackbarDuration.Short,
+                        )
+                    }
+                }
+            }
+        },
+    )
+}
+
+@Composable
+private fun CarbsDisplay(carbs: Int) {
+    Text(
+        text = stringResource(R.string.carbs, carbs),
+        fontSize = 24.sp,
+        modifier = Modifier.padding(bottom = 32.dp),
+    )
+}
+
+@Composable
+private fun AddCarbsButton(
+    carbIcon: CarbIcon,
+    onAddCarbs: () -> Unit,
+) {
+    FloatingActionButton(
+        onClick = onAddCarbs,
+        modifier = Modifier.size(210.dp).padding(bottom = 32.dp),
+    ) {
+        Icon(
+            painter = getIconResource(carbIcon),
+            contentDescription = stringResource(R.string.add_carbs),
+            modifier = Modifier.size(140.dp),
+        )
+    }
+}
+
+@Composable
+private fun OffsetControls(
+    currentOffset: Int,
+    onAddOffset: () -> Unit,
+    onHelpClick: () -> Unit,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+        modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp),
+    ) {
+        Text(
+            text = stringResource(R.string.offset),
+            fontSize = 18.sp,
+        )
+
+        OutlinedIconButton(
+            onClick = onAddOffset,
+            modifier = Modifier.size(40.dp),
+        ) {
+            Text(
+                text = "−",
+                fontSize = 24.sp,
+            )
+        }
+
+        Text(
+            text = stringResource(R.string.offset_minutes, currentOffset),
+            fontSize = 18.sp,
+        )
+
+        IconButton(
+            onClick = onHelpClick,
+            modifier = Modifier.size(24.dp),
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.help_24),
+                contentDescription = stringResource(R.string.offset_help_title),
+            )
+        }
+    }
+}
+
+@Composable
+private fun ActionButtons(
+    currentCarbs: Int,
+    onReset: () -> Unit,
+    onSubmit: () -> Unit,
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        Button(onClick = onReset) {
+            Text(stringResource(R.string.reset))
+        }
+
+        Button(
+            onClick = onSubmit,
+            enabled = currentCarbs > 0,
+        ) {
+            Text(stringResource(R.string.submit_treatment))
+        }
+    }
+}
+
+@Composable
+private fun HypoScreenContent(
+    state: HypoUiState,
+    onEvent: (HypoEvent) -> Unit,
+) {
+    val scrollState = rememberScrollState()
+
+    var showHelpDialog by rememberSaveable { mutableStateOf(false) }
+    val showHelp = { showHelpDialog = true }
+    val dismissHelp = { showHelpDialog = false }
+
+    var showOffsetHelpDialog by rememberSaveable { mutableStateOf(false) }
+    val showOffsetHelp = { showOffsetHelpDialog = true }
+    val dismissOffsetHelp = { showOffsetHelpDialog = false }
+
+    if (showHelpDialog) {
+        HelpDialog(onDismiss = dismissHelp)
+    }
+
+    if (showOffsetHelpDialog) {
+        OffsetHelpDialog(onDismiss = dismissOffsetHelp)
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier.fillMaxSize().verticalScroll(scrollState).padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            CarbsDisplay(state.carbs)
+            AddCarbsButton(
+                carbIcon = state.carbIcon,
+                onAddCarbs = { onEvent(HypoEvent.AddCarbs) },
+            )
+            OffsetControls(
+                currentOffset = state.offsetMinutes,
+                onAddOffset = { onEvent(HypoEvent.AddOffset) },
+                onHelpClick = showOffsetHelp,
+            )
+            ActionButtons(
+                currentCarbs = state.carbs,
+                onReset = { onEvent(HypoEvent.Reset) },
+                onSubmit = { onEvent(HypoEvent.Submit) },
+            )
+        }
+
+        IconButton(
+            onClick = showHelp,
+            modifier = Modifier.align(Alignment.TopEnd).padding(16.dp),
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.help_24),
+                contentDescription = stringResource(R.string.help_title),
+            )
+        }
+    }
+}
+
+@Composable
+private fun HelpDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.help_title)) },
+        text = { Text(stringResource(R.string.help_message)) },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.help_ok))
+            }
+        },
+    )
+}
+
+@Composable
+private fun OffsetHelpDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.offset_help_title)) },
+        text = { Text(stringResource(R.string.offset_help_message)) },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.help_ok))
+            }
+        },
+    )
+}
+
+@Composable
+private fun getIconResource(carbIcon: CarbIcon): Painter =
+    when (carbIcon) {
+        CarbIcon.SUGAR -> painterResource(R.drawable.sugar)
+        CarbIcon.COLA -> painterResource(R.drawable.cola)
+        CarbIcon.CANDIES -> painterResource(R.drawable.candies)
+    }
+
+@Preview(name = "Portrait")
+@Preview(name = "Landscape", widthDp = 800, heightDp = 300)
+@Composable
+private fun HypoScreenPreview() {
+    MaterialTheme {
+        HypoScreenContent(
+            HypoUiState(),
+            onEvent = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun CarbsDisplayPreview() {
+    MaterialTheme {
+        CarbsDisplay(carbs = 15)
+    }
+}
+
+@Preview
+@Composable
+private fun OffsetControlsPreview() {
+    MaterialTheme {
+        OffsetControls(
+            currentOffset = 30,
+            onAddOffset = { },
+            onHelpClick = { },
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ActionButtonsEnabledPreview() {
+    MaterialTheme {
+        ActionButtons(
+            currentCarbs = 15,
+            onReset = { },
+            onSubmit = { },
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ActionButtonsDisabledPreview() {
+    MaterialTheme {
+        ActionButtons(
+            currentCarbs = 0,
+            onReset = { },
+            onSubmit = { },
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun HelpDialogPreview() {
+    MaterialTheme {
+        HelpDialog(onDismiss = {})
+    }
+}

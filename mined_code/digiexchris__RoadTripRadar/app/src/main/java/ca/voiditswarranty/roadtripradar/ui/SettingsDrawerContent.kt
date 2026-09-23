@@ -1,0 +1,222 @@
+package ca.voiditswarranty.roadtripradar.ui
+
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.core.os.LocaleListCompat
+import ca.voiditswarranty.roadtripradar.R
+import java.util.Locale
+
+@Composable
+fun SettingsDrawerContent(
+    useGps: Boolean,
+    gpsIconOpacity: Float,
+    onGpsIconOpacityChange: (Float) -> Unit,
+    onGpsIconOpacityCommit: () -> Unit,
+    speedSize: Float,
+    onSpeedSizeChange: (Float) -> Unit,
+    onSpeedSizeCommit: () -> Unit,
+    compassWidgetSize: Float,
+    onCompassWidgetSizeChange: (Float) -> Unit,
+    onCompassWidgetSizeCommit: () -> Unit,
+    navWidgetSize: Float,
+    onNavWidgetSizeChange: (Float) -> Unit,
+    onNavWidgetSizeCommit: () -> Unit,
+    keepScreenOn: Boolean,
+    onKeepScreenOnChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(20.dp),
+    ) {
+        Text(stringResource(R.string.settings_display), style = MaterialTheme.typography.titleMedium)
+
+        if (useGps) {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(stringResource(R.string.settings_status_icon_opacity), style = MaterialTheme.typography.titleSmall)
+                    Text(
+                        "${(gpsIconOpacity * 100).toInt()}%",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+                GloveFriendlySlider(
+                    value = gpsIconOpacity,
+                    onValueChange = onGpsIconOpacityChange,
+                    onValueChangeFinished = onGpsIconOpacityCommit,
+                    valueRange = 0f..1f,
+                )
+            }
+        }
+
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(stringResource(R.string.settings_speedometer_size), style = MaterialTheme.typography.titleSmall)
+            GloveFriendlySlider(
+                value = speedSize,
+                onValueChange = onSpeedSizeChange,
+                onValueChangeFinished = onSpeedSizeCommit,
+                valueRange = 24f..96f,
+            )
+        }
+
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(stringResource(R.string.settings_compass_size), style = MaterialTheme.typography.titleSmall)
+            GloveFriendlySlider(
+                value = compassWidgetSize,
+                onValueChange = onCompassWidgetSizeChange,
+                onValueChangeFinished = onCompassWidgetSizeCommit,
+                valueRange = 24f..96f,
+            )
+        }
+
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(stringResource(R.string.settings_nav_widget_size), style = MaterialTheme.typography.titleSmall)
+            GloveFriendlySlider(
+                value = navWidgetSize,
+                onValueChange = onNavWidgetSizeChange,
+                onValueChangeFinished = onNavWidgetSizeCommit,
+                valueRange = 24f..96f,
+            )
+        }
+
+        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
+        Text(stringResource(R.string.settings_misc), style = MaterialTheme.typography.titleMedium)
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(stringResource(R.string.settings_keep_screen_on), style = MaterialTheme.typography.titleSmall)
+            Switch(
+                checked = keepScreenOn,
+                onCheckedChange = onKeepScreenOnChange,
+            )
+        }
+
+        LanguagePicker()
+    }
+}
+
+private data class LanguageOption(val tag: String?, val label: String)
+
+/**
+ * Parses locales_config.xml to discover supported locales and shows
+ * each in its own native display name. Automatically picks up new
+ * languages without code changes.
+ */
+@Composable
+private fun LanguagePicker() {
+    val context = LocalContext.current
+    val options = remember {
+        val list = mutableListOf(LanguageOption(null, ""))
+        try {
+            val parser = context.resources.getXml(R.xml.locales_config)
+            while (parser.next() != org.xmlpull.v1.XmlPullParser.END_DOCUMENT) {
+                if (parser.eventType == org.xmlpull.v1.XmlPullParser.START_TAG && parser.name == "locale") {
+                    val tag = parser.getAttributeValue(
+                        "http://schemas.android.com/apk/res/android", "name"
+                    )
+                    if (tag != null) {
+                        val locale = Locale.forLanguageTag(tag)
+                        val native = locale.getDisplayName(locale)
+                            .replaceFirstChar { it.uppercase(locale) }
+                        list.add(LanguageOption(tag, native))
+                    }
+                }
+            }
+            parser.close()
+        } catch (_: Exception) { /* fall back to System Default only */ }
+        list
+    }
+
+    // Patch the "System Default" label (requires composable context for stringResource)
+    val systemLabel = stringResource(R.string.language_system_default)
+    val patchedOptions = remember(systemLabel) {
+        options.toMutableList().also { it[0] = it[0].copy(label = systemLabel) }
+    }
+
+    val currentLocales = AppCompatDelegate.getApplicationLocales()
+    val currentTag = if (currentLocales.isEmpty) null else currentLocales.toLanguageTags()
+    val currentLabel = patchedOptions.firstOrNull { it.tag == currentTag }?.label
+        ?: patchedOptions.first().label
+
+    var showDialog by remember { mutableStateOf(false) }
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(stringResource(R.string.settings_language), style = MaterialTheme.typography.titleSmall)
+        TextButton(onClick = { showDialog = true }) {
+            Text(currentLabel)
+        }
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text(stringResource(R.string.settings_language)) },
+            text = {
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    patchedOptions.forEach { option ->
+                        TextButton(
+                            onClick = {
+                                val locales = if (option.tag == null) {
+                                    LocaleListCompat.getEmptyLocaleList()
+                                } else {
+                                    LocaleListCompat.forLanguageTags(option.tag)
+                                }
+                                AppCompatDelegate.setApplicationLocales(locales)
+                                showDialog = false
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text(
+                                option.label,
+                                color = if (option.tag == currentTag) {
+                                    MaterialTheme.colorScheme.primary
+                                } else {
+                                    MaterialTheme.colorScheme.onSurface
+                                },
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            },
+        )
+    }
+}

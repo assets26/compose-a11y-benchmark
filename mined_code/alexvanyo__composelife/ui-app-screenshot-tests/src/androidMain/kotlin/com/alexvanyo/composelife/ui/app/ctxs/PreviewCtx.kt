@@ -1,0 +1,133 @@
+/*
+ * Copyright 2022 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.alexvanyo.composelife.ui.app.ctxs
+
+import android.content.Context
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivity
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.platform.WindowInfo
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.work.ListenableWorker
+import androidx.work.WorkerParameters
+import com.alexvanyo.composelife.preferences.di.ComposeLifePreferencesProvider
+import com.alexvanyo.composelife.random.TestRandom
+import com.alexvanyo.composelife.scopes.ApplicationGraph
+import com.alexvanyo.composelife.scopes.ApplicationGraphArguments
+import com.alexvanyo.composelife.scopes.GlobalScope
+import com.alexvanyo.composelife.scopes.UiGraph
+import com.alexvanyo.composelife.scopes.UiGraphArguments
+import com.alexvanyo.composelife.scopes.UiScope
+import com.alexvanyo.composelife.ui.app.CellUniversePane
+import com.alexvanyo.composelife.ui.app.ComposeLifeAppUi
+import com.alexvanyo.composelife.ui.app.UiWithLoadedPreferencesScope
+import com.alexvanyo.composelife.ui.app.UiWithLoadedPreferencesScopeBindings
+import com.alexvanyo.composelife.ui.app.action.ClipboardCellStatePreview
+import com.alexvanyo.composelife.ui.app.action.InlineEditPane
+import com.alexvanyo.composelife.ui.app.component.GameOfLifeProgressIndicator
+import com.alexvanyo.composelife.ui.settings.SettingUi
+import com.alexvanyo.composelife.updatable.Updatable
+import dev.zacsweers.metro.AppScope
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.DependencyGraph
+import dev.zacsweers.metro.ForScope
+import dev.zacsweers.metro.createGraph
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlin.reflect.KClass
+
+@ContributesTo(AppScope::class)
+internal interface AppPreviewCtx {
+    @ForScope(AppScope::class)
+    val appUpdatables: Set<Updatable>
+
+    val workerFactories:
+        Map<KClass<out ListenableWorker>, @JvmSuppressWildcards (Context, WorkerParameters) -> ListenableWorker>
+}
+
+/**
+ * The full super-interface implementing all entry points for rendering
+ * previews in this module.
+ */
+@ContributesTo(UiScope::class)
+internal interface PreviewCtx : ComposeLifePreferencesProvider {
+    val cellUniversePane: CellUniversePane
+    val composeLifeAppUi: ComposeLifeAppUi
+    val clipboardCellStatePreview: ClipboardCellStatePreview
+    val gameOfLifeProgressIndicator: GameOfLifeProgressIndicator
+    val inlineEditPane: InlineEditPane
+    val settingUi: SettingUi
+    val testRandom: TestRandom
+
+    @ForScope(UiScope::class)
+    val uiUpdatables: Set<Updatable>
+}
+
+@DependencyGraph(GlobalScope::class)
+interface PreviewGlobalGraph
+
+@ContributesTo(UiWithLoadedPreferencesScope::class, replaces = [UiWithLoadedPreferencesScopeBindings::class])
+@BindingContainer
+interface TestLoadedComposeLifePreferencesHolderBindings
+
+/**
+ * Provides preview-appropriate bindings for the dependency graph.
+ */
+@Suppress("LongParameterList")
+@Composable
+internal fun WithPreviewDependencies(content: @Composable context(PreviewCtx) () -> Unit) {
+    val previewGraph = createGraph<PreviewGlobalGraph>()
+    val context = LocalContext.current
+    val applicationGraph = remember {
+        (previewGraph as ApplicationGraph.Factory).create(
+            object : ApplicationGraphArguments {
+                override val applicationContext: Context = context.applicationContext
+            },
+        )
+    }
+    val appCtx = applicationGraph as AppPreviewCtx
+    val activity = LocalActivity.current
+    val windowInfo = LocalWindowInfo.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val uiGraph = remember(context, activity, windowInfo) {
+        (applicationGraph as UiGraph.Factory).create(
+            object : UiGraphArguments {
+                override val uiContext: Context = context
+                override val activity: ComponentActivity? = activity as? ComponentActivity
+                override val windowInfo: WindowInfo = windowInfo
+                override val uiLifecycleOwner: LifecycleOwner = lifecycleOwner
+            },
+        )
+    }
+    val ctx = uiGraph as PreviewCtx
+
+    LaunchedEffect(ctx) {
+        coroutineScope {
+            (appCtx.appUpdatables + ctx.uiUpdatables).forEach {
+                launch { it.update() }
+            }
+        }
+    }
+
+    content(ctx)
+}

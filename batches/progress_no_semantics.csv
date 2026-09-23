@@ -1,0 +1,1928 @@
+item_id,category,repo,file,composable,evidence,snippet,verdict,notes,abs_path,resolve_method,file_found,decl_line,decl_name,decl_confidence,anchor_line,anchor_pattern,anchor_scope,anchor_text,anchor_found,context,imports
+pilot-0221,progress_no_semantics,itsluminous__ClearSMS,itsluminous__ClearSMS/app/src/main/kotlin/app/clearsms/ui/inbox/InboxScreen.kt,SortingProgressBanner,LinearProgressIndicator without progressSemantics," */
+@Composable
+private fun SortingProgressBanner(
+    banner: SortingBanner,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.secondaryContainer,
+        modifier = modifier.fillMaxWidth(),
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+            Text(
+                text = stringResource(R.string.inbox_sorting_banner),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/itsluminous__ClearSMS/app/src/main/kotlin/app/clearsms/ui/inbox/InboxScreen.kt,exact,True,593,SortingProgressBanner,1.0,610.0,ProgressIndicator,body,LinearProgressIndicator(,True,"  593 | private fun SortingProgressBanner(
+  594 |     banner: SortingBanner,
+  595 |     modifier: Modifier = Modifier,
+  596 | ) {
+  597 |     Surface(
+  598 |         shape = MaterialTheme.shapes.medium,
+  599 |         color = MaterialTheme.colorScheme.secondaryContainer,
+  600 |         modifier = modifier.fillMaxWidth(),
+  601 |     ) {
+  602 |         Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+  603 |             Text(
+  604 |                 text = stringResource(R.string.inbox_sorting_banner),
+  605 |                 style = MaterialTheme.typography.bodyMedium,
+  606 |                 color = MaterialTheme.colorScheme.onSecondaryContainer,
+  607 |             )
+  608 |             Spacer(Modifier.height(8.dp))
+  609 |             if (banner.total > 0) {
+  610 |                 LinearProgressIndicator(
+  611 |                     progress = { banner.processed.toFloat() / banner.total },
+  612 |                     modifier = Modifier.fillMaxWidth(),
+  613 |                 )
+  614 |             } else {
+  615 |                 LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+  616 |             }
+  617 |         }
+  618 |     }
+  619 | }
+  620 | 
+  621 | /**
+  622 |  * Right-aligned ""Unread"" view-mode switch shown above the pill row. A labeled
+  623 |  * [Switch] (not a [FilterChip]) so it reads as a mode toggle that composes
+  624 |  * with the pills, rather than one more mutually-exclusive category; the label
+  625 |  * carries the total unread count the old pill's badge used to show. Labeled,
+  626 |  * so it needs no long-press tooltip.
+  627 |  */
+  628 | @Composable
+  629 | private fun UnreadToggleRow(
+  630 |     unreadOnly: Boolean,
+  631 |     totalUnread: Int,
+  632 |     onToggleUnread: () -> Unit,
+  633 | ) {
+  634 |     Row(
+  635 |         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+  636 |         horizontalArrangement = Arrangement.End,
+  637 |     ) {
+  638 |         Row(
+  639 |             // One semantics node (Switch's own onCheckedChange is null below):
+  640 |             // TalkBack reads ""Unread · N, switch, on/off"" as a single control.
+  641 |             modifier =
+  642 |                 Modifier.toggleable(
+  643 |                     value = unreadOnly,
+  644 |                     role = Role.Switch,
+  645 |                     onValueChange = { onToggleUnread() },
+  646 |                 ),
+  647 |             verticalAlignment = Alignment.CenterVertically,
+  648 |             horizontalArrangement = Arrangement.spacedBy(8.dp),
+  649 |         ) {
+  650 |             Text(","import android.Manifest
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.material.icons.outlined.Archive
+import androidx.compose.material.icons.outlined.Block
+import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Contacts
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Inbox
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.MarkEmailRead
+import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.PushPin
+import androidx.compose.material.icons.outlined.SelectAll
+import androidx.compose.material3.Badge
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
+import app.clearsms.R
+import app.clearsms.domain.model.Category
+import app.clearsms.domain.model.SwipeAction
+import app.clearsms.mms.MmsSnippet
+import app.clearsms.sms.DefaultSmsAppHelper
+import app.clearsms.ui.common.UndoUiEvent
+import app.clearsms.ui.components.AvatarDefaults
+import app.clearsms.ui.components.CategoryBadge
+import app.clearsms.ui.components.DeleteConfirmationDialog
+import app.clearsms.ui.components.EmptyState
+import app.clearsms.ui.components.OtpBanner
+import app.clearsms.ui.components.SelectionState
+import app.clearsms.ui.components.SenderAvatar
+import app.clearsms.ui.components.SwipeDismissSnackbarHost
+import app.clearsms.ui.components.SwipeableMessageItem
+import app.clearsms.ui.components.TooltipIconButton
+import app.clearsms.ui.components.displayName
+import app.clearsms.ui.navigation.SearchSettingsActions
+import app.clearsms.ui.navigation.orderedPills
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import kotlinx.coroutines.launch"
+pilot-0222,progress_no_semantics,nikbulavin__flick,nikbulavin__flick/core/ui/src/main/kotlin/ru/resodostudio/flick/core/ui/UiState.kt,LoadingState,CircularProgressIndicator without progressSemantics,"
+@Composable
+fun LoadingState() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+fun EmptyState(message: String?, animationId: Int) {
+
+    val lottieComposition by rememberLottieComposition(LottieCompositionSpec.RawRes(animationId))
+    val progress by animateLottieCompositionAsState(",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/nikbulavin__flick/core/ui/src/main/kotlin/ru/resodostudio/flick/core/ui/UiState.kt,exact,True,27,LoadingState,1.0,32.0,ProgressIndicator,body,CircularProgressIndicator(),True,"   20 | import com.airbnb.lottie.compose.LottieAnimation
+   21 | import com.airbnb.lottie.compose.LottieCompositionSpec
+   22 | import com.airbnb.lottie.compose.LottieConstants
+   23 | import com.airbnb.lottie.compose.animateLottieCompositionAsState
+   24 | import com.airbnb.lottie.compose.rememberLottieComposition
+   25 | 
+   26 | @Composable
+   27 | fun LoadingState() {
+   28 |     Box(
+   29 |         modifier = Modifier.fillMaxSize(),
+   30 |         contentAlignment = Alignment.Center
+   31 |     ) {
+   32 |         CircularProgressIndicator()
+   33 |     }
+   34 | }
+   35 | 
+   36 | @Composable
+   37 | fun EmptyState(message: String?, animationId: Int) {
+   38 | 
+   39 |     val lottieComposition by rememberLottieComposition(LottieCompositionSpec.RawRes(animationId))
+   40 |     val progress by animateLottieCompositionAsState(
+   41 |         composition = lottieComposition,
+   42 |         iterations = LottieConstants.IterateForever
+   43 |     )
+   44 | 
+   45 |     Box(
+   46 |         modifier = Modifier
+   47 |             .padding(PaddingValues(16.dp))
+   48 |             .fillMaxSize(),
+   49 |         contentAlignment = Alignment.Center
+   50 |     ) {
+   51 |         Column(
+   52 |             modifier = Modifier.fillMaxSize(),
+   53 |             horizontalAlignment = Alignment.CenterHorizontally,
+   54 |             verticalArrangement = Arrangement.Center
+   55 |         ) {
+   56 |             LottieAnimation(
+   57 |                 modifier = Modifier.size(200.dp),
+   58 |                 composition = lottieComposition,
+   59 |                 progress = { progress }
+   60 |             )
+   61 |             Text(
+   62 |                 text = message.toString(),
+   63 |                 maxLines = 4,
+   64 |                 style = MaterialTheme.typography.bodyMedium,
+   65 |                 textAlign = TextAlign.Center,
+   66 |                 overflow = TextOverflow.Ellipsis
+   67 |             )
+   68 |         }
+   69 |     }
+   70 | }","import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition"
+pilot-0223,progress_no_semantics,yassineAbou__Clock,yassineAbou__Clock/app/src/main/java/com/yassineabou/clock/util/components/BackgroundIndicator.kt,BackgroundIndicator,CircularProgressIndicator without progressSemantics,"
+@Composable
+fun BackgroundIndicator(
+    /*@FloatRange(from = 0.0, to = 1.0)*/
+    progress: Float,
+    modifier: Modifier = Modifier,
+    foregroundColor: Color = MaterialTheme.colorScheme.primary,
+    backgroundColor: Color = MaterialTheme.colorScheme.primary.copy(alpha = PrimaryLightAlpha),
+    strokeWidth: Dp = ProgressIndicatorDefaults.StrokeWidth,
+) {
+    Box(modifier) {
+        CircularProgressIndicator(
+            progress = progress,
+            modifier = Modifier.fillMaxSize(),
+            color = foregroundColor,
+            strokeWidth = strokeWidth,",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/yassineAbou__Clock/app/src/main/java/com/yassineabou/clock/util/components/BackgroundIndicator.kt,exact,True,18,BackgroundIndicator,1.0,24.0,ProgressIndicator,body,"strokeWidth: Dp = ProgressIndicatorDefaults.StrokeWidth,",True,"   12 | import androidx.compose.ui.tooling.preview.Preview
+   13 | import androidx.compose.ui.unit.Dp
+   14 | import com.yassineabou.clock.ui.theme.ClockTheme
+   15 | import com.yassineabou.clock.ui.theme.PrimaryLightAlpha
+   16 | 
+   17 | @Composable
+   18 | fun BackgroundIndicator(
+   19 |     /*@FloatRange(from = 0.0, to = 1.0)*/
+   20 |     progress: Float,
+   21 |     modifier: Modifier = Modifier,
+   22 |     foregroundColor: Color = MaterialTheme.colorScheme.primary,
+   23 |     backgroundColor: Color = MaterialTheme.colorScheme.primary.copy(alpha = PrimaryLightAlpha),
+   24 |     strokeWidth: Dp = ProgressIndicatorDefaults.StrokeWidth,
+   25 | ) {
+   26 |     Box(modifier) {
+   27 |         CircularProgressIndicator(
+   28 |             progress = progress,
+   29 |             modifier = Modifier.fillMaxSize(),
+   30 |             color = foregroundColor,
+   31 |             strokeWidth = strokeWidth,
+   32 |         )
+   33 |         CircularProgressIndicator(
+   34 |             progress = 1f,
+   35 |             modifier = Modifier.fillMaxSize(),
+   36 |             color = backgroundColor,
+   37 |             strokeWidth = strokeWidth,
+   38 |         )
+   39 |     }
+   40 | }
+   41 | 
+   42 | @Preview(
+   43 |     name = ""Light mode"",
+   44 |     uiMode = Configuration.UI_MODE_NIGHT_NO,
+   45 | )
+   46 | @Preview(
+   47 |     name = ""Dark mode"",
+   48 |     uiMode = Configuration.UI_MODE_NIGHT_YES,
+   49 | )
+   50 | @Composable
+   51 | private fun ScreenContentPreview() {
+   52 |     ClockTheme {
+   53 |         Surface {
+   54 |             BackgroundIndicator(progress = .6f)
+   55 |         }
+   56 |     }
+   57 | }","import android.content.res.Configuration
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.ProgressIndicatorDefaults
+import androidx.compose.material.Surface
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import com.yassineabou.clock.ui.theme.ClockTheme
+import com.yassineabou.clock.ui.theme.PrimaryLightAlpha"
+pilot-0224,progress_no_semantics,RisorseArtificiali__anti-vocale,RisorseArtificiali__anti-vocale/app/src/main/java/com/antivocale/app/ui/dialogs/AddAppPreferenceDialog.kt,AddAppPreferenceDialog,CircularProgressIndicator without progressSemantics,"@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddAppPreferenceDialog(
+    onDismiss: () -> Unit,
+    onAppSelected: (String, String) -> Unit
+) {
+    val context = LocalContext.current
+    var searchQuery by remember { mutableStateOf("""") }
+    var installedApps by remember { mutableStateOf<List<AppInfo>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(true) }
+
+    // Load installed apps
+    LaunchedEffect(Unit) {
+        withContext(Dispatchers.IO) {
+            try {
+                val pm = context.packageManager",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/RisorseArtificiali__anti-vocale/app/src/main/java/com/antivocale/app/ui/dialogs/AddAppPreferenceDialog.kt,exact,True,37,AddAppPreferenceDialog,1.0,131.0,ProgressIndicator,body,CircularProgressIndicator(),True,"  119 |                 )
+  120 | 
+  121 |                 HorizontalDivider()
+  122 | 
+  123 |                 // App list
+  124 |                 if (isLoading) {
+  125 |                     Box(
+  126 |                         modifier = Modifier
+  127 |                             .fillMaxWidth()
+  128 |                             .height(200.dp),
+  129 |                         contentAlignment = Alignment.Center
+  130 |                     ) {
+  131 |                         CircularProgressIndicator()
+  132 |                     }
+  133 |                 } else if (filteredApps.isEmpty()) {
+  134 |                     Box(
+  135 |                         modifier = Modifier
+  136 |                             .fillMaxWidth()
+  137 |                             .height(200.dp),
+  138 |                         contentAlignment = Alignment.Center
+  139 |                     ) {
+  140 |                         Text(
+  141 |                             text = if (searchQuery.isBlank()) stringResource(R.string.per_app_settings_no_apps) else stringResource(R.string.per_app_settings_no_matching_apps),
+  142 |                             style = MaterialTheme.typography.bodyMedium,
+  143 |                             color = MaterialTheme.colorScheme.onSurfaceVariant
+  144 |                         )
+  145 |                     }
+  146 |                 } else {
+  147 |                     LazyColumn(
+  148 |                         modifier = Modifier.height(400.dp),
+  149 |                         verticalArrangement = Arrangement.spacedBy(4.dp)
+  150 |                     ) {
+  151 |                         items(filteredApps) { app ->
+  152 |                             AppListItem(
+  153 |                                 appName = app.appName,
+  154 |                                 packageName = app.packageName,
+  155 |                                 icon = app.icon,
+  156 |                                 onClick = {
+  157 |                                     onAppSelected(app.packageName, app.appName)
+  158 |                                     onDismiss()
+  159 |                                 }
+  160 |                             )
+  161 |                         }
+  162 |                     }
+  163 |                 }
+  164 |             }
+  165 |         },
+  166 |         confirmButton = {},
+  167 |         dismissButton = {}
+  168 |     )
+  169 | }
+  170 | 
+  171 | /**","import android.content.pm.PackageManager
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import com.antivocale.app.R
+import androidx.core.graphics.drawable.toBitmap
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext"
+pilot-0225,progress_no_semantics,iOrchid__android-jetpack-demo,iOrchid__android-jetpack-demo/compose/src/main/java/org/zhiwei/compose/screen/basic/material3/WidgetScreen.kt,UI_ProgressIndicator,CircularProgressIndicator without progressSemantics,"
+@Composable
+private fun UI_ProgressIndicator() {
+    Title_Text(title = ""ProgressIndicator"")
+    Title_Sub_Text(title = ""1、ProgressIndicator就是传统view中的progressBar，进度提示条/圈"")
+    Title_Desc_Text(desc = ""Indeterminate progress 默认进度progress是0的时候"")
+    CircularProgressIndicator()
+    Spacer(modifier = Modifier.height(8.dp))
+    LinearProgressIndicator()
+    Spacer(modifier = Modifier.height(8.dp))
+    Title_Desc_Text(desc = ""Determinate 有确切的进度"")
+    //在compose中，数据变化都是state的，
+    val progress = progressFlow.collectAsState(initial = 0)
+    CircularProgressIndicator(
+        progress = { progress.value / 100f },
+        color = Color(0XFFFA7E23),",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/iOrchid__android-jetpack-demo/compose/src/main/java/org/zhiwei/compose/screen/basic/material3/WidgetScreen.kt,exact,True,159,UI_ProgressIndicator,1.0,159.0,ProgressIndicator,body,private fun UI_ProgressIndicator() {,True,"  147 |     Snackbar(
+  148 |         action = { Text(text = ""Action"") },
+  149 |         shape = CutCornerShape(topStart = 10.dp, topEnd = 8.dp),
+  150 |         containerColor = Color(0XFFF19790),
+  151 |         actionContentColor = Color.Green,
+  152 |     ) {
+  153 |         //这里是个box容器布局类型，只显示最后一个compose的控件
+  154 |         Text(text = ""切角snackbar"")
+  155 |     }
+  156 | }
+  157 | 
+  158 | @Composable
+  159 | private fun UI_ProgressIndicator() {
+  160 |     Title_Text(title = ""ProgressIndicator"")
+  161 |     Title_Sub_Text(title = ""1、ProgressIndicator就是传统view中的progressBar，进度提示条/圈"")
+  162 |     Title_Desc_Text(desc = ""Indeterminate progress 默认进度progress是0的时候"")
+  163 |     CircularProgressIndicator()
+  164 |     Spacer(modifier = Modifier.height(8.dp))
+  165 |     LinearProgressIndicator()
+  166 |     Spacer(modifier = Modifier.height(8.dp))
+  167 |     Title_Desc_Text(desc = ""Determinate 有确切的进度"")
+  168 |     //在compose中，数据变化都是state的，
+  169 |     val progress = progressFlow.collectAsState(initial = 0)
+  170 |     CircularProgressIndicator(
+  171 |         progress = { progress.value / 100f },
+  172 |         color = Color(0XFFFA7E23),
+  173 |         strokeWidth = 4.dp,
+  174 |         trackColor = Color(0XFF1BA784),
+  175 |     )
+  176 |     Spacer(modifier = Modifier.height(8.dp))
+  177 |     Title_Desc_Text(desc = ""注意观察进度条的变化，使用flow数据流"")
+  178 |     LinearProgressIndicator(
+  179 |         progress = { progress.value / 100f },
+  180 |         color = Color(0XFFF6AD8F),
+  181 |         trackColor = Color(0XFF9BAE86),
+  182 |     )
+  183 |     Spacer(modifier = Modifier.height(8.dp))
+  184 |     Title_Desc_Text(desc = ""进度条变化动画形式"")
+  185 | 
+  186 |     var progressAnimated by remember { mutableFloatStateOf(0.1f) }
+  187 |     val animatedProgress by animateFloatAsState(
+  188 |         targetValue = progressAnimated,
+  189 |         animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
+  190 |         label = """"
+  191 |     )
+  192 |     Row(verticalAlignment = Alignment.CenterVertically) {
+  193 |         OutlinedButton(
+  194 |             onClick = { if (progressAnimated < 1f) progressAnimated += 0.1f }
+  195 |         ) {
+  196 |             Text(""变长～"")
+  197 |         }
+  198 |         Spacer(Modifier.requiredWidth(30.dp))
+  199 |         LinearProgressIndicator(progress = { animatedProgress })","import android.widget.Toast
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.CutCornerShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.ProgressIndicatorDefaults
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.RangeSlider
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TriStateCheckbox
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.state.ToggleableState
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import org.zhiwei.compose.ui.widget.Title_Desc_Text
+import org.zhiwei.compose.ui.widget.Title_Sub_Text
+import org.zhiwei.compose.ui.widget.Title_Text"
+pilot-0226,progress_no_semantics,cvc953__localplayer,cvc953__localplayer/app/src/main/java/com/cvc953/localplayer/ui/screens/ArtistsScreen.kt,ArtistsScreen,CircularProgressIndicator without progressSemantics,"@Suppress(""ktlint:standard:function-naming"")
+@Composable
+fun ArtistsScreen(
+    artistViewModel: ArtistViewModel,
+    playbackViewModel: PlaybackViewModel,
+    playerViewModel: PlayerViewModel,
+    onArtistClick: (artistName: String) -> Unit,
+) {
+    // Use the global SongViewModel to fetch all songs so we can build artist thumbnails
+    val songViewModel: SongViewModel = viewModel()
+    val songs by songViewModel.songs.collectAsState()
+    val artists by artistViewModel.artists.collectAsState()
+
+    // Expand and deduplicate artist names using normalization
+    val expandedArtists =
+        remember(artists) {",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/cvc953__localplayer/app/src/main/java/com/cvc953/localplayer/ui/screens/ArtistsScreen.kt,exact,True,100,ArtistsScreen,1.0,178.0,ProgressIndicator,body,CircularProgressIndicator(color = MaterialTheme.colorScheme.primary),True,"  166 | 
+  167 |     val listState = rememberLazyListState()
+  168 |     val gridState = rememberLazyGridState()
+  169 |     val scope = rememberCoroutineScope()
+  170 |     var currentScrollLetter by remember { mutableStateOf<String?>(null) }
+  171 | 
+  172 |     if (isScanning) {
+  173 |         Column(
+  174 |             modifier = Modifier.Companion.fillMaxSize(),
+  175 |             verticalArrangement = Arrangement.Center,
+  176 |             horizontalAlignment = Alignment.Companion.CenterHorizontally,
+  177 |         ) {
+  178 |             CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+  179 |             Spacer(modifier = Modifier.Companion.height(16.dp))
+  180 |             Text(stringResource(R.string.scanning_songs), color = MaterialTheme.colorScheme.onBackground)
+  181 |         }
+  182 |         return
+  183 |     }
+  184 | 
+  185 |     Box(
+  186 |         modifier = Modifier.Companion.fillMaxSize().background(MaterialTheme.colorScheme.background),
+  187 |     ) {
+  188 |         Column(modifier = Modifier.Companion.fillMaxSize()) {
+  189 |             Row(
+  190 |                 modifier = Modifier.Companion.fillMaxWidth().padding(16.dp),
+  191 |                 verticalAlignment = Alignment.Companion.CenterVertically,
+  192 |             ) {
+  193 |                 Text(
+  194 |                     text = stringResource(R.string.artists_title),
+  195 |                     fontSize = 28.sp,
+  196 |                     fontWeight = FontWeight.Companion.Bold,
+  197 |                     color = MaterialTheme.colorScheme.onBackground,
+  198 |                     maxLines = 1,
+  199 |                     modifier = Modifier.Companion.weight(1f),
+  200 |                 )
+  201 | 
+  202 |                 Box {
+  203 |                     IconButton(onClick = { sortMenuExpanded = true }) {
+  204 |                         Icon(
+  205 |                             Icons.Default.Sort,
+  206 |                             contentDescription = stringResource(R.string.action_sort),
+  207 |                             tint = MaterialTheme.colorScheme.onBackground,
+  208 |                         )
+  209 |                     }
+  210 |                     DropdownMenu(
+  211 |                         expanded = sortMenuExpanded,
+  212 |                         onDismissRequest = { sortMenuExpanded = false },
+  213 |                         containerColor = MaterialTheme.extendedColors.surfaceSheet,
+  214 |                     ) {
+  215 |                         DropdownMenuItem(
+  216 |                             text = {
+  217 |                                 Text(
+  218 |                                     stringResource(R.string.sort_title_asc),","import android.app.Activity
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.media.MediaMetadataRetriever
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LibraryMusic
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Shuffle
+import androidx.compose.material.icons.filled.Sort
+import androidx.compose.material.icons.filled.ViewList
+import androidx.compose.material.icons.filled.ViewModule
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cvc953.localplayer.R
+import com.cvc953.localplayer.model.Artist
+import com.cvc953.localplayer.model.Song
+import com.cvc953.localplayer.ui.components.AlphabetScrollerContent
+import com.cvc953.localplayer.ui.components.NativeSearchBar
+import com.cvc953.localplayer.ui.components.ScrollLetterDisplay
+import com.cvc953.localplayer.ui.extendedColors
+import com.cvc953.localplayer.ui.theme.md_textSecondary
+import com.cvc953.localplayer.util.ArtworkLoader
+import com.cvc953.localplayer.viewmodel.ArtistViewModel
+import com.cvc953.localplayer.viewmodel.PlaybackViewModel
+import com.cvc953.localplayer.viewmodel.PlayerViewModel
+import com.cvc953.localplayer.viewmodel.SongViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import kotlin.collections.isNotEmpty
+import kotlin.collections.map"
+pilot-0227,progress_no_semantics,kursatkumsuz__movie,kursatkumsuz__movie/core/component/src/main/java/com/kursatkumsuz/component/LoadingPage.kt,LoadingPage,CircularProgressIndicator without progressSemantics,"
+@Composable
+fun LoadingPage() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = ""Loading"",
+            color = MaterialTheme.colorScheme.primary,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/kursatkumsuz__movie/core/component/src/main/java/com/kursatkumsuz/component/LoadingPage.kt,exact,True,19,LoadingPage,1.0,33.0,ProgressIndicator,body,CircularProgressIndicator(Modifier.padding(top = 10.dp)),True,"   19 | fun LoadingPage() {
+   20 |     Column(
+   21 |         modifier = Modifier
+   22 |             .fillMaxSize()
+   23 |             .background(Color.Black),
+   24 |         verticalArrangement = Arrangement.Center,
+   25 |         horizontalAlignment = Alignment.CenterHorizontally
+   26 |     ) {
+   27 |         Text(
+   28 |             text = ""Loading"",
+   29 |             color = MaterialTheme.colorScheme.primary,
+   30 |             maxLines = 1,
+   31 |             overflow = TextOverflow.Ellipsis
+   32 |         )
+   33 |         CircularProgressIndicator(Modifier.padding(top = 10.dp))
+   34 |     }
+   35 | }","import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp"
+pilot-0228,progress_no_semantics,christianrowlands__android-network-survey,christianrowlands__android-network-survey/networksurvey/src/main/java/com/craxiom/networksurvey/ui/oui/OuiLookupScreen.kt,LoadingCard,CircularProgressIndicator without progressSemantics,"
+@Composable
+private fun LoadingCard(query: String) {
+    SurfaceCard {
+        MacDisplay(query)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(14.dp),
+                strokeWidth = 2.dp,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Text(
+                text = stringResource(R.string.oui_lookup_loading_label),",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/christianrowlands__android-network-survey/networksurvey/src/main/java/com/craxiom/networksurvey/ui/oui/OuiLookupScreen.kt,exact,True,264,LoadingCard,1.0,271.0,ProgressIndicator,body,CircularProgressIndicator(,True,"  259 |         }
+  260 |     }
+  261 | }
+  262 | 
+  263 | @Composable
+  264 | private fun LoadingCard(query: String) {
+  265 |     SurfaceCard {
+  266 |         MacDisplay(query)
+  267 |         Row(
+  268 |             verticalAlignment = Alignment.CenterVertically,
+  269 |             horizontalArrangement = Arrangement.spacedBy(10.dp),
+  270 |         ) {
+  271 |             CircularProgressIndicator(
+  272 |                 modifier = Modifier.size(14.dp),
+  273 |                 strokeWidth = 2.dp,
+  274 |                 color = MaterialTheme.colorScheme.primary,
+  275 |             )
+  276 |             Text(
+  277 |                 text = stringResource(R.string.oui_lookup_loading_label),
+  278 |                 style = MaterialTheme.typography.bodySmall,
+  279 |                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+  280 |             )
+  281 |         }
+  282 |     }
+  283 | }","import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.craxiom.networksurvey.R"
+pilot-0229,progress_no_semantics,reactivedroid__TvFlix,reactivedroid__TvFlix/app/src/main/java/com/android/tvflix/main/MainActivity.kt,CenterLoader,CircularProgressIndicator without progressSemantics,"
+@Composable
+private fun CenterLoader(modifier: Modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+        CircularProgressIndicator(color = colorResource(id = R.color.colorAccent))
+    }
+}
+
+@Composable
+private fun CenterError(
+    text: String,
+    showRetry: Boolean = false,
+    onRetry: (() -> Unit)? = null
+) {
+    Box(
+        modifier = Modifier",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/reactivedroid__TvFlix/app/src/main/java/com/android/tvflix/main/MainActivity.kt,exact,True,529,CenterLoader,1.0,531.0,ProgressIndicator,body,CircularProgressIndicator(color = colorResource(id = R.color.colorAccent)),True,"  519 |                 }
+  520 |                 if (rows[rowIndex].size == 1) {
+  521 |                     Spacer(modifier = Modifier.weight(1f))
+  522 |                 }
+  523 |             }
+  524 |         }
+  525 |     }
+  526 | }
+  527 | 
+  528 | @Composable
+  529 | private fun CenterLoader(modifier: Modifier = Modifier.fillMaxSize()) {
+  530 |     Box(modifier = modifier, contentAlignment = Alignment.Center) {
+  531 |         CircularProgressIndicator(color = colorResource(id = R.color.colorAccent))
+  532 |     }
+  533 | }
+  534 | 
+  535 | @Composable
+  536 | private fun CenterError(
+  537 |     text: String,
+  538 |     showRetry: Boolean = false,
+  539 |     onRetry: (() -> Unit)? = null
+  540 | ) {
+  541 |     Box(
+  542 |         modifier = Modifier
+  543 |             .fillMaxSize()
+  544 |             .padding(16.dp),
+  545 |         contentAlignment = Alignment.Center
+  546 |     ) {
+  547 |         Column(horizontalAlignment = Alignment.CenterHorizontally) {
+  548 |             Text(text = text, color = colorResource(id = R.color.red))
+  549 |             if (showRetry && onRetry != null) {
+  550 |                 Spacer(modifier = Modifier.height(8.dp))
+  551 |                 Button(
+  552 |                     onClick = onRetry,
+  553 |                     modifier = Modifier.testTag(""retry"")
+  554 |                 ) {
+  555 |                     Text(text = stringResource(id = R.string.retry))
+  556 |                 }
+  557 |             }
+  558 |         }
+  559 |     }
+  560 | }","import android.widget.Toast
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.core.text.HtmlCompat
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
+import coil.compose.AsyncImage
+import com.android.tvflix.R
+import com.android.tvflix.config.FavoritesFeatureFlag
+import com.android.tvflix.db.favouriteshow.FavoriteShow
+import com.android.tvflix.favorite.FavoriteShowState
+import com.android.tvflix.favorite.FavoriteShowsViewModel
+import com.android.tvflix.home.HomeViewData
+import com.android.tvflix.home.HomeViewModel
+import com.android.tvflix.home.HomeViewState
+import com.android.tvflix.network.home.Show
+import com.android.tvflix.shows.ShowsViewModel
+import com.android.tvflix.splash.SplashViewModel
+import com.android.tvflix.splash.SplashViewState
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject"
+pilot-0230,progress_no_semantics,RisorseArtificiali__anti-vocale,RisorseArtificiali__anti-vocale/app/src/main/java/com/antivocale/app/ui/components/ModelVariantCard.kt,DownloadProgressView,LinearProgressIndicator without progressSemantics," */
+@Composable
+internal fun DownloadProgressView(
+    downloadState: DownloadState,
+    downloadProgress: Float,
+    showExtractingFileSize: Boolean = false
+) {
+    when (val state = downloadState) {
+        is DownloadState.Downloading -> {
+            // TASK-384: talkback reads the same percentage the sighted UI shows
+            val percentText = ""${(downloadProgress * 100).toInt()}%""
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/RisorseArtificiali__anti-vocale/app/src/main/java/com/antivocale/app/ui/components/ModelVariantCard.kt,exact,True,341,DownloadProgressView,1.0,365.0,ProgressIndicator,body,LinearProgressIndicator(,True,"  341 | internal fun DownloadProgressView(
+  342 |     downloadState: DownloadState,
+  343 |     downloadProgress: Float,
+  344 |     showExtractingFileSize: Boolean = false
+  345 | ) {
+  346 |     when (val state = downloadState) {
+  347 |         is DownloadState.Downloading -> {
+  348 |             // TASK-384: talkback reads the same percentage the sighted UI shows
+  349 |             val percentText = ""${(downloadProgress * 100).toInt()}%""
+  350 |             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+  351 |                 Row(
+  352 |                     modifier = Modifier.fillMaxWidth(),
+  353 |                     horizontalArrangement = Arrangement.SpaceBetween
+  354 |                 ) {
+  355 |                     // Locale-safe: weight + ellipsis keeps the percentage anchored (TASK-345)
+  356 |                     Text(
+  357 |                         stringResource(R.string.download_status_downloading),
+  358 |                         style = MaterialTheme.typography.bodySmall,
+  359 |                         maxLines = 1,
+  360 |                         overflow = TextOverflow.Ellipsis,
+  361 |                         modifier = Modifier.weight(1f)
+  362 |                     )
+  363 |                     Text(percentText, style = MaterialTheme.typography.bodySmall)
+  364 |                 }
+  365 |                 LinearProgressIndicator(
+  366 |                     progress = { downloadProgress },
+  367 |                     modifier = Modifier.fillMaxWidth().semantics { stateDescription = percentText }
+  368 |                 )
+  369 |                 Text(
+  370 |                     text = formatFileSize(state.bytesDownloaded) +
+  371 |                         if (state.totalBytes > 0) "" / ${formatFileSize(state.totalBytes)}"" else """",
+  372 |                     style = MaterialTheme.typography.labelSmall,
+  373 |                     color = MaterialTheme.colorScheme.onSurfaceVariant
+  374 |                 )
+  375 |                 DownloadRateEta(state)
+  376 |             }
+  377 |         }
+  378 |         is DownloadState.Extracting -> {
+  379 |             // TASK-384: talkback reads the same status label the sighted UI shows
+  380 |             val extractingLabel =
+  381 |                 state.fileName.takeIf { it.isNotEmpty() }
+  382 |                     ?: stringResource(R.string.download_status_extracting_files)
+  383 |             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+  384 |                 LinearProgressIndicator(
+  385 |                     progress = { downloadProgress },
+  386 |                     modifier = Modifier.fillMaxWidth().semantics { stateDescription = extractingLabel }
+  387 |                 )
+  388 |                 if (showExtractingFileSize && state.currentFileSize > 0) {
+  389 |                     Row(
+  390 |                         modifier = Modifier.fillMaxWidth(),
+  391 |                         horizontalArrangement = Arrangement.SpaceBetween
+  392 |                     ) {
+  393 |                         // Locale-safe: weight + ellipsis keeps the byte counter anchored (TASK-345)
+  394 |                         Text(
+  395 |                             stringResource(R.string.download_status_extracting, state.fileName.takeIf { it.isNotEmpty() } ?: stringResource(R.string.download_status_file_progress, state.fileIndex, state.totalFiles)),
+  396 |                             style = MaterialTheme.typography.bodySmall,
+  397 |                             maxLines = 1,
+  398 |                             overflow = TextOverflow.Ellipsis,
+  399 |                             modifier = Modifier.weight(1f)
+  400 |                         )
+  401 |                         Text(
+  402 |                             ""${formatFileSize(state.bytesExtracted)} / ${formatFileSize(state.currentFileSize)}"",
+  403 |                             style = MaterialTheme.typography.labelSmall,
+  404 |                             color = MaterialTheme.colorScheme.onSurfaceVariant
+  405 |                         )","import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import com.antivocale.app.R
+import com.antivocale.app.data.download.DownloadState
+import com.antivocale.app.transcription.ModelVariant
+import com.antivocale.app.util.formatFileSize"
+pilot-0231,progress_no_semantics,isotjs__todosian-app,isotjs__todosian-app/app/src/main/java/com/isotjs/todosian/ui/components/TodosianComponents.kt,TodosianLinearProgress,LinearProgressIndicator without progressSemantics,"
+@Composable
+fun TodosianLinearProgress(
+    progress: Float,
+    modifier: Modifier = Modifier,
+) {
+    val shape = RoundedCornerShape(TodosianDimens.ProgressHeight / 2)
+    LinearProgressIndicator(
+        progress = { progress.coerceIn(0f, 1f) },
+        color = MaterialTheme.colorScheme.primary,
+        trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+        modifier = modifier
+            .height(TodosianDimens.ProgressHeight)
+            .clip(shape),
+    )
+}",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/isotjs__todosian-app/app/src/main/java/com/isotjs/todosian/ui/components/TodosianComponents.kt,exact,True,51,TodosianLinearProgress,1.0,56.0,ProgressIndicator,body,LinearProgressIndicator(,True,"   44 |         color = MaterialTheme.colorScheme.primary,
+   45 |         modifier = modifier
+   46 |             .padding(top = 16.dp, bottom = 8.dp),
+   47 |     )
+   48 | }
+   49 | 
+   50 | @Composable
+   51 | fun TodosianLinearProgress(
+   52 |     progress: Float,
+   53 |     modifier: Modifier = Modifier,
+   54 | ) {
+   55 |     val shape = RoundedCornerShape(TodosianDimens.ProgressHeight / 2)
+   56 |     LinearProgressIndicator(
+   57 |         progress = { progress.coerceIn(0f, 1f) },
+   58 |         color = MaterialTheme.colorScheme.primary,
+   59 |         trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+   60 |         modifier = modifier
+   61 |             .height(TodosianDimens.ProgressHeight)
+   62 |             .clip(shape),
+   63 |     )
+   64 | }","import androidx.compose.animation.core.SpringSpec
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp"
+pilot-0232,progress_no_semantics,MoatazBadawy__Mawaqeet-Todo_and_Habits,MoatazBadawy__Mawaqeet-Todo_and_Habits/todos/ui/view/src/main/java/com/moataz/todos/ui/view/component/Loading.kt,Loading,CircularProgressIndicator without progressSemantics,"
+@Composable
+fun Loading() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator(color = Color.Black)
+    }
+}
+",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/MoatazBadawy__Mawaqeet-Todo_and_Habits/todos/ui/view/src/main/java/com/moataz/todos/ui/view/component/Loading.kt,exact,True,12,Loading,1.0,14.0,ProgressIndicator,body,CircularProgressIndicator(color = Color.Black),True,"    2 | 
+    3 | import androidx.compose.foundation.layout.Box
+    4 | import androidx.compose.foundation.layout.fillMaxSize
+    5 | import androidx.compose.material.CircularProgressIndicator
+    6 | import androidx.compose.runtime.Composable
+    7 | import androidx.compose.ui.Alignment
+    8 | import androidx.compose.ui.Modifier
+    9 | import androidx.compose.ui.graphics.Color
+   10 | 
+   11 | @Composable
+   12 | fun Loading() {
+   13 |     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+   14 |         CircularProgressIndicator(color = Color.Black)
+   15 |     }
+   16 | }","import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color"
+pilot-0233,progress_no_semantics,AhmadHassan-BTed__Parchment,AhmadHassan-BTed__Parchment/app/src/main/java/ted/parchment/reader/ui/components/PdfThumbnail.kt,PdfThumbnail,CircularProgressIndicator without progressSemantics," */
+@Composable
+fun PdfThumbnail(fileName: String) {
+    val context = LocalContext.current
+    var bitmap by remember { mutableStateOf<Bitmap?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
+    val scope = rememberCoroutineScope()
+
+    DisposableEffect(fileName) {
+        val job = scope.launch(Dispatchers.IO) {
+            var pfd: ParcelFileDescriptor? = null
+            var pdfRenderer: PdfRenderer? = null
+            var page: PdfRenderer.Page? = null
+
+            try {
+                pfd = PdfUtils.getPdfFileDescriptor(context, fileName)",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/AhmadHassan-BTed__Parchment/app/src/main/java/ted/parchment/reader/ui/components/PdfThumbnail.kt,exact,True,36,PdfThumbnail,1.0,99.0,ProgressIndicator,body,CircularProgressIndicator(,True,"   87 |         Image(
+   88 |             bitmap = bitmap!!.asImageBitmap(),
+   89 |             contentDescription = null,
+   90 |             contentScale = ContentScale.Crop,
+   91 |             modifier = Modifier.fillMaxSize()
+   92 |         )
+   93 |     } else {
+   94 |         Box(
+   95 |             modifier = Modifier.fillMaxSize(),
+   96 |             contentAlignment = Alignment.Center
+   97 |         ) {
+   98 |             if (isLoading) {
+   99 |                 CircularProgressIndicator(
+  100 |                     modifier = Modifier.size(24.dp),
+  101 |                     strokeWidth = 2.dp,
+  102 |                     color = MaterialTheme.colorScheme.primary
+  103 |                 )
+  104 |             } else {
+  105 |                 Box(
+  106 |                     modifier = Modifier
+  107 |                         .size(48.dp)
+  108 |                         .clip(RoundedCornerShape(50))
+  109 |                         .background(MaterialTheme.colorScheme.secondaryContainer),
+  110 |                     contentAlignment = Alignment.Center
+  111 |                 ) {
+  112 |                     Icon(
+  113 |                         imageVector = Icons.Default.Description,
+  114 |                         contentDescription = null,
+  115 |                         modifier = Modifier.size(24.dp),
+  116 |                         tint = MaterialTheme.colorScheme.onSecondaryContainer
+  117 |                     )
+  118 |                 }
+  119 |             }
+  120 |         }
+  121 |     }
+  122 | }","import android.graphics.Bitmap
+import android.graphics.pdf.PdfRenderer
+import android.os.ParcelFileDescriptor
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import ted.parchment.reader.utils.PdfUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.IOException"
+pilot-0234,progress_no_semantics,RisorseArtificiali__anti-vocale,RisorseArtificiali__anti-vocale/app/src/main/java/com/antivocale/app/ui/components/ModelVariantCard.kt,DownloadProgressView,CircularProgressIndicator without progressSemantics," */
+@Composable
+internal fun DownloadProgressView(
+    downloadState: DownloadState,
+    downloadProgress: Float,
+    showExtractingFileSize: Boolean = false
+) {
+    when (val state = downloadState) {
+        is DownloadState.Downloading -> {
+            // TASK-384: talkback reads the same percentage the sighted UI shows
+            val percentText = ""${(downloadProgress * 100).toInt()}%""
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/RisorseArtificiali__anti-vocale/app/src/main/java/com/antivocale/app/ui/components/ModelVariantCard.kt,exact,True,341,DownloadProgressView,1.0,365.0,ProgressIndicator,body,LinearProgressIndicator(,True,"  341 | internal fun DownloadProgressView(
+  342 |     downloadState: DownloadState,
+  343 |     downloadProgress: Float,
+  344 |     showExtractingFileSize: Boolean = false
+  345 | ) {
+  346 |     when (val state = downloadState) {
+  347 |         is DownloadState.Downloading -> {
+  348 |             // TASK-384: talkback reads the same percentage the sighted UI shows
+  349 |             val percentText = ""${(downloadProgress * 100).toInt()}%""
+  350 |             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+  351 |                 Row(
+  352 |                     modifier = Modifier.fillMaxWidth(),
+  353 |                     horizontalArrangement = Arrangement.SpaceBetween
+  354 |                 ) {
+  355 |                     // Locale-safe: weight + ellipsis keeps the percentage anchored (TASK-345)
+  356 |                     Text(
+  357 |                         stringResource(R.string.download_status_downloading),
+  358 |                         style = MaterialTheme.typography.bodySmall,
+  359 |                         maxLines = 1,
+  360 |                         overflow = TextOverflow.Ellipsis,
+  361 |                         modifier = Modifier.weight(1f)
+  362 |                     )
+  363 |                     Text(percentText, style = MaterialTheme.typography.bodySmall)
+  364 |                 }
+  365 |                 LinearProgressIndicator(
+  366 |                     progress = { downloadProgress },
+  367 |                     modifier = Modifier.fillMaxWidth().semantics { stateDescription = percentText }
+  368 |                 )
+  369 |                 Text(
+  370 |                     text = formatFileSize(state.bytesDownloaded) +
+  371 |                         if (state.totalBytes > 0) "" / ${formatFileSize(state.totalBytes)}"" else """",
+  372 |                     style = MaterialTheme.typography.labelSmall,
+  373 |                     color = MaterialTheme.colorScheme.onSurfaceVariant
+  374 |                 )
+  375 |                 DownloadRateEta(state)
+  376 |             }
+  377 |         }
+  378 |         is DownloadState.Extracting -> {
+  379 |             // TASK-384: talkback reads the same status label the sighted UI shows
+  380 |             val extractingLabel =
+  381 |                 state.fileName.takeIf { it.isNotEmpty() }
+  382 |                     ?: stringResource(R.string.download_status_extracting_files)
+  383 |             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+  384 |                 LinearProgressIndicator(
+  385 |                     progress = { downloadProgress },
+  386 |                     modifier = Modifier.fillMaxWidth().semantics { stateDescription = extractingLabel }
+  387 |                 )
+  388 |                 if (showExtractingFileSize && state.currentFileSize > 0) {
+  389 |                     Row(
+  390 |                         modifier = Modifier.fillMaxWidth(),
+  391 |                         horizontalArrangement = Arrangement.SpaceBetween
+  392 |                     ) {
+  393 |                         // Locale-safe: weight + ellipsis keeps the byte counter anchored (TASK-345)
+  394 |                         Text(
+  395 |                             stringResource(R.string.download_status_extracting, state.fileName.takeIf { it.isNotEmpty() } ?: stringResource(R.string.download_status_file_progress, state.fileIndex, state.totalFiles)),
+  396 |                             style = MaterialTheme.typography.bodySmall,
+  397 |                             maxLines = 1,
+  398 |                             overflow = TextOverflow.Ellipsis,
+  399 |                             modifier = Modifier.weight(1f)
+  400 |                         )
+  401 |                         Text(
+  402 |                             ""${formatFileSize(state.bytesExtracted)} / ${formatFileSize(state.currentFileSize)}"",
+  403 |                             style = MaterialTheme.typography.labelSmall,
+  404 |                             color = MaterialTheme.colorScheme.onSurfaceVariant
+  405 |                         )","import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import com.antivocale.app.R
+import com.antivocale.app.data.download.DownloadState
+import com.antivocale.app.transcription.ModelVariant
+import com.antivocale.app.util.formatFileSize"
+pilot-0235,progress_no_semantics,miaowmiaow__fragmject,miaowmiaow__fragmject/core/ui/src/main/java/com/example/fragmject/core/ui/components/LoadingContent.kt,LoadingContent,CircularProgressIndicator without progressSemantics,"
+@Composable
+fun LoadingContent(
+    isLoading: Boolean,
+    modifier: Modifier = Modifier,
+    innerPadding: PaddingValues = PaddingValues(),
+    content: @Composable () -> Unit
+) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(innerPadding)
+    ) {
+        content()
+        if (isLoading) {
+            CircularProgressIndicator(",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/miaowmiaow__fragmject/core/ui/src/main/java/com/example/fragmject/core/ui/components/LoadingContent.kt,exact,True,14,LoadingContent,1.0,27.0,ProgressIndicator,body,CircularProgressIndicator(,True,"   14 | fun LoadingContent(
+   15 |     isLoading: Boolean,
+   16 |     modifier: Modifier = Modifier,
+   17 |     innerPadding: PaddingValues = PaddingValues(),
+   18 |     content: @Composable () -> Unit
+   19 | ) {
+   20 |     Box(
+   21 |         modifier = modifier
+   22 |             .fillMaxSize()
+   23 |             .padding(innerPadding)
+   24 |     ) {
+   25 |         content()
+   26 |         if (isLoading) {
+   27 |             CircularProgressIndicator(
+   28 |                 modifier = Modifier.align(Alignment.Center),
+   29 |                 color = MaterialTheme.colorScheme.onSecondaryContainer
+   30 |             )
+   31 |         }
+   32 |     }
+   33 | }","import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier"
+pilot-0236,progress_no_semantics,beradeep__aiyo,beradeep__aiyo/ui/src/main/java/com/beradeep/aiyo/ui/screens/components/ModelSelectionSheet.kt,ModelSelectionSheet,LinearProgressIndicator without progressSemantics,"
+@Composable
+fun ModelSelectionSheet(
+    isVisible: Boolean,
+    modifier: Modifier = Modifier,
+    isFetchingModels: Boolean,
+    fetchModels: () -> Unit,
+    models: List<Model>,
+    selectedModel: Model,
+    onModelSelected: (Model) -> Unit,
+    onDismiss: () -> Unit
+) {
+    ModalBottomSheet(
+        isVisible = isVisible,
+        onDismissRequest = onDismiss,
+        sheetGesturesEnabled = false",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/beradeep__aiyo/ui/src/main/java/com/beradeep/aiyo/ui/screens/components/ModelSelectionSheet.kt,exact,True,41,ModelSelectionSheet,1.0,89.0,ProgressIndicator,body,"LinearProgressIndicator(Modifier.fillMaxWidth(), strokeCap = StrokeCap.Square)",True,"   77 |             )
+   78 |             Spacer(modifier = Modifier.height(12.dp))
+   79 |             TextField(
+   80 |                 modifier = Modifier.padding(horizontal = 16.dp),
+   81 |                 value = searchText,
+   82 |                 onValueChange = { searchText = it },
+   83 |                 leadingIcon = { Icon(Icons.Rounded.Search) },
+   84 |                 placeholder = { Text(""Search"") },
+   85 |                 shape = CircleShape
+   86 |             )
+   87 |             Spacer(modifier = Modifier.height(12.dp))
+   88 |             AnimatedVisibility(isFetchingModels) {
+   89 |                 LinearProgressIndicator(Modifier.fillMaxWidth(), strokeCap = StrokeCap.Square)
+   90 |             }
+   91 |             LazyColumn {
+   92 |                 items(
+   93 |                     items = filteredModels,
+   94 |                     key = { it.id }
+   95 |                 ) { model ->
+   96 |                     val isSelected = model.id == selectedModel.id
+   97 |                     Surface(
+   98 |                         color = if (isSelected) AiyoTheme.colors.surface else AiyoTheme.colors.background
+   99 |                     ) {
+  100 |                         Row(
+  101 |                             modifier =
+  102 |                             Modifier
+  103 |                                 .fillMaxWidth()
+  104 |                                 .padding(horizontal = 16.dp)
+  105 |                                 .clip(RoundedCornerShape(8.dp))
+  106 |                                 .clickable {
+  107 |                                     onModelSelected(model)
+  108 |                                 }
+  109 |                         ) {
+  110 |                             Column(
+  111 |                                 modifier =
+  112 |                                 Modifier
+  113 |                                     .weight(1f)
+  114 |                                     .padding(vertical = 12.dp),
+  115 |                                 verticalArrangement = Arrangement.Center
+  116 |                             ) {
+  117 |                                 Text(
+  118 |                                     text = model.ownedBy ?: model.id.substringBefore('/'),
+  119 |                                     style = LocalTypography.current.h4
+  120 |                                 )
+  121 |                                 Text(
+  122 |                                     modifier = Modifier.padding(top = 2.dp),
+  123 |                                     text = model.id.substringAfter('/'),
+  124 |                                     style = LocalTypography.current.body2
+  125 |                                 )
+  126 |                                 Spacer(modifier = Modifier.height(8.dp))
+  127 |                             }
+  128 |                         }
+  129 |                     }","import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.unit.dp
+import com.beradeep.aiyo.domain.model.Model
+import com.beradeep.aiyo.ui.AiyoTheme
+import com.beradeep.aiyo.ui.LocalTypography
+import com.beradeep.aiyo.ui.basics.components.Icon
+import com.beradeep.aiyo.ui.basics.components.ModalBottomSheet
+import com.beradeep.aiyo.ui.basics.components.Surface
+import com.beradeep.aiyo.ui.basics.components.Text
+import com.beradeep.aiyo.ui.basics.components.progressindicators.LinearProgressIndicator
+import com.beradeep.aiyo.ui.basics.components.textfield.TextField"
+pilot-0237,progress_no_semantics,Dev-Aditya-More__PokeVerse,Dev-Aditya-More__PokeVerse/app/src/main/java/com/aditya1875/pokeverse/feature/analysis/presentation/screens/TeamAnalysis.kt,AnalysisAdGate,CircularProgressIndicator without progressSemantics,"
+@Composable
+private fun AnalysisAdGate(
+    adState: RewardedAdState,
+    onWatchAd: () -> Unit,
+    onGetPremium: () -> Unit
+) {
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(AnalysisColors.BG),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            Modifier.padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/Dev-Aditya-More__PokeVerse/app/src/main/java/com/aditya1875/pokeverse/feature/analysis/presentation/screens/TeamAnalysis.kt,exact,True,271,AnalysisAdGate,1.0,303.0,ProgressIndicator,body,"CircularProgressIndicator(color = BLUE, modifier = Modifier.size(40.dp))",True,"  271 | private fun AnalysisAdGate(
+  272 |     adState: RewardedAdState,
+  273 |     onWatchAd: () -> Unit,
+  274 |     onGetPremium: () -> Unit
+  275 | ) {
+  276 |     Box(
+  277 |         Modifier
+  278 |             .fillMaxSize()
+  279 |             .background(AnalysisColors.BG),
+  280 |         contentAlignment = Alignment.Center
+  281 |     ) {
+  282 |         Column(
+  283 |             Modifier.padding(32.dp),
+  284 |             horizontalAlignment = Alignment.CenterHorizontally,
+  285 |             verticalArrangement = Arrangement.spacedBy(16.dp)
+  286 |         ) {
+  287 |             Text(
+  288 |                 stringResource(R.string.analysis_ad_title),
+  289 |                 style = MaterialTheme.typography.headlineSmall,
+  290 |                 color = Color.White,
+  291 |                 fontWeight = FontWeight.Bold,
+  292 |                 textAlign = TextAlign.Center
+  293 |             )
+  294 |             Text(
+  295 |                 stringResource(R.string.analysis_ad_body),
+  296 |                 style = MaterialTheme.typography.bodyMedium,
+  297 |                 color = Color.White.copy(alpha = 0.7f),
+  298 |                 textAlign = TextAlign.Center
+  299 |             )
+  300 |             Spacer(Modifier.height(8.dp))
+  301 |             when (adState) {
+  302 |                 is RewardedAdState.Loading -> {
+  303 |                     CircularProgressIndicator(color = BLUE, modifier = Modifier.size(40.dp))
+  304 |                     Text(
+  305 |                         stringResource(R.string.analysis_ad_loading),
+  306 |                         style = MaterialTheme.typography.bodySmall,
+  307 |                         color = Color.White.copy(alpha = 0.5f)
+  308 |                     )
+  309 |                 }
+  310 |                 is RewardedAdState.Ready, is RewardedAdState.Idle -> {
+  311 |                     Button(
+  312 |                         onClick = onWatchAd,
+  313 |                         enabled = adState is RewardedAdState.Ready,
+  314 |                         shape = RoundedCornerShape(12.dp),
+  315 |                         colors = ButtonDefaults.buttonColors(containerColor = BLUE),
+  316 |                         modifier = Modifier.fillMaxWidth()
+  317 |                     ) {
+  318 |                         Text(
+  319 |                             if (adState is RewardedAdState.Ready) stringResource(R.string.action_watch_ad)
+  320 |                             else stringResource(R.string.analysis_ad_unavailable),
+  321 |                             modifier = Modifier.padding(vertical = 4.dp)
+  322 |                         )
+  323 |                     }
+  324 |                 }
+  325 |                 is RewardedAdState.Showing -> {
+  326 |                     CircularProgressIndicator(color = BLUE, modifier = Modifier.size(40.dp))
+  327 |                 }
+  328 |             }
+  329 |             Button(
+  330 |                 onClick = onGetPremium,
+  331 |                 shape = RoundedCornerShape(12.dp),
+  332 |                 colors = ButtonDefaults.buttonColors(
+  333 |                     containerColor = Color.White.copy(alpha = 0.12f)
+  334 |                 ),
+  335 |                 modifier = Modifier.fillMaxWidth()
+  336 |             ) {
+  337 |                 Text(
+  338 |                     stringResource(R.string.action_go_premium),
+  339 |                     color = Color.White,
+  340 |                     modifier = Modifier.padding(vertical = 4.dp)
+  341 |                 )
+  342 |             }
+  343 |         }","import android.app.Activity
+import android.util.Log
+import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.aditya1875.pokeverse.R
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import com.aditya1875.pokeverse.feature.core.navigation.components.Route
+import com.aditya1875.pokeverse.feature.game.core.data.ads.IRewardedAdManager
+import com.aditya1875.pokeverse.feature.game.core.data.ads.RewardedAdState
+import com.aditya1875.pokeverse.feature.game.core.data.billing.IBillingManager
+import com.aditya1875.pokeverse.feature.game.core.data.billing.SubscriptionState
+import org.koin.compose.koinInject
+import com.aditya1875.pokeverse.feature.analysis.presentation.screens.AnalysisColors.BLUE
+import com.aditya1875.pokeverse.feature.analysis.presentation.components.AnalysisContent
+import com.aditya1875.pokeverse.feature.analysis.presentation.components.ErrorView
+import com.aditya1875.pokeverse.feature.analysis.presentation.components.LoadingView
+import com.aditya1875.pokeverse.feature.analysis.presentation.components.TeamAnalysis
+import com.aditya1875.pokeverse.feature.analysis.presentation.components.TeamAnalyzer
+import com.aditya1875.pokeverse.feature.analysis.presentation.components.TeamMemberWithTypes
+import com.aditya1875.pokeverse.feature.game.premium.components.PremiumBottomSheet
+import com.aditya1875.pokeverse.feature.pokemon.detail.presentation.viewmodels.PokemonDetailsViewModel
+import com.aditya1875.pokeverse.feature.team.presentation.viewmodels.TeamViewModel
+import com.aditya1875.pokeverse.presentation.viewmodel.BillingViewModel
+import org.koin.androidx.compose.koinViewModel"
+pilot-0238,progress_no_semantics,piratecash__pcash-wallet,piratecash__pcash-wallet/app/src/main/java/cash/p/terminal/modules/coin/overview/ui/CoinOverviewScreen.kt,Loading,CircularProgressIndicator without progressSemantics,"@Preview
+@Composable
+fun LoadingPreview() {
+    cash.p.terminal.ui_compose.theme.ComposeAppTheme {
+        Loading()
+    }
+}
+
+@Composable
+fun Error(message: String) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        subhead2_grey(text = message)
+    }",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/piratecash__pcash-wallet/app/src/main/java/cash/p/terminal/modules/coin/overview/ui/CoinOverviewScreen.kt,exact,True,241,onClick,1.0,286.0,ProgressIndicator,file,CircularProgressIndicator(,True,"  274 |         contentAlignment = Alignment.Center
+  275 |     ) {
+  276 |         subhead2_grey(text = message)
+  277 |     }
+  278 | }
+  279 | 
+  280 | @Composable
+  281 | fun Loading(modifier: Modifier = Modifier) {
+  282 |     Box(
+  283 |         modifier = modifier.fillMaxSize(),
+  284 |         contentAlignment = Alignment.Center
+  285 |     ) {
+  286 |         CircularProgressIndicator(
+  287 |             modifier = Modifier.size(24.dp),
+  288 |             color = ComposeAppTheme.colors.grey,
+  289 |             strokeWidth = 2.dp
+  290 |         )
+  291 |     }
+  292 | }","import android.content.Context
+import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import cash.p.terminal.R
+import cash.p.terminal.core.iconPlaceholder
+import cash.p.terminal.modules.coin.CoinLink
+import cash.p.terminal.modules.coin.overview.CoinOverviewModule
+import cash.p.terminal.modules.coin.overview.CoinOverviewViewModel
+import cash.p.terminal.modules.coin.overview.HudMessageType
+import cash.p.terminal.modules.coin.ui.CoinScreenTitle
+import cash.p.terminal.modules.enablecoin.restoresettings.RestoreSettingsViewModel
+import cash.p.terminal.modules.managewallets.ManageWalletsModule
+import cash.p.terminal.modules.managewallets.ManageWalletsViewModel
+import cash.p.terminal.modules.markdown.MarkdownFragment
+import cash.p.terminal.modules.enablecoin.restoresettings.openRestoreSettingsDialog
+import cash.p.terminal.navigation.slideFromRight
+import cash.p.terminal.ui_compose.components.ButtonSecondaryDefault
+import cash.p.terminal.ui.compose.components.ListErrorView
+import cash.p.terminal.ui.helpers.LinkHelper
+import cash.p.terminal.ui.helpers.TextHelper
+import cash.p.terminal.ui_compose.components.ButtonSecondaryCircle
+import cash.p.terminal.ui_compose.components.CellFooter
+import cash.p.terminal.ui_compose.components.CellUniversalLawrenceSection
+import cash.p.terminal.ui_compose.components.HSSwipeRefresh
+import cash.p.terminal.ui_compose.components.HSpacer
+import cash.p.terminal.ui_compose.components.RowUniversal
+import cash.p.terminal.ui_compose.components.subhead2_grey
+import cash.p.terminal.ui_compose.entities.ViewState
+import cash.p.terminal.ui_compose.theme.ComposeAppTheme
+import cash.p.terminal.wallet.alternativeImageUrl
+import cash.p.terminal.wallet.entities.FullCoin
+import cash.p.terminal.wallet.imageUrl
+import cash.p.terminal.wallet.models.LinkType
+import io.horizontalsystems.chartview.chart.ChartViewModel
+import io.horizontalsystems.chartview.ui.Chart
+import cash.p.terminal.ui_compose.components.HudHelper
+import cash.p.terminal.ui_compose.currentYear"
+pilot-0239,progress_no_semantics,Chesire__Nekome,Chesire__Nekome/features/search/src/main/java/com/chesire/nekome/app/search/search/ui/SearchScreen.kt,Render,CircularProgressIndicator without progressSemantics,"
+@Composable
+private fun Render(
+    state: State<UIState>,
+    onInputTextChanged: (String) -> Unit,
+    onSearchGroupSelected: (SearchGroup) -> Unit,
+    onSearchPressed: () -> Unit,
+    onSeriesTrack: (ResultModel) -> Unit,
+    onSnackbarShown: () -> Unit
+) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/Chesire__Nekome/features/search/src/main/java/com/chesire/nekome/app/search/search/ui/SearchScreen.kt,exact,True,88,Render,1.0,121.0,ProgressIndicator,body,CircularProgressIndicator(),True,"   88 | private fun Render(
+   89 |     state: State<UIState>,
+   90 |     onInputTextChanged: (String) -> Unit,
+   91 |     onSearchGroupSelected: (SearchGroup) -> Unit,
+   92 |     onSearchPressed: () -> Unit,
+   93 |     onSeriesTrack: (ResultModel) -> Unit,
+   94 |     onSnackbarShown: () -> Unit
+   95 | ) {
+   96 |     val snackbarHostState = remember { SnackbarHostState() }
+   97 | 
+   98 |     Scaffold(
+   99 |         snackbarHost = {
+  100 |             SnackbarHost(
+  101 |                 hostState = snackbarHostState,
+  102 |                 modifier = Modifier.semantics { testTag = SearchTags.Snackbar }
+  103 |             )
+  104 |         },
+  105 |         modifier = Modifier.semantics { testTag = SearchTags.Root }
+  106 |     ) { paddingValues ->
+  107 |         Column(
+  108 |             modifier = Modifier
+  109 |                 .fillMaxSize()
+  110 |                 .padding(paddingValues),
+  111 |             horizontalAlignment = Alignment.CenterHorizontally
+  112 |         ) {
+  113 |             InputText(
+  114 |                 state.value.searchText,
+  115 |                 state.value.isSearchTextError,
+  116 |                 onInputTextChanged,
+  117 |                 onSearchPressed
+  118 |             )
+  119 |             SearchGroup(state.value.searchGroup, onSearchGroupSelected)
+  120 |             if (state.value.isSearching) {
+  121 |                 CircularProgressIndicator()
+  122 |             } else {
+  123 |                 SearchButton(state.value.isSearching, onSearchPressed)
+  124 |             }
+  125 |             Divider(modifier = Modifier.padding(8.dp))
+  126 |             SearchResults(state.value.resultModels, onSeriesTrack)
+  127 |         }
+  128 |     }
+  129 | 
+  130 |     val snackbar = state.value.errorSnackbar
+  131 |     if (snackbar != null) {
+  132 |         val message = stringResource(id = snackbar.stringRes, snackbar.formatText)
+  133 |         LaunchedEffect(message) {
+  134 |             snackbarHostState.showSnackbar(message = message, duration = SnackbarDuration.Short)
+  135 |             onSnackbarShown()
+  136 |         }
+  137 |     }
+  138 | }
+  139 | 
+  140 | @Composable
+  141 | private fun InputText(
+  142 |     text: String,
+  143 |     isError: Boolean,
+  144 |     onInputTextChanged: (String) -> Unit,
+  145 |     onDonePressed: () -> Unit
+  146 | ) {
+  147 |     val keyboardController = LocalSoftwareKeyboardController.current
+  148 | 
+  149 |     OutlinedTextField(
+  150 |         value = text,
+  151 |         onValueChange = onInputTextChanged,
+  152 |         keyboardOptions = KeyboardOptions.Default.copy(
+  153 |             keyboardType = KeyboardType.Text,
+  154 |             autoCorrect = false
+  155 |         ),
+  156 |         keyboardActions = KeyboardActions(
+  157 |             onDone = {
+  158 |                 onDonePressed()
+  159 |                 keyboardController?.hide()
+  160 |             }
+  161 |         ),","import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.BrokenImage
+import androidx.compose.material.icons.filled.CollectionsBookmark
+import androidx.compose.material.icons.filled.InsertPhoto
+import androidx.compose.material.icons.filled.VideoLibrary
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import com.chesire.nekome.app.search.search.core.model.SearchGroup
+import com.chesire.nekome.core.compose.theme.NekomeTheme
+import com.chesire.nekome.core.flags.SeriesType
+import com.chesire.nekome.resources.StringResource"
+pilot-0240,progress_no_semantics,jordond__MaterialKolor,jordond__MaterialKolor/builder/shared/src/commonMain/kotlin/com/materialkolor/builder/ui/home/components/ExportDialog.kt,ExportDialog,CircularProgressIndicator without progressSemantics,"
+@Composable
+fun ExportDialog(
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Dialog(
+        onDismissRequest = {},
+        properties = DialogProperties(
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false,
+        ),
+        content = {
+            Card(
+                modifier = modifier
+                    .size(300.dp)",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/jordond__MaterialKolor/builder/shared/src/commonMain/kotlin/com/materialkolor/builder/ui/home/components/ExportDialog.kt,exact,True,22,ExportDialog,1.0,42.0,ProgressIndicator,body,CircularProgressIndicator(),True,"   22 | fun ExportDialog(
+   23 |     onDismiss: () -> Unit,
+   24 |     modifier: Modifier = Modifier,
+   25 | ) {
+   26 |     Dialog(
+   27 |         onDismissRequest = {},
+   28 |         properties = DialogProperties(
+   29 |             dismissOnBackPress = false,
+   30 |             dismissOnClickOutside = false,
+   31 |         ),
+   32 |         content = {
+   33 |             Card(
+   34 |                 modifier = modifier
+   35 |                     .size(300.dp)
+   36 |                     .padding(16.dp),
+   37 |             ) {
+   38 |                 Column(
+   39 |                     verticalArrangement = Arrangement.Center,
+   40 |                     horizontalAlignment = Alignment.CenterHorizontally,
+   41 |                 ) {
+   42 |                     CircularProgressIndicator()
+   43 |                     Spacer(modifier = Modifier.height(16.dp))
+   44 |                     Text(text = ""Exporting..."", fontStyle = FontStyle.Italic)
+   45 |                     Spacer(modifier = Modifier.height(32.dp))
+   46 | 
+   47 |                     Button(onClick = onDismiss) {
+   48 |                         Text(text = ""Cancel"")
+   49 |                     }
+   50 |                 }
+   51 |             }
+   52 |         },
+   53 |     )
+   54 | }","import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties"

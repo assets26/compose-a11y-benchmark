@@ -1,0 +1,88 @@
+@file:Suppress("FunctionName")
+
+package os.kei.ui.page.main.os.components
+
+import android.graphics.Bitmap
+import androidx.compose.runtime.Composable
+import com.kyant.backdrop.Backdrop
+import os.kei.ui.page.main.os.OsGoogleSystemServiceConfig
+import os.kei.ui.page.main.os.shortcut.ShortcutActivityClassOption
+import os.kei.ui.page.main.os.shortcut.ShortcutInstalledAppOption
+import os.kei.ui.page.main.os.shortcut.ShortcutSuggestionField
+import os.kei.ui.page.main.os.shortcut.ShortcutSuggestionItem
+
+@Composable
+internal fun OsActivityShortcutEditorHost(
+    showEditor: Boolean,
+    editorTitle: String,
+    sheetBackdrop: Backdrop,
+    draft: OsGoogleSystemServiceConfig,
+    onDraftChange: (OsGoogleSystemServiceConfig) -> Unit,
+    onOpenSuggestionSheet: (ShortcutSuggestionField) -> Unit,
+    showBuiltInBadge: Boolean,
+    showDeleteAction: Boolean,
+    hasUnsavedChanges: Boolean,
+    onDeleteEditor: () -> Unit,
+    onDismissEditor: () -> Unit,
+    onDismissEditorFinished: () -> Unit,
+    onSaveEditor: () -> Unit,
+    showSuggestionSheet: Boolean,
+    suggestionTarget: ShortcutSuggestionField,
+    packageSuggestions: List<ShortcutInstalledAppOption>,
+    packageSuggestionsLoading: Boolean,
+    packageSuggestionQuery: String,
+    onPackageSuggestionQueryChange: (String) -> Unit,
+    classSuggestions: List<ShortcutActivityClassOption>,
+    activityIconBitmaps: Map<String, Bitmap>,
+    packageIconBitmaps: Map<String, Bitmap>,
+    classSuggestionsLoading: Boolean,
+    classSuggestionQuery: String,
+    onClassSuggestionQueryChange: (String) -> Unit,
+    noMatchedResultsText: String,
+    onDismissSuggestionSheet: () -> Unit,
+    onApplySuggestion: (ShortcutSuggestionItem) -> Unit,
+    onApplyExplicitActionRecommendation: () -> Unit,
+    onApplyImplicitActionRecommendation: () -> Unit,
+    onApplyExplicitCategoryRecommendation: () -> Unit,
+    onApplyImplicitCategoryRecommendation: () -> Unit,
+) {
+    OsGoogleSystemServiceEditorSheet(
+        show = showEditor,
+        title = editorTitle,
+        sheetBackdrop = sheetBackdrop,
+        draft = draft,
+        onDraftChange = onDraftChange,
+        onOpenSuggestionSheet = onOpenSuggestionSheet,
+        showBuiltInBadge = showBuiltInBadge,
+        showDeleteAction = showDeleteAction,
+        hasUnsavedChanges = hasUnsavedChanges,
+        onDelete = onDeleteEditor,
+        onDismissRequest = onDismissEditor,
+        onDismissFinished = onDismissEditorFinished,
+        onSave = onSaveEditor,
+    )
+
+    OsGoogleSystemServiceSuggestionSheet(
+        show = showSuggestionSheet,
+        target = suggestionTarget,
+        draft = draft,
+        sheetBackdrop = sheetBackdrop,
+        packageSuggestions = packageSuggestions,
+        packageSuggestionsLoading = packageSuggestionsLoading,
+        packageSuggestionQuery = packageSuggestionQuery,
+        onPackageSuggestionQueryChange = onPackageSuggestionQueryChange,
+        classSuggestions = classSuggestions,
+        activityIconBitmaps = activityIconBitmaps,
+        packageIconBitmaps = packageIconBitmaps,
+        classSuggestionsLoading = classSuggestionsLoading,
+        classSuggestionQuery = classSuggestionQuery,
+        onClassSuggestionQueryChange = onClassSuggestionQueryChange,
+        noMatchedResultsText = noMatchedResultsText,
+        onDismissRequest = onDismissSuggestionSheet,
+        onApplySuggestion = onApplySuggestion,
+        onApplyExplicitActionRecommendation = onApplyExplicitActionRecommendation,
+        onApplyImplicitActionRecommendation = onApplyImplicitActionRecommendation,
+        onApplyExplicitCategoryRecommendation = onApplyExplicitCategoryRecommendation,
+        onApplyImplicitCategoryRecommendation = onApplyImplicitCategoryRecommendation,
+    )
+}

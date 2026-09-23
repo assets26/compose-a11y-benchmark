@@ -1,0 +1,268 @@
+package com.chmouel.liseur.ui.settings
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.chmouel.liseur.R
+import com.chmouel.liseur.data.settings.ColumnMode
+import com.chmouel.liseur.data.settings.FooterMode
+import com.chmouel.liseur.data.settings.ReadingFont
+import com.chmouel.liseur.data.settings.ReaderPrefs
+import com.chmouel.liseur.data.settings.fonts.UserFont
+import com.chmouel.liseur.data.settings.ReaderTheme
+import com.chmouel.liseur.data.settings.ReaderThemeChoice
+import com.chmouel.liseur.reader.annotations.HighlightPalette
+import com.chmouel.liseur.reader.annotations.HighlightTint
+import com.chmouel.liseur.ui.contentWidthCap
+import com.chmouel.liseur.ui.reading.ReadingBrightnessSlider
+import com.chmouel.liseur.ui.reading.ReadingFontDropdown
+import com.chmouel.liseur.ui.reading.readingFamily
+import com.chmouel.liseur.ui.reading.rememberFontLibrary
+import com.chmouel.liseur.ui.reading.ReadingFontSizeSlider
+import com.chmouel.liseur.ui.reading.ReadingFooterModeDropdown
+import com.chmouel.liseur.ui.reading.ReadingHighlightPaletteControls
+import com.chmouel.liseur.data.settings.ReadingCss
+import com.chmouel.liseur.ui.reading.FineTypographyActions
+import com.chmouel.liseur.ui.reading.ReadingFineTypographyControls
+import com.chmouel.liseur.ui.reading.ReadingLayoutControls
+import com.chmouel.liseur.ui.reading.previewFontWeight
+import com.chmouel.liseur.ui.reading.previewLetterSpacing
+import com.chmouel.liseur.ui.reading.previewParagraphGapSp
+import com.chmouel.liseur.ui.reading.previewTextAlign
+import com.chmouel.liseur.ui.reading.ReadingSectionLabel
+import com.chmouel.liseur.ui.reading.ReadingThemeRow
+import com.chmouel.liseur.ui.reading.composeFamily
+import com.chmouel.liseur.ui.windowWidth
+
+/**
+ * How the page looks, away from any particular page.
+ *
+ * The same controls the "Aa" sheet shows, on a screen you can reach
+ * without opening a book — which is what a reader who had turned the app
+ * dark and found their books still white was looking for, and could not
+ * find (issue #13).
+ *
+ * The preview at the top is the point of having this here rather than a
+ * row of sentences: with no page behind them, these settings need
+ * something to be true of. It stays above the Advanced section and goes
+ * on answering to what is inside it, so opening that is not a step away
+ * from the only page there is to look at.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ReadingAppearanceScreen(
+    prefs: ReaderPrefs,
+    appIsDark: Boolean,
+    onTheme: (ReaderThemeChoice) -> Unit,
+    onFont: (ReadingFont) -> Unit,
+    onFontSize: (Double) -> Unit,
+    onLineHeight: (Double?) -> Unit,
+    onPageMargins: (Double?) -> Unit,
+    onBrightness: (Float?) -> Unit,
+    onColumnMode: (ColumnMode) -> Unit,
+    onFooterMode: (FooterMode) -> Unit,
+    highlightPalette: HighlightPalette,
+    onHighlightTintToggled: (HighlightTint) -> Unit,
+    onHighlightDefaultTint: (HighlightTint) -> Unit,
+    fineTypography: FineTypographyActions,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val resolved = prefs.themeChoice.resolve(appIsDark)
+
+    Scaffold(
+        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            LargeTopAppBar(
+                title = { Text(stringResource(R.string.settings_reading_appearance)) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            Icons.Outlined.ArrowBack,
+                            contentDescription = stringResource(R.string.back),
+                        )
+                    }
+                },
+                scrollBehavior = scrollBehavior,
+            )
+        },
+    ) { padding ->
+        Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.TopCenter) {
+            Column(
+                Modifier
+                    .widthIn(max = contentWidthCap(windowWidth()))
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 20.dp)
+                    .padding(bottom = 32.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp),
+            ) {
+                val fontLibrary = rememberFontLibrary(onSelected = onFont)
+                ReadingPreview(
+                    prefs = prefs,
+                    theme = resolved,
+                    imported = fontLibrary.fonts,
+                )
+                ReadingThemeRow(
+                    selected = prefs.themeChoice,
+                    resolved = resolved,
+                    onSelected = onTheme,
+                )
+                ReadingFontSizeSlider(
+                    value = prefs.fontSize,
+                    // No book here, so nothing is refused: the reader is
+                    // choosing a default for every book they will open.
+                    enabled = true,
+                    onChanged = onFontSize,
+                )
+                ReadingBrightnessSlider(value = prefs.brightness, onChanged = onBrightness)
+                ReadingFontDropdown(
+                    selected = prefs.font,
+                    imported = fontLibrary.fonts,
+                    enabled = true,
+                    onSelected = onFont,
+                    onImport = fontLibrary.pick,
+                    onRemove = fontLibrary.remove,
+                )
+                Text(
+                    text = stringResource(R.string.settings_reading_appearance_detail),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                // Last, and closed, the way the "Aa" sheet's Advanced row
+                // is: the same settings should not be everyday on one
+                // surface and buried on the other.
+                var advancedOpen by remember { mutableStateOf(false) }
+                SettingsExpandableSection(
+                    title = stringResource(R.string.settings_advanced),
+                    expanded = advancedOpen,
+                    onExpandedChange = { advancedOpen = it },
+                ) {
+                    ReadingLayoutControls(
+                        lineHeight = prefs.lineHeight,
+                        pageMargins = prefs.pageMargins,
+                        columnMode = prefs.columnMode,
+                        // The sheet hides this in a scrolled book, where
+                        // columns don't apply. There is no book here to
+                        // check, so the preference is always offered; the
+                        // reader surface decides whether to honor it.
+                        showColumns = true,
+                        enabled = true,
+                        onLineHeightChanged = onLineHeight,
+                        onPageMarginsChanged = onPageMargins,
+                        onColumnModeChanged = onColumnMode,
+                    )
+                    // No book is open here, so nothing is disabled and the
+                    // wording names the writing systems a setting applies
+                    // to rather than claiming anything about one book.
+                    ReadingFineTypographyControls(
+                        prefs = prefs,
+                        css = ReadingCss.Unknown,
+                        actions = fineTypography,
+                    )
+                    ReadingFooterModeDropdown(
+                        selected = prefs.footerMode,
+                        onSelected = onFooterMode,
+                    )
+                    ReadingHighlightPaletteControls(
+                        palette = highlightPalette,
+                        onTintToggled = onHighlightTintToggled,
+                        onDefaultChanged = onHighlightDefaultTint,
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * A few lines of a book that is not there.
+ *
+ * Drawn in the reading theme's own colours rather than the app's, so
+ * the difference between the two — the thing the reporter of #13 could
+ * not see — is on the screen where the setting is. The size, spacing
+ * and margins are the real ones; the brightness is not, since it is the
+ * screen's and not the page's.
+ */
+@Composable
+private fun ReadingPreview(
+    prefs: ReaderPrefs,
+    theme: ReaderTheme,
+    imported: List<UserFont>,
+) {
+    val family = prefs.font.readingFamily(imported)
+    val textSp = 17 * prefs.fontSize
+    // Derived in sp and converted here, so the gap follows the size
+    // slider and the system font scale rather than only the first.
+    val paragraphGap = with(LocalDensity.current) {
+        previewParagraphGapSp(prefs.paragraphSpacing, textSp).sp.toDp()
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        ReadingSectionLabel(stringResource(R.string.reader_preview_title))
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(theme.background)
+                .padding(
+                    horizontal = (24 * (prefs.pageMargins ?: 1.0)).dp,
+                    vertical = 20.dp,
+                ),
+        ) {
+            // Two paragraphs rather than one, so paragraph spacing has a
+            // gap to be visible in. Hyphenation and word spacing are not
+            // drawn here — neither shows reliably in this little text,
+            // and a preview that only sometimes tells the truth is worse
+            // than one that does not claim to.
+            Column(verticalArrangement = Arrangement.spacedBy(paragraphGap)) {
+                listOf(
+                    R.string.reader_preview_body,
+                    R.string.reader_preview_body_second,
+                ).forEach { body ->
+                    Text(
+                        text = stringResource(body),
+                        color = theme.foreground,
+                        fontFamily = family,
+                        fontSize = textSp.sp,
+                        fontWeight = previewFontWeight(prefs.fontWeight),
+                        letterSpacing = previewLetterSpacing(prefs.letterSpacing),
+                        lineHeight = (textSp * (prefs.lineHeight ?: 1.4)).sp,
+                        textAlign = previewTextAlign(prefs.textAlign),
+                    )
+                }
+            }
+        }
+    }
+}

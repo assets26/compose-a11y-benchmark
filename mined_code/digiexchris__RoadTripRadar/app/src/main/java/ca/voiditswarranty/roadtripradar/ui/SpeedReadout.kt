@@ -1,0 +1,47 @@
+package ca.voiditswarranty.roadtripradar.ui
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import ca.voiditswarranty.roadtripradar.R
+
+@Composable
+fun SpeedReadout(
+    speedMps: Double,
+    useMetric: Boolean,
+    speedSize: Float,
+    modifier: Modifier = Modifier,
+) {
+    val displaySpeed = if (useMetric) (speedMps * 3.6).toInt() else (speedMps * 2.23694).toInt()
+    val unitLabel = if (useMetric) stringResource(R.string.speed_unit_kmh) else stringResource(R.string.speed_unit_mph)
+    Column(
+        modifier = modifier
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = displaySpeed.coerceAtLeast(0).toString(),
+            fontSize = speedSize.sp,
+            lineHeight = speedSize.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center,
+        )
+        Text(
+            text = unitLabel,
+            fontSize = (speedSize / 3).sp,
+            lineHeight = (speedSize / 3).sp,
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center,
+        )
+    }
+}

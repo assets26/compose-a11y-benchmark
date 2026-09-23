@@ -1,0 +1,462 @@
+package ca.voiditswarranty.roadtripradar.ui
+
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.Cloud
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.PublicOff
+import androidx.compose.material.icons.filled.SatelliteAlt
+import androidx.compose.material.icons.filled.SignalCellular4Bar
+import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.Wifi
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LargeFloatingActionButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
+import ca.voiditswarranty.roadtripradar.R
+import ca.voiditswarranty.roadtripradar.model.NetworkStatus
+import ca.voiditswarranty.roadtripradar.model.NetworkTransport
+import ca.voiditswarranty.roadtripradar.ui.tutorial.TutorialAnchors
+import ca.voiditswarranty.roadtripradar.ui.tutorial.tutorialAnchor
+
+private val fabBorderModifier: Modifier = Modifier
+
+@Composable
+fun RecenterFab(
+    hasLocation: Boolean,
+    isTrackingCamera: Boolean,
+    onRecenter: () -> Unit,
+    scale: Float = 1f,
+    modifier: Modifier = Modifier,
+) {
+    if (!isTrackingCamera && hasLocation) {
+        LargeFloatingActionButton(
+            onClick = onRecenter,
+            modifier = modifier
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                },
+            shape = CircleShape,
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+        ) {
+            Icon(
+                imageVector = Icons.Default.MyLocation,
+                contentDescription = stringResource(R.string.cd_recenter_location),
+            )
+        }
+    }
+}
+
+@Composable
+fun RecenterTextButton(
+    hasLocation: Boolean,
+    isTrackingCamera: Boolean,
+    onRecenter: () -> Unit,
+    scale: Float = 1f,
+    modifier: Modifier = Modifier,
+) {
+    if (!isTrackingCamera && hasLocation) {
+        Button(
+            onClick = onRecenter,
+            modifier = modifier.graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            },
+            shape = RoundedCornerShape(10.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            ),
+        ) {
+            Text(stringResource(R.string.fab_recenter))
+        }
+    }
+}
+
+@Composable
+fun RetryFailedButton(
+    hasFailedCells: Boolean,
+    onRetry: () -> Unit,
+    scale: Float = 1f,
+    modifier: Modifier = Modifier,
+) {
+    if (!hasFailedCells) return
+    Button(
+        onClick = onRetry,
+        modifier = modifier.graphicsLayer {
+            scaleX = scale
+            scaleY = scale
+        },
+        shape = RoundedCornerShape(10.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ),
+    ) {
+        Text(stringResource(R.string.fab_retry_failed))
+    }
+}
+
+@Composable
+fun LeftContent(
+    verticalArrangement: Arrangement.Vertical = Arrangement.Center,
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = verticalArrangement,
+        horizontalAlignment = Alignment.Start,
+    ) {
+        content()
+    }
+}
+
+@Composable
+fun RightContent(
+    verticalArrangement: Arrangement.Vertical = Arrangement.Center,
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = verticalArrangement,
+        horizontalAlignment = Alignment.End,
+    ) {
+        content()
+    }
+}
+
+@Composable
+fun GpsStatusIcon(
+    hasGpsFix: Boolean,
+    opacity: Float = 1f,
+    modifier: Modifier = Modifier,
+) {
+    val transition = rememberInfiniteTransition(label = "gps-blink")
+    val blinkProgress by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1500),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "gps-blink-alpha",
+    )
+    val tint = if (hasGpsFix) Color.White else lerp(Color.White, Color.Red, blinkProgress)
+    Icon(
+        imageVector = Icons.Default.SatelliteAlt,
+        contentDescription = if (hasGpsFix) stringResource(R.string.cd_gps_fix_acquired) else stringResource(R.string.cd_waiting_gps_fix),
+        tint = tint,
+        modifier = modifier
+            .size(32.dp)
+            .graphicsLayer { alpha = opacity },
+    )
+}
+
+@Composable
+fun NetworkStatusIcon(
+    status: NetworkStatus,
+    opacity: Float = 1f,
+    modifier: Modifier = Modifier,
+) {
+    val transition = rememberInfiniteTransition(label = "net-blink")
+    val blinkProgress by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1500),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "net-blink-alpha",
+    )
+
+    val icon: ImageVector
+    val description: String
+    val tint: Color
+
+    if (!status.connected) {
+        icon = Icons.Default.PublicOff
+        description = stringResource(R.string.cd_no_network)
+        tint = lerp(Color.White, Color.Red, blinkProgress)
+    } else {
+        icon = when (status.transport) {
+            NetworkTransport.WIFI -> Icons.Default.Wifi
+            NetworkTransport.CELLULAR -> Icons.Default.SignalCellular4Bar
+            else -> Icons.Default.PublicOff
+        }
+        description = when (status.transport) {
+            NetworkTransport.WIFI -> stringResource(R.string.cd_wifi)
+            NetworkTransport.CELLULAR -> stringResource(R.string.cd_cellular)
+            else -> stringResource(R.string.cd_unknown_network)
+        }
+        tint = if (status.validated) Color.White else lerp(Color.White, Color.Red, blinkProgress)
+    }
+
+    Icon(
+        imageVector = icon,
+        contentDescription = description,
+        tint = tint,
+        modifier = modifier
+            .size(32.dp)
+            .graphicsLayer { alpha = opacity },
+    )
+}
+
+@Composable
+fun BottomContent(
+    onZoomIn: () -> Unit,
+    onZoomOut: () -> Unit,
+    isWeatherPlaying: Boolean,
+    weatherActive: Boolean,
+    onToggleWeatherPlayPause: () -> Unit,
+    onWeatherOff: () -> Unit,
+    onOpenMenu: () -> Unit,
+    aboveContent: @Composable () -> Unit,
+    isLandscape: Boolean = false,
+    scale: Float = 1f,
+    onZoomInLong: () -> Unit = {},
+    onZoomOutLong: () -> Unit = {},
+    modifier: Modifier = Modifier,
+) {
+    val haptics = LocalHapticFeedback.current
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        aboveContent()
+        BoxWithConstraints(
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            val buttonCount = 4
+            val minGap = 8.dp
+            val preferredSize = 96.dp
+            val totalGapSpace = minGap * (buttonCount + 1)
+            val availableForButtons = maxWidth - totalGapSpace
+            val buttonSize = min(preferredSize, availableForButtons / buttonCount)
+            val iconSize = 48.dp * (buttonSize / preferredSize)
+            Row(
+                modifier = Modifier.fillMaxWidth().let {
+                    if (isLandscape) it.padding(horizontal = minGap) else it
+                },
+                horizontalArrangement = if (isLandscape) Arrangement.spacedBy(minGap) else Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+            val weatherDescription = when {
+                !weatherActive -> stringResource(R.string.cd_weather_off)
+                isWeatherPlaying -> stringResource(R.string.cd_weather_pause)
+                else -> stringResource(R.string.cd_weather_play)
+            }
+            val weatherColor = when {
+                !weatherActive -> MaterialTheme.colorScheme.surfaceVariant
+                isWeatherPlaying -> MaterialTheme.colorScheme.primaryContainer
+                else -> MaterialTheme.colorScheme.primaryContainer
+            }
+            Surface(
+                shape = CircleShape,
+                color = weatherColor,
+                tonalElevation = 6.dp,
+                shadowElevation = 6.dp,
+                modifier = fabBorderModifier
+                    .size(buttonSize)
+                    .graphicsLayer {
+                        scaleX = scale
+                        scaleY = scale
+                    }
+                    .tutorialAnchor(TutorialAnchors.WEATHER_FAB),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .combinedClickable(
+                            onClick = onToggleWeatherPlayPause,
+                            onLongClick = onWeatherOff,
+                        ),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    if (!weatherActive) {
+                        WeatherOffIcon(
+                            contentDescription = weatherDescription,
+                            modifier = Modifier.size(iconSize),
+                        )
+                    } else {
+                        Icon(
+                            imageVector = if (isWeatherPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                            contentDescription = weatherDescription,
+                            modifier = Modifier.size(iconSize),
+                        )
+                    }
+                }
+            }
+
+            Surface(
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.primaryContainer,
+                tonalElevation = 6.dp,
+                shadowElevation = 6.dp,
+                modifier = fabBorderModifier
+                    .size(buttonSize)
+                    .graphicsLayer {
+                        scaleX = scale
+                        scaleY = scale
+                    }
+                    .tutorialAnchor(TutorialAnchors.ZOOM_OUT),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .combinedClickable(
+                            onClick = onZoomOut,
+                            onLongClick = {
+                                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                onZoomOutLong()
+                            },
+                        ),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Remove,
+                        contentDescription = stringResource(R.string.cd_zoom_out),
+                        modifier = Modifier.size(iconSize),
+                    )
+                }
+            }
+
+            if (isLandscape) {
+                Spacer(modifier = Modifier.weight(1f))
+            }
+
+            Surface(
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.primaryContainer,
+                tonalElevation = 6.dp,
+                shadowElevation = 6.dp,
+                modifier = fabBorderModifier
+                    .size(buttonSize)
+                    .graphicsLayer {
+                        scaleX = scale
+                        scaleY = scale
+                    }
+                    .tutorialAnchor(TutorialAnchors.ZOOM_IN),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .combinedClickable(
+                            onClick = onZoomIn,
+                            onLongClick = {
+                                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                onZoomInLong()
+                            },
+                        ),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = stringResource(R.string.cd_zoom_in),
+                        modifier = Modifier.size(iconSize),
+                    )
+                }
+            }
+
+            LargeFloatingActionButton(
+                onClick = onOpenMenu,
+                modifier = fabBorderModifier
+                    .size(buttonSize)
+                    .graphicsLayer {
+                        scaleX = scale
+                        scaleY = scale
+                    }
+                    .tutorialAnchor(TutorialAnchors.MENU_FAB),
+                shape = CircleShape,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = stringResource(R.string.cd_quick_actions),
+                    modifier = Modifier.size(iconSize),
+                )
+            }
+        }
+        }
+    }
+}
+
+@Composable
+fun TopContent(
+    leftContent: @Composable () -> Unit,
+    centerContent: @Composable () -> Unit,
+    rightContent: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.Top,
+    ) {
+        leftContent()
+        centerContent()
+        rightContent()
+    }
+}
+
+@Composable
+private fun WeatherOffIcon(
+    contentDescription: String,
+    modifier: Modifier = Modifier,
+) {
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+        Icon(
+            imageVector = Icons.Default.Cloud,
+            contentDescription = contentDescription,
+            modifier = Modifier.fillMaxSize(0.6f),
+        )
+        Icon(
+            imageVector = Icons.Default.Block,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+        )
+    }
+}

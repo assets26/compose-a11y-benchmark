@@ -1,0 +1,2390 @@
+item_id,category,repo,file,composable,evidence,snippet,verdict,notes,abs_path,resolve_method,file_found,decl_line,decl_name,decl_confidence,anchor_line,anchor_pattern,anchor_scope,anchor_text,anchor_found,context,imports
+pilot-0061,error_state_no_semantics,CliffracerMerchant__SoundAura,CliffracerMerchant__SoundAura/app/src/main/java/com/cliffracertech/soundaura/addbutton/AddButtonDialog.kt,NamingTextField,isError set without semantics { error(...) },"}
+
+@Composable private fun NamingTextField(
+    state: NamingState,
+    modifier: Modifier,
+) = Column(modifier) {
+    TextField(
+        value = state.name,
+        onValueChange = state::onNameChange,
+        textStyle = MaterialTheme.typography.body1,
+        singleLine = true,
+        isError = state.message?.isError == true,
+        modifier = Modifier.fillMaxWidth())
+    AnimatedValidatorMessage(state.message)
+}
+",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/CliffracerMerchant__SoundAura/app/src/main/java/com/cliffracertech/soundaura/addbutton/AddButtonDialog.kt,exact,True,106,NamingTextField,1.0,115.0,\bisError\b,body,"isError = state.message?.isError == true,",True,"  103 |     LaunchedEffect(Unit) { launcher.launch(permission) }
+  104 | }
+  105 | 
+  106 | @Composable private fun NamingTextField(
+  107 |     state: NamingState,
+  108 |     modifier: Modifier,
+  109 | ) = Column(modifier) {
+  110 |     TextField(
+  111 |         value = state.name,
+  112 |         onValueChange = state::onNameChange,
+  113 |         textStyle = MaterialTheme.typography.body1,
+  114 |         singleLine = true,
+  115 |         isError = state.message?.isError == true,
+  116 |         modifier = Modifier.fillMaxWidth())
+  117 |     AnimatedValidatorMessage(state.message)
+  118 | }
+  119 | 
+  120 | /** Show the add button related dialog to the user inside an instance of
+  121 |  * [SoundAuraDialog]. Nothing will be shown if the value of [state] is one of
+  122 |  * [AddButtonDialogState]'s values that are not displayed in an instance of
+  123 |  * [SoundAuraDialog] (generally ones that are shown as Android system dialogs
+  124 |  * instead, e.g. a permission dialog).*/
+  125 | @Composable private fun AddButtonSoundAuraDialogShower(state: AddButtonDialogState) =
+  126 |     SoundAuraDialog(
+  127 |         width = DialogWidth.MatchToScreenSize(WindowInsets.ime),
+  128 |         title = stringResource(state.titleResId),
+  129 |         onDismissRequest = state.onDismissRequest,
+  130 |         buttons = { AddButtonDialogButtons(state) }
+  131 |     ) {
+  132 |         SlideAnimatedContent(
+  133 |             targetState = state,
+  134 |             leftToRight = state.wasNavigatedForwardTo,
+  135 |         ) { state ->
+  136 |             // This background modifiers gives a border to the content to
+  137 |             // improve the appearance of the SlideAnimatedContent animations
+  138 |             val backgroundModifier = Modifier
+  139 |                 .background(MaterialTheme.colors.surface)
+  140 |                 .padding(horizontal = 16.dp)
+  141 |             when (state) {
+  142 |                 is AddButtonDialogState.SelectingFiles -> {}
+  143 |                 is AddButtonDialogState.RequestStoragePermission -> {}
+  144 |                 is AddButtonDialogState.AddIndividuallyOrAsPlaylistQuery -> {
+  145 |                     Box(modifier = backgroundModifier.padding(vertical = 16.dp),
+  146 |                         // The vertical padding is set to match the TextField decoration box's
+  147 |                         // vertical padding. This reduces the amount that the dialog box height
+  148 |                         // has to be animated when switching between steps of the dialog.
+  149 |                         contentAlignment = Alignment.CenterStart
+  150 |                     ) {
+  151 |                         Text(stringResource(state.textResId))
+  152 |                     }
+  153 |                 } is AddButtonDialogState.NamePreset -> {
+  154 |                     NamingTextField(state, backgroundModifier)
+  155 |                 } is AddButtonDialogState.NameTracks -> {","import android.Manifest
+import android.net.Uri
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import com.cliffracertech.soundaura.dialog.AnimatedValidatorMessage
+import com.cliffracertech.soundaura.dialog.DialogWidth
+import com.cliffracertech.soundaura.dialog.NamingState
+import com.cliffracertech.soundaura.dialog.SoundAuraDialog
+import com.cliffracertech.soundaura.library.PlaylistOptionsView
+import com.cliffracertech.soundaura.ui.HorizontalDivider
+import com.cliffracertech.soundaura.ui.SlideAnimatedContent
+import com.cliffracertech.soundaura.ui.TextButton
+import com.cliffracertech.soundaura.ui.VerticalDivider
+import com.cliffracertech.soundaura.ui.bottomEndShape
+import com.cliffracertech.soundaura.ui.bottomShape
+import com.cliffracertech.soundaura.ui.bottomStartShape
+import com.cliffracertech.soundaura.ui.minTouchTargetSize"
+pilot-0062,error_state_no_semantics,IacobIonut01__ReFra,IacobIonut01__ReFra/app/src/main/kotlin/com/dot/gallery/cloud/ui/CloudAddServerScreen.kt,ServerStep,isError set without semantics { error(...) },"
+@Composable
+private fun ServerStep(
+    state: AddServerUiState,
+    descriptor: com.dot.gallery.cloud.ui.descriptor.ProviderUiDescriptor,
+    isUrlValid: Boolean,
+    viewModel: CloudAccountsViewModel
+) {
+    AppTextField(
+        value = state.serverUrl,
+        onValueChange = viewModel::updateServerUrl,
+        label = { Text(stringResource(R.string.cloud_server_url)) },
+        placeholder = { Text(stringResource(descriptor.urlHintRes)) },
+        modifier = frostedFieldModifier(),
+        containerColor = Color.Transparent,
+        singleLine = true,",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/IacobIonut01__ReFra/app/src/main/kotlin/com/dot/gallery/cloud/ui/CloudAddServerScreen.kt,exact,True,353,ServerStep,1.0,367.0,\bisError\b,body,"isError = state.serverUrl.isNotBlank() && !isUrlValid,",True,"  353 | private fun ServerStep(
+  354 |     state: AddServerUiState,
+  355 |     descriptor: com.dot.gallery.cloud.ui.descriptor.ProviderUiDescriptor,
+  356 |     isUrlValid: Boolean,
+  357 |     viewModel: CloudAccountsViewModel
+  358 | ) {
+  359 |     AppTextField(
+  360 |         value = state.serverUrl,
+  361 |         onValueChange = viewModel::updateServerUrl,
+  362 |         label = { Text(stringResource(R.string.cloud_server_url)) },
+  363 |         placeholder = { Text(stringResource(descriptor.urlHintRes)) },
+  364 |         modifier = frostedFieldModifier(),
+  365 |         containerColor = Color.Transparent,
+  366 |         singleLine = true,
+  367 |         isError = state.serverUrl.isNotBlank() && !isUrlValid,
+  368 |         supportingText = if (state.serverUrl.isNotBlank() && !isUrlValid) {
+  369 |             { Text(stringResource(R.string.cloud_url_invalid)) }
+  370 |         } else null,
+  371 |         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri)
+  372 |     )
+  373 |     if (descriptor.isLanOnly) {
+  374 |         Spacer(Modifier.height(8.dp))
+  375 |         Text(
+  376 |             stringResource(R.string.cloud_network_share_lan_note),
+  377 |             style = MaterialTheme.typography.bodySmall,
+  378 |             color = MaterialTheme.colorScheme.onSurfaceVariant
+  379 |         )
+  380 |     }
+  381 |     descriptor.setupHintRes?.let { hintRes ->
+  382 |         Spacer(Modifier.height(8.dp))
+  383 |         SetupHelpCard(hintText = stringResource(hintRes))
+  384 |     }
+  385 | }
+  386 | 
+  387 | @Composable
+  388 | private fun CredentialsStep(
+  389 |     state: AddServerUiState,
+  390 |     descriptor: com.dot.gallery.cloud.ui.descriptor.ProviderUiDescriptor,
+  391 |     credentialValues: CredentialValues,
+  392 |     supportsInteractiveAuth: Boolean,
+  393 |     viewModel: CloudAccountsViewModel
+  394 | ) {
+  395 |     val context = LocalContext.current
+  396 |     val scope = rememberCoroutineScope()
+  397 |     var showLocalNetworkRationale by remember { mutableStateOf(false) }
+  398 |     var pendingConnectionTest by remember { mutableStateOf<(() -> Unit)?>(null) }
+  399 |     val localNetworkPermissionLauncher = rememberLauncherForActivityResult(
+  400 |         ActivityResultContracts.RequestPermission()
+  401 |     ) { granted ->
+  402 |         val action = pendingConnectionTest
+  403 |         pendingConnectionTest = null
+  404 |         if (granted) action?.invoke()
+  405 |     }
+  406 |     val testConnection: () -> Unit = {
+  407 |         val action = viewModel::testConnection","import android.Manifest
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Warning
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.dot.gallery.R
+import com.dot.gallery.cloud.core.ProviderType
+import com.dot.gallery.cloud.core.auth.InteractiveAuthErrorKind
+import com.dot.gallery.cloud.ui.descriptor.CredentialField
+import com.dot.gallery.cloud.ui.descriptor.CredentialFieldKind
+import com.dot.gallery.cloud.ui.descriptor.CredentialValues
+import com.dot.gallery.cloud.ui.descriptor.ProviderUiDescriptors
+import com.dot.gallery.core.LocalEventHandler
+import com.dot.gallery.core.presentation.components.AppTextField
+import com.dot.gallery.core.presentation.components.SetupButton
+import com.dot.gallery.feature_node.domain.model.Album
+import com.dot.gallery.feature_node.presentation.setup.components.SetupWizardScaffold
+import com.dot.gallery.feature_node.presentation.util.LocalHazeState
+import com.dot.gallery.feature_node.presentation.util.rememberAppBottomSheetState
+import dev.chrisbanes.haze.LocalHazeStyle
+import dev.chrisbanes.haze.hazeEffect
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.net.InetAddress
+import java.net.URI"
+pilot-0063,error_state_no_semantics,maxwhipw__marmalade-tts-android,maxwhipw__marmalade-tts-android/app/src/main/java/app/marmalade/tts/ui/screen/EffectEditorScreen.kt,EffectEditorScreen,isError set without semantics { error(...) },"@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EffectEditorScreen(
+    onBack: () -> Unit,
+    viewModel: EffectEditorViewModel = hiltViewModel(),
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    Scaffold(
+        contentWindowInsets = WindowInsets(0),
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        stringResource(
+                            if (state.isEdit) {",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/maxwhipw__marmalade-tts-android/app/src/main/java/app/marmalade/tts/ui/screen/EffectEditorScreen.kt,exact,True,75,EffectEditorScreen,1.0,136.0,\bisError\b,body,"isError = state.nameError,",True,"  124 |             modifier = Modifier
+  125 |                 .fillMaxSize()
+  126 |                 .padding(innerPadding)
+  127 |                 .verticalScroll(rememberScrollState())
+  128 |                 .padding(16.dp),
+  129 |             verticalArrangement = Arrangement.spacedBy(12.dp),
+  130 |         ) {
+  131 |             OutlinedTextField(
+  132 |                 value = state.name,
+  133 |                 onValueChange = viewModel::onNameChange,
+  134 |                 label = { Text(stringResource(R.string.effects_name)) },
+  135 |                 singleLine = true,
+  136 |                 isError = state.nameError,
+  137 |                 supportingText = if (state.nameError) {
+  138 |                     {
+  139 |                         Text(
+  140 |                             stringResource(R.string.effects_name_error),
+  141 |                             color = MaterialTheme.colorScheme.error,
+  142 |                         )
+  143 |                     }
+  144 |                 } else {
+  145 |                     null
+  146 |                 },
+  147 |                 modifier = Modifier.fillMaxWidth(),
+  148 |             )
+  149 | 
+  150 |             Text(
+  151 |                 text = stringResource(R.string.effects_chain),
+  152 |                 style = MaterialTheme.typography.titleSmall,
+  153 |                 fontWeight = FontWeight.SemiBold,
+  154 |                 modifier = Modifier.semantics { heading() },
+  155 |             )
+  156 |             Text(
+  157 |                 text = stringResource(R.string.effects_chain_help),
+  158 |                 style = MaterialTheme.typography.bodySmall,
+  159 |                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+  160 |             )
+  161 | 
+  162 |             if (state.blocks.isEmpty()) {
+  163 |                 Text(
+  164 |                     text = stringResource(R.string.effects_chain_empty),
+  165 |                     style = MaterialTheme.typography.bodyMedium,
+  166 |                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+  167 |                 )
+  168 |             } else {
+  169 |                 state.blocks.forEachIndexed { index, block ->
+  170 |                     BlockCard(
+  171 |                         block = block,
+  172 |                         index = index,
+  173 |                         count = state.blocks.size,
+  174 |                         onChange = { viewModel.updateBlock(index, it) },
+  175 |                         onRemove = { viewModel.removeBlock(index) },
+  176 |                         onMoveUp = { viewModel.moveUp(index) },","import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import app.marmalade.tts.R
+import app.marmalade.tts.audio.EffectBlock"
+pilot-0064,error_state_no_semantics,maxwhipw__marmalade-tts-android,maxwhipw__marmalade-tts-android/app/src/main/java/app/marmalade/tts/ui/onboarding/OnboardingScreen.kt,CreateAliasStep,isError set without semantics { error(...) },"@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CreateAliasStep(
+    padding: PaddingValues,
+    editor: OnboardingViewModel.AliasFields,
+    voices: List<VoiceMeta>,
+    aliasCreated: Boolean,
+    onSeedDefaults: () -> Unit,
+    onNameChange: (String) -> Unit,
+    onEngineChange: (String) -> Unit,
+    onVoiceChange: (String) -> Unit,
+    onSpeedChange: (Float) -> Unit,
+    onEffectChange: (EffectPreset) -> Unit,
+    onSave: () -> Unit,
+    onUseDefaults: () -> Unit,
+    onFinish: () -> Unit,",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/maxwhipw__marmalade-tts-android/app/src/main/java/app/marmalade/tts/ui/onboarding/OnboardingScreen.kt,exact,True,772,CreateAliasStep,1.0,828.0,\bisError\b,body,"isError = editor.error != null,",True,"  816 |             onValueChange = onNameChange,
+  817 |             label = { Text(stringResource(R.string.onboarding_alias_name_label)) },
+  818 |             singleLine = true,
+  819 |             supportingText = {
+  820 |                 Text(
+  821 |                     text = stringResource(
+  822 |                         editor.error ?: R.string.onboarding_alias_name_helper,
+  823 |                     ),
+  824 |                     color = if (editor.error != null) MaterialTheme.colorScheme.error
+  825 |                             else MaterialTheme.colorScheme.onSurfaceVariant,
+  826 |                 )
+  827 |             },
+  828 |             isError = editor.error != null,
+  829 |             modifier = Modifier.fillMaxWidth(),
+  830 |         )
+  831 |         Spacer(Modifier.height(12.dp))
+  832 | 
+  833 |         OnboardingEngineDropdown(
+  834 |             selected = editor.engine,
+  835 |             onPick = onEngineChange,
+  836 |         )
+  837 |         Spacer(Modifier.height(12.dp))
+  838 | 
+  839 |         OnboardingVoiceDropdown(
+  840 |             selected = editor.voiceId,
+  841 |             voices = voices,
+  842 |             onPick = onVoiceChange,
+  843 |         )
+  844 |         Spacer(Modifier.height(12.dp))
+  845 | 
+  846 |         Column {
+  847 |             val speedText = stringResource(R.string.onboarding_alias_speed_value, editor.speed)
+  848 |             Text(
+  849 |                 text = stringResource(R.string.onboarding_alias_speed_label, speedText),
+  850 |                 style = MaterialTheme.typography.bodyMedium,
+  851 |             )
+  852 |             val speedDescription = stringResource(
+  853 |                 R.string.onboarding_alias_speed_content_description,
+  854 |             )
+  855 |             Slider(
+  856 |                 value = editor.speed,
+  857 |                 onValueChange = onSpeedChange,
+  858 |                 valueRange = VoiceAlias.MIN_SPEED..VoiceAlias.MAX_SPEED,
+  859 |                 steps = 14,
+  860 |                 modifier = Modifier.semantics {
+  861 |                     contentDescription = speedDescription
+  862 |                     stateDescription = speedText
+  863 |                 },
+  864 |             )
+  865 |         }
+  866 |         Spacer(Modifier.height(12.dp))
+  867 | 
+  868 |         OnboardingEffectDropdown(","import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.annotation.StringRes
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.VerticalDivider
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import app.marmalade.tts.R
+import app.marmalade.tts.audio.EffectPreset
+import app.marmalade.tts.data.KittenDirectVoiceCatalog
+import app.marmalade.tts.data.db.VoiceAlias
+import app.marmalade.tts.data.db.VoiceMeta
+import app.marmalade.tts.install.EngineCatalog
+import app.marmalade.tts.install.EngineDescriptor
+import app.marmalade.tts.install.InstallState
+import app.marmalade.tts.perf.EngineFit
+import app.marmalade.tts.ui.components.EngineSpecColumn
+import app.marmalade.tts.ui.components.JarMascot
+import app.marmalade.tts.ui.components.JarMascotState"
+pilot-0065,error_state_no_semantics,AmanoTeam__Kahon,AmanoTeam__Kahon/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/components/ExtensionStoresDialogs.kt,ExtensionStoreCreateDialog,isError set without semantics { error(...) },"
+@Composable
+fun ExtensionStoreCreateDialog(
+    onDismissRequest: () -> Unit,
+    onCreate: (String) -> Unit,
+    storeIndexUrls: Set<String>,
+    processing: Boolean,
+    errorMessage: String?,
+) {
+    val state = rememberTextFieldState()
+    val storeAlreadyExists by remember(storeIndexUrls) {
+        derivedStateOf {
+            val indexUrl = state.text.toString()
+            storeIndexUrls.contains(indexUrl)
+        }
+    }",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/AmanoTeam__Kahon/app/src/main/java/eu/kanade/presentation/more/settings/screen/browse/components/ExtensionStoresDialogs.kt,exact,True,27,ExtensionStoreCreateDialog,1.0,66.0,\bisError\b,body,"isError = errorMessage != null || storeAlreadyExists,",True,"   54 |                 state = state,
+   55 |                 label = {
+   56 |                     Text(text = stringResource(MR.strings.extensionStoresScreen_addStoreInput_inputLabel))
+   57 |                 },
+   58 |                 supportingText = {
+   59 |                     val msgRes = if (storeAlreadyExists) {
+   60 |                         MR.strings.extensionStoresScreen_addStore_alreadyExists
+   61 |                     } else {
+   62 |                         MR.strings.information_required_plain
+   63 |                     }
+   64 |                     Text(text = errorMessage ?: stringResource(msgRes))
+   65 |                 },
+   66 |                 isError = errorMessage != null || storeAlreadyExists,
+   67 |                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+   68 |                 lineLimits = TextFieldLineLimits.SingleLine,
+   69 |             )
+   70 |         },
+   71 |         confirmButton = {
+   72 |             TextButton(
+   73 |                 onClick = { onCreate(state.text.toString()) },
+   74 |                 enabled = !processing && state.text.isNotEmpty() && !storeAlreadyExists,
+   75 |             ) {
+   76 |                 Text(
+   77 |                     text = stringResource(
+   78 |                         resource = if (processing) {
+   79 |                             MR.strings.extensionStoresScreen_addStore_processing
+   80 |                         } else {
+   81 |                             MR.strings.action_add
+   82 |                         },
+   83 |                     ),
+   84 |                 )
+   85 |             }
+   86 |         },
+   87 |         dismissButton = {
+   88 |             TextButton(onClick = onDismissRequest) {
+   89 |                 Text(text = stringResource(MR.strings.action_cancel))
+   90 |             }
+   91 |         },
+   92 |     )
+   93 | 
+   94 |     LaunchedEffect(focusRequester) {
+   95 |         focusRequester.requestFocus()
+   96 |     }
+   97 | }
+   98 | 
+   99 | @Composable
+  100 | fun ExtensionStoreDeleteDialog(
+  101 |     onDismissRequest: () -> Unit,
+  102 |     onDelete: () -> Unit,
+  103 |     storeName: String,
+  104 |     storeIndexUrl: String,
+  105 | ) {
+  106 |     AlertDialog(","import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import tachiyomi.i18n.MR
+import tachiyomi.presentation.core.i18n.stringResource"
+pilot-0066,error_state_no_semantics,wisnukurniawan__Compose-ToDo,wisnukurniawan__Compose-ToDo/app/src/main/java/com/wisnu/kurniawan/composetodolist/features/login/ui/LoginScreen.kt,LoginScreen,isError set without semantics { error(...) },"
+@Composable
+fun LoginScreen(viewModel: LoginViewModel, onNavigateToDashboard: () -> Unit) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    LoginScreen(
+        state = state,
+        onEmailChanged = { viewModel.dispatch(LoginAction.ChangeEmail(it)) },
+        onPasswordChanged = { viewModel.dispatch(LoginAction.ChangePassword(it)) },
+        onPasswordImeAction = { viewModel.dispatch(LoginAction.ClickImePasswordDone) },
+        onClickLogin = { viewModel.dispatch(LoginAction.ClickLogin) }
+    )
+
+    HandleEffect(viewModel) {
+        when (it) {
+            LoginEffect.NavigateToDashboard -> {",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/wisnukurniawan__Compose-ToDo/app/src/main/java/com/wisnu/kurniawan/composetodolist/features/login/ui/LoginScreen.kt,exact,True,45,LoginScreen,1.0,85.0,\bisError\b,file,"isError = state.showEmailInvalidError,",True,"   73 |     PgPageLayout {
+   74 |         Box(
+   75 |             modifier = Modifier
+   76 |                 .fillMaxSize()
+   77 |                 .padding(20.dp),
+   78 |             contentAlignment = Alignment.Center
+   79 |         ) {
+   80 |             Column {
+   81 |                 val passwordFocusRequest = remember { FocusRequester() }
+   82 | 
+   83 |                 EmailField(
+   84 |                     email = state.email,
+   85 |                     isError = state.showEmailInvalidError,
+   86 |                     onEmailChanged = onEmailChanged,
+   87 |                     onImeAction = { passwordFocusRequest.requestFocus() },
+   88 |                     errorLabel = { TextFieldError(stringResource(R.string.login_email_invalid)) }
+   89 |                 )
+   90 | 
+   91 |                 Spacer(modifier = Modifier.height(8.dp))
+   92 | 
+   93 |                 PasswordField(
+   94 |                     password = state.password,
+   95 |                     modifier = Modifier.focusRequester(passwordFocusRequest),
+   96 |                     onPasswordChanged = onPasswordChanged,
+   97 |                     onImeAction = onPasswordImeAction
+   98 |                 )
+   99 | 
+  100 |                 Spacer(modifier = Modifier.height(16.dp))
+  101 | 
+  102 |                 PgButton(
+  103 |                     modifier = Modifier.fillMaxWidth(),
+  104 |                     enabled = state.canLogin(),
+  105 |                     onClick = onClickLogin
+  106 |                 ) { Text(text = stringResource(R.string.login_login), color = Color.White) }
+  107 |             }
+  108 |         }
+  109 |     }
+  110 | }
+  111 | 
+  112 | @Composable
+  113 | private fun EmailField(
+  114 |     email: String,
+  115 |     isError: Boolean,
+  116 |     onEmailChanged: (String) -> Unit,
+  117 |     onImeAction: () -> Unit,
+  118 |     errorLabel: @Composable (() -> Unit)? = null
+  119 | ) {
+  120 |     PgTextField(
+  121 |         value = email,
+  122 |         onValueChange = { onEmailChanged(it) },
+  123 |         placeholderValue = stringResource(R.string.login_email),
+  124 |         isError = isError,
+  125 |         keyboardOptions = KeyboardOptions(","import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.wisnu.kurniawan.composetodolist.R
+import com.wisnu.kurniawan.composetodolist.foundation.uicomponent.PgButton
+import com.wisnu.kurniawan.composetodolist.foundation.uicomponent.PgPageLayout
+import com.wisnu.kurniawan.composetodolist.foundation.uicomponent.PgTextField
+import com.wisnu.kurniawan.composetodolist.foundation.viewmodel.HandleEffect"
+pilot-0067,error_state_no_semantics,xavier-tobin__BundledUI-Android,xavier-tobin__BundledUI-Android/src/main/java/com/xaviertobin/bundledui/section/widgets/SectionTextInput.kt,SectionPasswordInput,isError set without semantics { error(...) },"@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SectionPasswordInput(
+    password: TextFieldState,
+    fontSize: TextUnit = 16.sp,
+    label: String,
+    placeholder: String? = label,
+    first: Boolean = false,
+    last: Boolean = false,
+    required: Boolean = false,
+    enabled: Boolean = true,
+    errorMessage: String? = null,
+) {
+
+    var showPassword by remember { mutableStateOf(false) }
+    var focused by remember { mutableStateOf(false) }",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/xavier-tobin__BundledUI-Android/src/main/java/com/xaviertobin/bundledui/section/widgets/SectionTextInput.kt,exact,True,153,SectionPasswordInput,1.0,168.0,\bisError\b,body,val isError = errorMessage != null,True,"  153 | fun SectionPasswordInput(
+  154 |     password: TextFieldState,
+  155 |     fontSize: TextUnit = 16.sp,
+  156 |     label: String,
+  157 |     placeholder: String? = label,
+  158 |     first: Boolean = false,
+  159 |     last: Boolean = false,
+  160 |     required: Boolean = false,
+  161 |     enabled: Boolean = true,
+  162 |     errorMessage: String? = null,
+  163 | ) {
+  164 | 
+  165 |     var showPassword by remember { mutableStateOf(false) }
+  166 |     var focused by remember { mutableStateOf(false) }
+  167 |     val interactionSource = remember { MutableInteractionSource() }
+  168 |     val isError = errorMessage != null
+  169 |     val indicatorColors = sectionTextInputIndicatorColors(isError)
+  170 | 
+  171 |     SectionRow(
+  172 |         first = first,
+  173 |         last = last,
+  174 |         padding = SectionDefaults.verticalPaddingValues(
+  175 |             first = first,
+  176 |             last = last,
+  177 |             start = 22.dp,
+  178 |             top = 4.dp,
+  179 |             end = 14.dp,
+  180 |             bottom = 10.dp
+  181 |         ),
+  182 |         focused = focused,
+  183 |         modifier = Modifier.alpha(if (enabled) 1f else 0.5f),
+  184 |         tone = if (isError) {
+  185 |             Tone.NEGATIVE
+  186 |         } else {
+  187 |             Tone.NEUTRAL
+  188 |         }
+  189 |     ) {
+  190 |         Column(modifier = Modifier.weight(1f)) {
+  191 | 
+  192 |             SectionTextInputSlidingLabel(
+  193 |                 label = label,
+  194 |                 required = required
+  195 |             )
+  196 | 
+  197 |             SecureTextField(
+  198 |                 state = password,
+  199 |                 textObfuscationMode = if (showPassword) {
+  200 |                     TextObfuscationMode.Visible
+  201 |                 } else {
+  202 |                     TextObfuscationMode.RevealLastTyped
+  203 |                 },
+  204 |                 modifier = Modifier
+  205 |                     .sectionTextInput(
+  206 |                         interactionSource = interactionSource,
+  207 |                         indicatorColors = indicatorColors,
+  208 |                         onFocusChanged = {","import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.TextObfuscationMode
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.rounded.Visibility
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SecureTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TextFieldDefaults.indicatorLine
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.ContentType
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentType
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.xaviertobin.bundledui.animations.AnimatedVerticalVisibility
+import com.xaviertobin.bundledui.base.Tone
+import com.xaviertobin.bundledui.buttons.IconButton
+import com.xaviertobin.bundledui.section.base.Section
+import com.xaviertobin.bundledui.section.base.SectionDefaults
+import com.xaviertobin.bundledui.section.base.SectionRow
+import com.xaviertobin.bundledui.theme.ThemedPreview
+import com.xaviertobin.bundledui.theme.text"
+pilot-0068,error_state_no_semantics,android__nowinandroid,android__nowinandroid/core/designsystem/src/main/kotlin/com/google/samples/apps/nowinandroid/core/designsystem/component/DynamicAsyncImage.kt,DynamicAsyncImage,isError set without semantics { error(...) }," */
+@Composable
+fun DynamicAsyncImage(
+    imageUrl: String,
+    contentDescription: String?,
+    modifier: Modifier = Modifier,
+    placeholder: Painter = painterResource(R.drawable.core_designsystem_ic_placeholder_default),
+) {
+    val iconTint = LocalTintTheme.current.iconTint
+    var isLoading by remember { mutableStateOf(true) }
+    var isError by remember { mutableStateOf(false) }
+    val imageLoader = rememberAsyncImagePainter(
+        model = imageUrl,
+        onState = { state ->
+            isLoading = state is Loading
+            isError = state is Error",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/android__nowinandroid/core/designsystem/src/main/kotlin/com/google/samples/apps/nowinandroid/core/designsystem/component/DynamicAsyncImage.kt,exact,True,49,DynamicAsyncImage,1.0,57.0,\bisError\b,body,var isError by remember { mutableStateOf(false) },True,"   45 | /**
+   46 |  * A wrapper around [AsyncImage] which determines the colorFilter based on the theme
+   47 |  */
+   48 | @Composable
+   49 | fun DynamicAsyncImage(
+   50 |     imageUrl: String,
+   51 |     contentDescription: String?,
+   52 |     modifier: Modifier = Modifier,
+   53 |     placeholder: Painter = painterResource(R.drawable.core_designsystem_ic_placeholder_default),
+   54 | ) {
+   55 |     val iconTint = LocalTintTheme.current.iconTint
+   56 |     var isLoading by remember { mutableStateOf(true) }
+   57 |     var isError by remember { mutableStateOf(false) }
+   58 |     val imageLoader = rememberAsyncImagePainter(
+   59 |         model = imageUrl,
+   60 |         onState = { state ->
+   61 |             isLoading = state is Loading
+   62 |             isError = state is Error
+   63 |         },
+   64 |     )
+   65 |     val isLocalInspection = LocalInspectionMode.current
+   66 |     Box(
+   67 |         modifier = modifier,
+   68 |         contentAlignment = Alignment.Center,
+   69 |     ) {
+   70 |         if (isLoading && !isLocalInspection) {
+   71 |             // Display a progress bar while loading
+   72 |             CircularProgressIndicator(
+   73 |                 modifier = Modifier
+   74 |                     .align(Alignment.Center)
+   75 |                     .size(80.dp),
+   76 |                 color = MaterialTheme.colorScheme.tertiary,
+   77 |             )
+   78 |         }
+   79 |         Image(
+   80 |             contentScale = ContentScale.Crop,
+   81 |             painter = if (isError.not() && !isLocalInspection) imageLoader else placeholder,
+   82 |             contentDescription = contentDescription,
+   83 |             colorFilter = if (iconTint != Unspecified) ColorFilter.tint(iconTint) else null,
+   84 |         )
+   85 |     }
+   86 | }","import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color.Companion.Unspecified
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter.State.Error
+import coil.compose.AsyncImagePainter.State.Loading
+import coil.compose.rememberAsyncImagePainter
+import com.google.samples.apps.nowinandroid.core.designsystem.R
+import com.google.samples.apps.nowinandroid.core.designsystem.theme.LocalTintTheme"
+pilot-0069,error_state_no_semantics,maximilian-schwaerzler__Do-It,maximilian-schwaerzler__Do-It/app/src/main/java/at/co/schwaerzler/maximilian/doit/ui/navigation/screen/EditTodoScreen.kt,EditTodoScreenContent,isError set without semantics { error(...) },"@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun EditTodoScreenContent(
+    id: Int?,
+    uiState: EditTodoUiState,
+    onTitleChange: (String) -> Unit,
+    onDescriptionChange: (String) -> Unit,
+    onDeadlineChange: (Instant?) -> Unit,
+    onSave: () -> Unit,
+    onCancel: () -> Unit,
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var showDatePicker by remember { mutableStateOf(false) }
+    var showTimePicker by remember { mutableStateOf(false) }
+    var pendingDateMillis by remember { mutableLongStateOf(0L) }",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/maximilian-schwaerzler__Do-It/app/src/main/java/at/co/schwaerzler/maximilian/doit/ui/navigation/screen/EditTodoScreen.kt,exact,True,214,EditTodoScreenContent,1.0,367.0,\bisError\b,body,"isError = uiState.titleError != null,",True,"  355 |                     onValueChange = onTitleChange,
+  356 |                     Modifier
+  357 |                         .fillMaxWidth()
+  358 |                         .padding(bottom = 8.dp)
+  359 |                         .focusRequester(titleFocusRequester),
+  360 |                     singleLine = true,
+  361 |                     label = {
+  362 |                         Text(stringResource(R.string.title))
+  363 |                     },
+  364 |                     supportingText = {
+  365 |                         Text(uiState.titleError ?: stringResource(R.string.required))
+  366 |                     },
+  367 |                     isError = uiState.titleError != null,
+  368 |                     leadingIcon = {
+  369 |                         Icon(painterResource(R.drawable.title_24px), contentDescription = null)
+  370 |                     },
+  371 |                     textStyle = LocalTextStyle.current.copy(
+  372 |                         fontWeight = FontWeight.Bold
+  373 |                     )
+  374 |                 )
+  375 | 
+  376 |                 OutlinedTextField(
+  377 |                     uiState.description,
+  378 |                     onValueChange = onDescriptionChange,
+  379 |                     Modifier.fillMaxWidth(),
+  380 |                     label = {
+  381 |                         Text(stringResource(R.string.description))
+  382 |                     },
+  383 |                     minLines = 5,
+  384 |                     supportingText = {
+  385 |                         Text(uiState.descriptionError ?: stringResource(R.string.optional))
+  386 |                     },
+  387 |                     isError = uiState.descriptionError != null
+  388 |                 )
+  389 | 
+  390 |                 val deadlineSet = uiState.deadline != null
+  391 | 
+  392 |                 Row(
+  393 |                     verticalAlignment = Alignment.CenterVertically,
+  394 |                     modifier = Modifier.padding(top = 4.dp)
+  395 |                 ) {
+  396 |                     Checkbox(
+  397 |                         checked = deadlineSet,
+  398 |                         onCheckedChange = { checked ->
+  399 |                             if (checked) {
+  400 |                                 showDatePicker = true
+  401 |                             } else {
+  402 |                                 onDeadlineChange(null)
+  403 |                             }
+  404 |                         }
+  405 |                     )
+  406 |                     Text(stringResource(R.string.set_deadline))
+  407 |                 }","import android.content.Intent
+import android.os.Build
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberTimePickerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import at.co.schwaerzler.maximilian.doit.R
+import at.co.schwaerzler.maximilian.doit.data.EditTodoViewModel
+import at.co.schwaerzler.maximilian.doit.data.EditTodoViewModel.EditTodoUiState
+import at.co.schwaerzler.maximilian.doit.ui.component.MaxWidthLayout
+import at.co.schwaerzler.maximilian.doit.ui.component.NotificationPermissionDialog
+import at.co.schwaerzler.maximilian.doit.ui.theme.DoItTheme
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
+import com.google.accompanist.permissions.PermissionStatus
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toJavaLocalDateTime
+import kotlinx.datetime.toLocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import kotlin.time.Instant"
+pilot-0070,error_state_no_semantics,wisnukurniawan__Compose-Expense,wisnukurniawan__Compose-Expense/app/src/main/java/com/wisnu/kurniawan/wallee/features/login/ui/LoginScreen.kt,LoginScreen,isError set without semantics { error(...) },"
+@Composable
+fun LoginScreen(
+    viewModel: LoginViewModel,
+    onLogin: () -> Unit
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    LoginScreen(
+        state = state,
+        onEmailChanged = { viewModel.dispatch(LoginAction.ChangeEmail(it)) },
+        onPasswordChanged = { viewModel.dispatch(LoginAction.ChangePassword(it)) },
+        onPasswordImeAction = { viewModel.dispatch(LoginAction.ClickImePasswordDone) },
+        onClickLogin = { viewModel.dispatch(LoginAction.ClickLogin) }
+    )
+",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/wisnukurniawan__Compose-Expense/app/src/main/java/com/wisnu/kurniawan/wallee/features/login/ui/LoginScreen.kt,exact,True,45,LoginScreen,1.0,90.0,\bisError\b,file,"isError = state.showEmailInvalidError,",True,"   78 |     PgPageLayout {
+   79 |         Box(
+   80 |             modifier = Modifier
+   81 |                 .fillMaxSize()
+   82 |                 .padding(20.dp),
+   83 |             contentAlignment = Alignment.Center
+   84 |         ) {
+   85 |             Column {
+   86 |                 val passwordFocusRequest = remember { FocusRequester() }
+   87 | 
+   88 |                 EmailField(
+   89 |                     email = state.email,
+   90 |                     isError = state.showEmailInvalidError,
+   91 |                     onEmailChanged = onEmailChanged,
+   92 |                     onImeAction = { passwordFocusRequest.requestFocus() },
+   93 |                     errorLabel = { TextFieldError(stringResource(R.string.login_email_invalid)) }
+   94 |                 )
+   95 | 
+   96 |                 Spacer(modifier = Modifier.height(8.dp))
+   97 | 
+   98 |                 PasswordField(
+   99 |                     password = state.password,
+  100 |                     modifier = Modifier.focusRequester(passwordFocusRequest),
+  101 |                     onPasswordChanged = onPasswordChanged,
+  102 |                     onImeAction = onPasswordImeAction
+  103 |                 )
+  104 | 
+  105 |                 Spacer(modifier = Modifier.height(16.dp))
+  106 | 
+  107 |                 PgButton(
+  108 |                     modifier = Modifier.fillMaxWidth(),
+  109 |                     enabled = state.canLogin(),
+  110 |                     onClick = onClickLogin
+  111 |                 ) { Text(text = stringResource(R.string.login_login), color = Color.White) }
+  112 |             }
+  113 |         }
+  114 |     }
+  115 | }
+  116 | 
+  117 | @Composable
+  118 | private fun EmailField(
+  119 |     email: String,
+  120 |     isError: Boolean,
+  121 |     onEmailChanged: (String) -> Unit,
+  122 |     onImeAction: () -> Unit,
+  123 |     errorLabel: @Composable (() -> Unit)? = null
+  124 | ) {
+  125 |     PgTextField(
+  126 |         value = email,
+  127 |         onValueChange = { onEmailChanged(it) },
+  128 |         placeholderValue = stringResource(R.string.login_email),
+  129 |         isError = isError,
+  130 |         keyboardOptions = KeyboardOptions(","import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.wisnu.kurniawan.wallee.R
+import com.wisnu.kurniawan.wallee.foundation.uicomponent.PgButton
+import com.wisnu.kurniawan.wallee.foundation.uicomponent.PgPageLayout
+import com.wisnu.kurniawan.wallee.foundation.uicomponent.PgTextField
+import com.wisnu.kurniawan.wallee.foundation.viewmodel.HandleEffect"
+pilot-0071,error_state_no_semantics,eslamfaisal__android-compose-clean-architecture-sample,eslamfaisal__android-compose-clean-architecture-sample/app/src/androidTest/java/com/eslam/bakingapp/ui/LoginScreenTest.kt,LoginTestContent,isError set without semantics { error(...) },"
+@Composable
+private fun LoginTestContent(
+    uiState: LoginUiState,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onLoginClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/eslamfaisal__android-compose-clean-architecture-sample/app/src/androidTest/java/com/eslam/bakingapp/ui/LoginScreenTest.kt,exact,True,174,LoginTestContent,1.0,210.0,\bisError\b,body,"isError = uiState.emailError != null,",True,"  174 | private fun LoginTestContent(
+  175 |     uiState: LoginUiState,
+  176 |     onEmailChange: (String) -> Unit,
+  177 |     onPasswordChange: (String) -> Unit,
+  178 |     onLoginClick: () -> Unit
+  179 | ) {
+  180 |     Column(
+  181 |         modifier = Modifier
+  182 |             .fillMaxSize()
+  183 |             .padding(24.dp),
+  184 |         horizontalAlignment = Alignment.CenterHorizontally,
+  185 |         verticalArrangement = Arrangement.Center
+  186 |     ) {
+  187 |         Text(
+  188 |             text = ""🍰"",
+  189 |             style = MaterialTheme.typography.displayLarge
+  190 |         )
+  191 |         
+  192 |         Spacer(modifier = Modifier.height(16.dp))
+  193 |         
+  194 |         Text(
+  195 |             text = ""Welcome Back"",
+  196 |             style = MaterialTheme.typography.headlineLarge
+  197 |         )
+  198 |         
+  199 |         Text(
+  200 |             text = ""Sign in to continue baking"",
+  201 |             style = MaterialTheme.typography.bodyLarge
+  202 |         )
+  203 |         
+  204 |         Spacer(modifier = Modifier.height(32.dp))
+  205 |         
+  206 |         BakingTextField(
+  207 |             value = uiState.email,
+  208 |             onValueChange = onEmailChange,
+  209 |             label = ""Email"",
+  210 |             isError = uiState.emailError != null,
+  211 |             errorMessage = uiState.emailError
+  212 |         )
+  213 |         
+  214 |         Spacer(modifier = Modifier.height(16.dp))
+  215 |         
+  216 |         PasswordTextField(
+  217 |             value = uiState.password,
+  218 |             onValueChange = onPasswordChange,
+  219 |             label = ""Password"",
+  220 |             isError = uiState.passwordError != null,
+  221 |             errorMessage = uiState.passwordError
+  222 |         )
+  223 |         
+  224 |         TertiaryButton(
+  225 |             text = ""Forgot Password?"",
+  226 |             onClick = {}
+  227 |         )
+  228 |         
+  229 |         if (uiState.errorMessage != null) {
+  230 |             Text(
+  231 |                 text = uiState.errorMessage ?: """",
+  232 |                 color = MaterialTheme.colorScheme.error
+  233 |             )
+  234 |         }
+  235 |         
+  236 |         Spacer(modifier = Modifier.height(16.dp))
+  237 |         
+  238 |         PrimaryButton(
+  239 |             text = ""Sign In"",
+  240 |             onClick = onLoginClick,
+  241 |             isLoading = uiState.isLoading
+  242 |         )
+  243 |         
+  244 |         TertiaryButton(
+  245 |             text = ""Don't have an account? Sign Up"",
+  246 |             onClick = {}
+  247 |         )
+  248 |         
+  249 |         Spacer(modifier = Modifier.height(16.dp))
+  250 |         ","import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.unit.dp
+import com.eslam.bakingapp.core.ui.components.BakingTextField
+import com.eslam.bakingapp.core.ui.components.PasswordTextField
+import com.eslam.bakingapp.core.ui.components.PrimaryButton
+import com.eslam.bakingapp.core.ui.components.TertiaryButton
+import com.eslam.bakingapp.core.ui.theme.BakingAppTheme
+import com.eslam.bakingapp.features.login.presentation.LoginUiState
+import org.junit.Rule
+import org.junit.Test"
+pilot-0072,error_state_no_semantics,SachinRupani__LoginWithJetpackCompose,SachinRupani__LoginWithJetpackCompose/app/src/main/java/com/jodhpurtechies/composelogin/ui/screens/unauthenticated/registration/RegistrationInputs.kt,RegistrationInputs,isError set without semantics { error(...) },"
+@Composable
+fun RegistrationInputs(
+    registrationState: RegistrationState,
+    onEmailIdChange: (String) -> Unit,
+    onMobileNumberChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onConfirmPasswordChange: (String) -> Unit,
+    onSubmit: () -> Unit,
+) {
+    // Login Inputs Section
+    Column(modifier = Modifier.fillMaxWidth()) {
+
+        // Email ID
+        EmailTextField(
+            modifier = Modifier",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/SachinRupani__LoginWithJetpackCompose/app/src/main/java/com/jodhpurtechies/composelogin/ui/screens/unauthenticated/registration/RegistrationInputs.kt,exact,True,19,RegistrationInputs,1.0,38.0,\bisError\b,body,"isError = registrationState.errorState.emailIdErrorState.hasError,",True,"   19 | fun RegistrationInputs(
+   20 |     registrationState: RegistrationState,
+   21 |     onEmailIdChange: (String) -> Unit,
+   22 |     onMobileNumberChange: (String) -> Unit,
+   23 |     onPasswordChange: (String) -> Unit,
+   24 |     onConfirmPasswordChange: (String) -> Unit,
+   25 |     onSubmit: () -> Unit,
+   26 | ) {
+   27 |     // Login Inputs Section
+   28 |     Column(modifier = Modifier.fillMaxWidth()) {
+   29 | 
+   30 |         // Email ID
+   31 |         EmailTextField(
+   32 |             modifier = Modifier
+   33 |                 .fillMaxWidth()
+   34 |                 .padding(top = AppTheme.dimens.paddingLarge),
+   35 |             value = registrationState.emailId,
+   36 |             onValueChange = onEmailIdChange,
+   37 |             label = stringResource(id = R.string.registration_email_label),
+   38 |             isError = registrationState.errorState.emailIdErrorState.hasError,
+   39 |             errorText = stringResource(id = registrationState.errorState.emailIdErrorState.errorMessageStringResource),
+   40 |             imeAction = ImeAction.Next
+   41 |         )
+   42 | 
+   43 |         // Mobile Number
+   44 |         MobileNumberTextField(
+   45 |             modifier = Modifier
+   46 |                 .fillMaxWidth()
+   47 |                 .padding(top = AppTheme.dimens.paddingLarge),
+   48 |             value = registrationState.mobileNumber,
+   49 |             onValueChange = onMobileNumberChange,
+   50 |             label = stringResource(id = R.string.registration_mobile_label),
+   51 |             isError = registrationState.errorState.mobileNumberErrorState.hasError,
+   52 |             errorText = stringResource(id = registrationState.errorState.mobileNumberErrorState.errorMessageStringResource),
+   53 |             imeAction = ImeAction.Next
+   54 |         )
+   55 | 
+   56 | 
+   57 |         // Password
+   58 |         PasswordTextField(
+   59 |             modifier = Modifier
+   60 |                 .fillMaxWidth()
+   61 |                 .padding(top = AppTheme.dimens.paddingLarge),
+   62 |             value = registrationState.password,
+   63 |             onValueChange = onPasswordChange,
+   64 |             label = stringResource(id = R.string.registration_password_label),
+   65 |             isError = registrationState.errorState.passwordErrorState.hasError,
+   66 |             errorText = stringResource(id = registrationState.errorState.passwordErrorState.errorMessageStringResource),
+   67 |             imeAction = ImeAction.Next
+   68 |         )
+   69 | 
+   70 |         // Confirm Password
+   71 |         PasswordTextField(
+   72 |             modifier = Modifier
+   73 |                 .fillMaxWidth()
+   74 |                 .padding(top = AppTheme.dimens.paddingLarge),
+   75 |             value = registrationState.confirmPassword,
+   76 |             onValueChange = onConfirmPasswordChange,
+   77 |             label = stringResource(id = R.string.registration_confirm_password_label),
+   78 |             isError = registrationState.errorState.confirmPasswordErrorState.hasError,","import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import com.jodhpurtechies.composelogin.R
+import com.jodhpurtechies.composelogin.ui.common.customComposableViews.EmailTextField
+import com.jodhpurtechies.composelogin.ui.common.customComposableViews.MobileNumberTextField
+import com.jodhpurtechies.composelogin.ui.common.customComposableViews.NormalButton
+import com.jodhpurtechies.composelogin.ui.common.customComposableViews.PasswordTextField
+import com.jodhpurtechies.composelogin.ui.screens.unauthenticated.registration.state.RegistrationState
+import com.jodhpurtechies.composelogin.ui.theme.AppTheme"
+pilot-0073,error_state_no_semantics,norsehorse-dev__AgePonyAndroid,norsehorse-dev__AgePonyAndroid/app/src/main/java/com/agepony/app/ui/VaultGate.kt,CreateSecretDialog,isError set without semantics { error(...) }," */
+@Composable
+private fun CreateSecretDialog(
+    onConfirm: (CharArray, String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var kind by remember { mutableStateOf(""password"") }
+    var value by remember { mutableStateOf("""") }
+    var again by remember { mutableStateOf("""") }
+    val focusRequester = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
+    val view = LocalView.current
+    val isPin = kind == ""pin""
+    val mismatch = again.isNotEmpty() && value != again
+    val valid = value.isNotEmpty() && value == again
+",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/norsehorse-dev__AgePonyAndroid/app/src/main/java/com/agepony/app/ui/VaultGate.kt,exact,True,330,CreateSecretDialog,1.0,398.0,\bisError\b,body,"isError = mismatch,",True,"  386 |                         delay(20)
+  387 |                         tries++
+  388 |                     }
+  389 |                     focusRequester.requestFocus()
+  390 |                     keyboard?.show()
+  391 |                     ViewCompat.getWindowInsetsController(view)?.show(WindowInsetsCompat.Type.ime())
+  392 |                 }
+  393 |                 OutlinedTextField(
+  394 |                     value = again,
+  395 |                     onValueChange = { again = it },
+  396 |                     singleLine = true,
+  397 |                     label = { Text(""Confirm"") },
+  398 |                     isError = mismatch,
+  399 |                     visualTransformation = PasswordVisualTransformation(),
+  400 |                     keyboardOptions = kb,
+  401 |                     modifier = Modifier.padding(top = 8.dp),
+  402 |                 )
+  403 |                 if (mismatch) {
+  404 |                     Text(
+  405 |                         ""They don't match."",
+  406 |                         style = MaterialTheme.typography.bodySmall,
+  407 |                         color = MaterialTheme.colorScheme.error,
+  408 |                     )
+  409 |                 }
+  410 |             }
+  411 |         },
+  412 |         confirmButton = {
+  413 |             TextButton(onClick = { onConfirm(value.toCharArray(), kind) }, enabled = valid) {
+  414 |                 Text(""Create vault"")
+  415 |             }
+  416 |         },
+  417 |         dismissButton = { TextButton(onClick = onDismiss) { Text(""Cancel"") } },
+  418 |     )
+  419 | }","import android.app.Activity
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import kotlinx.coroutines.delay
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import com.agepony.app.security.BiometricGate
+import com.agepony.app.vault.LockMode
+import com.agepony.app.vault.VaultViewModel"
+pilot-0074,error_state_no_semantics,maxwhipw__marmalade-tts-android,maxwhipw__marmalade-tts-android/app/src/main/java/app/marmalade/tts/ui/screen/AliasScreen.kt,AliasEditorSheet,isError set without semantics { error(...) },"@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AliasEditorSheet(
+    state: EditorState,
+    voicePath: VoicePath?,
+    effects: List<Effect>,
+    canDelete: Boolean,
+    canSetPrimary: Boolean,
+    fallbackCandidates: List<VoiceAlias>,
+    onSetPrimary: () -> Unit,
+    onNameChange: (String) -> Unit,
+    onOpenVoicePicker: () -> Unit,
+    onFallbackChange: (String?) -> Unit,
+    onSpeedChange: (Float) -> Unit,
+    onEffectChange: (String?) -> Unit,
+    onPhonemizationLanguageChange: (String?) -> Unit,",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/maxwhipw__marmalade-tts-android/app/src/main/java/app/marmalade/tts/ui/screen/AliasScreen.kt,exact,True,632,AliasEditorSheet,1.0,688.0,\bisError\b,body,isError = state.error is SaveError.InvalidName ||,True,"  676 |                 supportingText = {
+  677 |                     Text(
+  678 |                         text = stringResource(
+  679 |                             errorTextFor(state.error) ?: R.string.alias_name_help,
+  680 |                         ),
+  681 |                         color = if (state.error != null) {
+  682 |                             MaterialTheme.colorScheme.error
+  683 |                         } else {
+  684 |                             MaterialTheme.colorScheme.onSurfaceVariant
+  685 |                         },
+  686 |                     )
+  687 |                 },
+  688 |                 isError = state.error is SaveError.InvalidName ||
+  689 |                     state.error is SaveError.NameTaken,
+  690 |                 modifier = Modifier.fillMaxWidth(),
+  691 |             )
+  692 | 
+  693 |             // One row for both kinds of voice. The engine and voice used to
+  694 |             // be separate dropdowns, which let them drift out of step and
+  695 |             // forced the user to know which engine owned a voice before
+  696 |             // they could pick it. Now the row opens the drill-down picker
+  697 |             // and the two move together — see AliasViewModel.pickVoice.
+  698 |             VoiceRowField(
+  699 |                 path = voicePath,
+  700 |                 isError = state.error is SaveError.MissingVoice,
+  701 |                 onClick = onOpenVoicePicker,
+  702 |             )
+  703 | 
+  704 |             // Only cloud voices can fail for want of a network, so the
+  705 |             // fallback only appears for them. Hidden entirely otherwise
+  706 |             // rather than shown disabled — a permanently-greyed control on
+  707 |             // every on-device alias would be noise.
+  708 |             if (voicePath?.isCloud == true) {
+  709 |                 FallbackPicker(
+  710 |                     selected = state.fallbackAliasId,
+  711 |                     candidates = fallbackCandidates,
+  712 |                     onPick = onFallbackChange,
+  713 |                 )
+  714 |             }
+  715 | 
+  716 |             Column {
+  717 |                 val speedText = stringResource(R.string.alias_speed_chip, state.speed)
+  718 |                 val speedLabel = stringResource(R.string.alias_speed)
+  719 |                 Text(
+  720 |                     text = stringResource(R.string.alias_speed_label, speedText),
+  721 |                     style = MaterialTheme.typography.bodyMedium,
+  722 |                 )
+  723 |                 Slider(
+  724 |                     value = state.speed,
+  725 |                     onValueChange = onSpeedChange,
+  726 |                     valueRange = VoiceAlias.MIN_SPEED..VoiceAlias.MAX_SPEED,
+  727 |                     // 15 steps between 0.5 and 2.0 = 0.1x increments
+  728 |                     // (Slider's `steps` excludes the endpoints).","import androidx.annotation.StringRes
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import app.marmalade.tts.R
+import app.marmalade.tts.data.db.AppAliasMapping
+import app.marmalade.tts.data.db.Effect
+import app.marmalade.tts.data.db.VoiceAlias
+import app.marmalade.tts.data.KittenDirectVoiceCatalog
+import app.marmalade.tts.data.KokoroDirectVoiceCatalog
+import app.marmalade.tts.data.PocketDevVoiceCatalog
+import app.marmalade.tts.data.PocketVoiceCatalog
+import app.marmalade.tts.data.VoicePath
+import app.marmalade.tts.data.db.VoiceMeta
+import app.marmalade.tts.lang.LangDetector
+import app.marmalade.tts.install.EngineCatalog"
+pilot-0075,error_state_no_semantics,maximilian-schwaerzler__Do-It,maximilian-schwaerzler__Do-It/app/src/main/java/at/co/schwaerzler/maximilian/doit/ui/navigation/screen/EditTodoScreen.kt,EditTodoScreenContent,isError set without semantics { error(...) },"@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun EditTodoScreenContent(
+    id: Int?,
+    uiState: EditTodoUiState,
+    onTitleChange: (String) -> Unit,
+    onDescriptionChange: (String) -> Unit,
+    onDeadlineChange: (Instant?) -> Unit,
+    onSave: () -> Unit,
+    onCancel: () -> Unit,
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var showDatePicker by remember { mutableStateOf(false) }
+    var showTimePicker by remember { mutableStateOf(false) }
+    var pendingDateMillis by remember { mutableLongStateOf(0L) }",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/maximilian-schwaerzler__Do-It/app/src/main/java/at/co/schwaerzler/maximilian/doit/ui/navigation/screen/EditTodoScreen.kt,exact,True,214,EditTodoScreenContent,1.0,367.0,\bisError\b,body,"isError = uiState.titleError != null,",True,"  355 |                     onValueChange = onTitleChange,
+  356 |                     Modifier
+  357 |                         .fillMaxWidth()
+  358 |                         .padding(bottom = 8.dp)
+  359 |                         .focusRequester(titleFocusRequester),
+  360 |                     singleLine = true,
+  361 |                     label = {
+  362 |                         Text(stringResource(R.string.title))
+  363 |                     },
+  364 |                     supportingText = {
+  365 |                         Text(uiState.titleError ?: stringResource(R.string.required))
+  366 |                     },
+  367 |                     isError = uiState.titleError != null,
+  368 |                     leadingIcon = {
+  369 |                         Icon(painterResource(R.drawable.title_24px), contentDescription = null)
+  370 |                     },
+  371 |                     textStyle = LocalTextStyle.current.copy(
+  372 |                         fontWeight = FontWeight.Bold
+  373 |                     )
+  374 |                 )
+  375 | 
+  376 |                 OutlinedTextField(
+  377 |                     uiState.description,
+  378 |                     onValueChange = onDescriptionChange,
+  379 |                     Modifier.fillMaxWidth(),
+  380 |                     label = {
+  381 |                         Text(stringResource(R.string.description))
+  382 |                     },
+  383 |                     minLines = 5,
+  384 |                     supportingText = {
+  385 |                         Text(uiState.descriptionError ?: stringResource(R.string.optional))
+  386 |                     },
+  387 |                     isError = uiState.descriptionError != null
+  388 |                 )
+  389 | 
+  390 |                 val deadlineSet = uiState.deadline != null
+  391 | 
+  392 |                 Row(
+  393 |                     verticalAlignment = Alignment.CenterVertically,
+  394 |                     modifier = Modifier.padding(top = 4.dp)
+  395 |                 ) {
+  396 |                     Checkbox(
+  397 |                         checked = deadlineSet,
+  398 |                         onCheckedChange = { checked ->
+  399 |                             if (checked) {
+  400 |                                 showDatePicker = true
+  401 |                             } else {
+  402 |                                 onDeadlineChange(null)
+  403 |                             }
+  404 |                         }
+  405 |                     )
+  406 |                     Text(stringResource(R.string.set_deadline))
+  407 |                 }","import android.content.Intent
+import android.os.Build
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberTimePickerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import at.co.schwaerzler.maximilian.doit.R
+import at.co.schwaerzler.maximilian.doit.data.EditTodoViewModel
+import at.co.schwaerzler.maximilian.doit.data.EditTodoViewModel.EditTodoUiState
+import at.co.schwaerzler.maximilian.doit.ui.component.MaxWidthLayout
+import at.co.schwaerzler.maximilian.doit.ui.component.NotificationPermissionDialog
+import at.co.schwaerzler.maximilian.doit.ui.theme.DoItTheme
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
+import com.google.accompanist.permissions.PermissionStatus
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toJavaLocalDateTime
+import kotlinx.datetime.toLocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import kotlin.time.Instant"
+pilot-0076,error_state_no_semantics,AmrDeveloper__LinkHub,AmrDeveloper__LinkHub/app/src/main/java/com/amrdeveloper/linkhub/ui/link/LinkScreen.kt,LinkInputField,isError set without semantics { error(...) },"
+@Composable
+private fun LinkInputField(
+    label: String,
+    value: String,
+    errorMessage: String,
+    onValueChange: (String) -> Unit
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = { onValueChange(it) },
+        label = { Text(text = label) },
+        leadingIcon = {
+            Icon(
+                painter = painterResource(R.drawable.ic_link),
+                contentDescription = ""Link Icon"",",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/AmrDeveloper__LinkHub/app/src/main/java/com/amrdeveloper/linkhub/ui/link/LinkScreen.kt,exact,True,280,LinkInputField,1.0,311.0,\bisError\b,body,"isError = errorMessage.isNotEmpty(),",True,"  280 | private fun LinkInputField(
+  281 |     label: String,
+  282 |     value: String,
+  283 |     errorMessage: String,
+  284 |     onValueChange: (String) -> Unit
+  285 | ) {
+  286 |     OutlinedTextField(
+  287 |         value = value,
+  288 |         onValueChange = { onValueChange(it) },
+  289 |         label = { Text(text = label) },
+  290 |         leadingIcon = {
+  291 |             Icon(
+  292 |                 painter = painterResource(R.drawable.ic_link),
+  293 |                 contentDescription = ""Link Icon"",
+  294 |                 tint = Color.Unspecified,
+  295 |             )
+  296 |         },
+  297 |         trailingIcon = {
+  298 |             if (value.isNotEmpty()) {
+  299 |                 IconButton(onClick = { onValueChange("""") }) {
+  300 |                     Icon(
+  301 |                         painter = painterResource(R.drawable.ic_delete),
+  302 |                         contentDescription = ""Link Icon""
+  303 |                     )
+  304 |                 }
+  305 |             }
+  306 |         },
+  307 |         singleLine = true,
+  308 |         modifier = Modifier
+  309 |             .fillMaxWidth()
+  310 |             .padding(8.dp),
+  311 |         isError = errorMessage.isNotEmpty(),
+  312 |         colors = OutlinedTextFieldDefaults.colors(
+  313 |             cursorColor = colorResource(R.color.light_blue_600),
+  314 |             focusedBorderColor = colorResource(R.color.light_blue_600),
+  315 |             focusedLabelColor = colorResource(R.color.light_blue_600)
+  316 |         ),
+  317 |         supportingText = {
+  318 |             if (errorMessage.isNotEmpty()) {
+  319 |                 Text(text = errorMessage)
+  320 |             }
+  321 |         })
+  322 | }
+  323 | 
+  324 | @Composable
+  325 | private fun LinkCreatedAndUpdatedTime(link: Link) {
+  326 |     val dateFormatter = DateFormat.getDateTimeInstance()
+  327 | 
+  328 |     Row(
+  329 |         modifier = Modifier.padding(8.dp),
+  330 |         verticalAlignment = Alignment.CenterVertically
+  331 |     ) {
+  332 |         Icon(
+  333 |             painter = painterResource(R.drawable.ic_clock),
+  334 |             contentDescription = ""Time Icon"",
+  335 |             tint = Color.Unspecified,
+  336 |             modifier = Modifier
+  337 |                 .size(20.dp)
+  338 |                 .padding(4.dp)
+  339 |         )
+  340 | 
+  341 |         Text(
+  342 |             text = ""Created at: "",
+  343 |             textAlign = TextAlign.Center,
+  344 |         )
+  345 | 
+  346 |         Spacer(modifier = Modifier.weight(1f))
+  347 | 
+  348 |         Text(
+  349 |             text = ""${dateFormatter.format(link.createdTime)}"",
+  350 |             textAlign = TextAlign.Center,
+  351 |         )","import android.graphics.Bitmap
+import android.webkit.URLUtil
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.amrdeveloper.linkhub.R
+import com.amrdeveloper.linkhub.common.TaskState
+import com.amrdeveloper.linkhub.data.Folder
+import com.amrdeveloper.linkhub.data.Link
+import com.amrdeveloper.linkhub.ui.components.FolderSelector
+import com.amrdeveloper.linkhub.ui.components.PinnedSwitch
+import com.amrdeveloper.linkhub.ui.components.SaveDeleteActionsRow
+import com.amrdeveloper.linkhub.util.CREATED_FOLDER_NAME_KEY
+import com.amrdeveloper.linkhub.util.CREATE_FOLDER_ID
+import com.amrdeveloper.linkhub.util.FOLDER_NONE_ID
+import com.amrdeveloper.linkhub.util.UiPreferences
+import com.amrdeveloper.linkhub.util.generateQrCodeBitmap
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.net.URI
+import java.text.DateFormat"
+pilot-0077,error_state_no_semantics,wisnukurniawan__Compose-Expense,wisnukurniawan__Compose-Expense/app/src/main/java/com/wisnu/kurniawan/wallee/features/account/detail/ui/AccountDetailScreen.kt,AccountDetailScreen,isError set without semantics { error(...) },"
+@Composable
+fun AccountDetailScreen(
+    viewModel: AccountDetailViewModel,
+    onClosePage: () -> Unit,
+    onCancelClick: () -> Unit,
+    onCategorySectionClick: () -> Unit,
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    val localFocusManager = LocalFocusManager.current
+
+    HandleEffect(
+        viewModel = viewModel,
+    ) {
+        when (it) {",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/wisnukurniawan__Compose-Expense/app/src/main/java/com/wisnu/kurniawan/wallee/features/account/detail/ui/AccountDetailScreen.kt,exact,True,67,AccountDetailScreen,1.0,159.0,\bisError\b,file,isError = state.shouldShowDuplicateNameError,True,"  147 |         ) {
+  148 |             item {
+  149 |                 if (state.shouldShowDuplicateNameError) {
+  150 |                     PgErrorLabel(
+  151 |                         text = stringResource(R.string.account_edit_name_duplicate),
+  152 |                         modifier = Modifier.padding(start = 16.dp, bottom = 6.dp)
+  153 |                     )
+  154 |                 }
+  155 | 
+  156 |                 NameSection(
+  157 |                     name = state.name,
+  158 |                     onNameChange = onNameChange,
+  159 |                     isError = state.shouldShowDuplicateNameError
+  160 |                 )
+  161 | 
+  162 |                 CategorySection(
+  163 |                     categoryName = stringResource(state.selectedAccountType().getLabel()),
+  164 |                     onCategorySectionClick = onCategorySectionClick
+  165 |                 )
+  166 |             }
+  167 | 
+  168 |             item {
+  169 |                 Spacer(Modifier.height(16.dp))
+  170 |             }
+  171 | 
+  172 |             item {
+  173 |                 AmountSection(
+  174 |                     totalAmount = state.totalAmount,
+  175 |                     totalAmountDisplay = state.getAmountDisplay(),
+  176 |                     onTotalAmountChange = onTotalAmountChange,
+  177 |                 )
+  178 |             }
+  179 | 
+  180 |             AdjustAmountReasonCell(
+  181 |                 data = state.adjustBalanceReasonItems,
+  182 |                 shouldShow = state.isEditMode,
+  183 |                 onItemClick = onAdjustBalanceReasonClick
+  184 |             )
+  185 | 
+  186 |             if (state.canDelete()) {
+  187 |                 item {
+  188 |                     Spacer(Modifier.height(32.dp))
+  189 |                     PgSecondaryButton(
+  190 |                         modifier = Modifier.fillMaxWidth(),
+  191 |                         border = BorderStroke(
+  192 |                             width = 1.dp,
+  193 |                             color = MaterialTheme.colorScheme.error
+  194 |                         ),
+  195 |                         onClick = onDeleteClick
+  196 |                     ) {
+  197 |                         PgContentTitle(
+  198 |                             text = stringResource(R.string.account_edit_delete),
+  199 |                             color = MaterialTheme.colorScheme.error","import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.ChevronRight
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.wisnu.kurniawan.wallee.R
+import com.wisnu.kurniawan.wallee.foundation.extension.cellShape
+import com.wisnu.kurniawan.wallee.foundation.extension.getLabel
+import com.wisnu.kurniawan.wallee.foundation.extension.shouldShowDivider
+import com.wisnu.kurniawan.wallee.foundation.theme.AlphaDisabled
+import com.wisnu.kurniawan.wallee.foundation.theme.MediumRadius
+import com.wisnu.kurniawan.wallee.foundation.uicomponent.ActionContentCell
+import com.wisnu.kurniawan.wallee.foundation.uicomponent.PgBasicTextField
+import com.wisnu.kurniawan.wallee.foundation.uicomponent.PgContentTitle
+import com.wisnu.kurniawan.wallee.foundation.uicomponent.PgErrorLabel
+import com.wisnu.kurniawan.wallee.foundation.uicomponent.PgHeaderEditMode
+import com.wisnu.kurniawan.wallee.foundation.uicomponent.PgHeadlineLabel
+import com.wisnu.kurniawan.wallee.foundation.uicomponent.PgIcon
+import com.wisnu.kurniawan.wallee.foundation.uicomponent.PgPageLayout
+import com.wisnu.kurniawan.wallee.foundation.uicomponent.PgSecondaryButton
+import com.wisnu.kurniawan.wallee.foundation.uiextension.paddingCell
+import com.wisnu.kurniawan.wallee.foundation.viewmodel.HandleEffect"
+pilot-0078,error_state_no_semantics,christianrowlands__android-network-survey,christianrowlands__android-network-survey/networksurvey/src/main/java/com/craxiom/networksurvey/ui/cellular/CalculatorScreen.kt,NciInputField,isError set without semantics { error(...) },"
+@Composable
+fun NciInputField(
+    cellIdInput: String,
+    viewModel: CalculatorViewModel,
+    onValueChange: (String) -> Unit
+) {
+    val nciError by viewModel.nciError.collectAsState()
+
+    OutlinedTextField(
+        value = cellIdInput,
+        onValueChange = onValueChange,
+        label = { Text(""NCI"") },
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+        modifier = Modifier.fillMaxWidth(),
+        singleLine = true,",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/christianrowlands__android-network-survey/networksurvey/src/main/java/com/craxiom/networksurvey/ui/cellular/CalculatorScreen.kt,exact,True,182,NciInputField,1.0,196.0,\bisError\b,body,isError = nciError != null,True,"  182 | fun NciInputField(
+  183 |     cellIdInput: String,
+  184 |     viewModel: CalculatorViewModel,
+  185 |     onValueChange: (String) -> Unit
+  186 | ) {
+  187 |     val nciError by viewModel.nciError.collectAsState()
+  188 | 
+  189 |     OutlinedTextField(
+  190 |         value = cellIdInput,
+  191 |         onValueChange = onValueChange,
+  192 |         label = { Text(""NCI"") },
+  193 |         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+  194 |         modifier = Modifier.fillMaxWidth(),
+  195 |         singleLine = true,
+  196 |         isError = nciError != null
+  197 |     )
+  198 | }
+  199 | 
+  200 | @Composable
+  201 | fun ResultsDisplay(gnbIdOutput: String, sectorIdOutput: String, viewModel: CalculatorViewModel) {
+  202 |     Column {
+  203 |         val nciError by viewModel.nciError.collectAsState()
+  204 | 
+  205 |         Text(text = ""gNB ID: $gnbIdOutput"", style = MaterialTheme.typography.bodyLarge)
+  206 |         Text(text = ""Sector ID: $sectorIdOutput"", style = MaterialTheme.typography.bodyLarge)
+  207 | 
+  208 |         if (nciError != null) {
+  209 |             Spacer(modifier = Modifier.height(8.dp))
+  210 |             Text(text = nciError.orEmpty(), color = MaterialTheme.colorScheme.error)
+  211 |         }
+  212 |     }
+  213 | }
+  214 | 
+  215 | @Composable
+  216 | fun LteCalculators(viewModel: CalculatorViewModel) {
+  217 |     Column {
+  218 |         // 4G LTE Cell ID calculator
+  219 |         CardItem {
+  220 |             Column {
+  221 |                 val lteSectorIdOutput by viewModel.lteSectorIdOutput.collectAsState()
+  222 |                 val lteCidError by viewModel.lteCidError.collectAsState()
+  223 |                 val collectAsState by viewModel.enbIdOutput.collectAsState()
+  224 | 
+  225 |                 TitleText(text = ""Cell ID to eNB ID and Sector ID"")
+  226 | 
+  227 |                 OutlinedTextField(
+  228 |                     value = viewModel.lteCellIdInput.collectAsState().value,
+  229 |                     onValueChange = {
+  230 |                         viewModel.setLteCellIdInput(it)
+  231 |                         viewModel.calculateLteCellId()
+  232 |                     },
+  233 |                     label = { Text(""Cell ID"") },
+  234 |                     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+  235 |                     modifier = Modifier.fillMaxWidth(),
+  236 |                     isError = lteCidError != null","import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.craxiom.networksurvey.ui.cellular.model.CalculatorNetworkType
+import com.craxiom.networksurvey.ui.cellular.model.CalculatorViewModel
+import com.craxiom.networksurvey.ui.cellular.model.GnbIdLengthOption"
+pilot-0079,error_state_no_semantics,chmouel__liseur,chmouel__liseur/app/src/main/kotlin/com/chmouel/liseur/ui/settings/ReadingNavigationScreen.kt,DictionarySiteRow,isError set without semantics { error(...) },"@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DictionarySiteRow(baseUrl: String, onBaseUrl: (String) -> Unit) {
+    val storedEdition = remember(baseUrl) { WiktionaryEditions.editionOf(baseUrl) }
+    var customChosen by remember(baseUrl) { mutableStateOf(storedEdition == null) }
+    var expanded by remember { mutableStateOf(false) }
+    var typed by remember(baseUrl) { mutableStateOf(if (storedEdition == null) baseUrl else """") }
+    val normalised = remember(typed) { DictionaryUrl.normalise(typed) }
+    val invalid = typed.isNotBlank() && normalised == null
+
+    // Probed only when the reader commits a choice here — never on
+    // merely opening the screen, because a request nobody asked for
+    // has no place in this app.
+    var probeTarget by remember { mutableStateOf<String?>(null) }
+    var probeResult by remember { mutableStateOf<ProbeUi>(ProbeUi.Idle) }
+    val client = remember { WiktionaryClient() }",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/chmouel__liseur/app/src/main/kotlin/com/chmouel/liseur/ui/settings/ReadingNavigationScreen.kt,exact,True,287,DictionarySiteRow,1.0,379.0,\bisError\b,body,"isError = invalid,",True,"  367 |                         expanded = false
+  368 |                         customChosen = true
+  369 |                     },
+  370 |                 )
+  371 |             }
+  372 |         }
+  373 |         if (customChosen) {
+  374 |             OutlinedTextField(
+  375 |                 value = typed,
+  376 |                 onValueChange = { typed = it },
+  377 |                 modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+  378 |                 singleLine = true,
+  379 |                 isError = invalid,
+  380 |                 placeholder = { Text(stringResource(R.string.settings_dictionary_site_hint)) },
+  381 |                 supportingText = if (invalid) {
+  382 |                     { Text(stringResource(R.string.settings_dictionary_site_invalid)) }
+  383 |                 } else {
+  384 |                     null
+  385 |                 },
+  386 |                 keyboardOptions = KeyboardOptions(
+  387 |                     keyboardType = KeyboardType.Uri,
+  388 |                     imeAction = ImeAction.Done,
+  389 |                 ),
+  390 |                 // Committed on Done, not per keystroke: a commit stores
+  391 |                 // the setting and probes the site, and a half-typed host
+  392 |                 // deserves neither.
+  393 |                 keyboardActions = KeyboardActions(onDone = { normalised?.let(commit) }),
+  394 |             )
+  395 |         }
+  396 |         when (val probe = probeResult) {
+  397 |             ProbeUi.Idle -> Unit
+  398 |             ProbeUi.Checking -> Text(
+  399 |                 text = stringResource(R.string.settings_dictionary_site_checking),
+  400 |                 style = MaterialTheme.typography.bodySmall,
+  401 |                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+  402 |                 modifier = Modifier.padding(top = 8.dp),
+  403 |             )
+  404 |             is ProbeUi.Ok -> Text(
+  405 |                 text = stringResource(R.string.settings_dictionary_site_ok, probe.host),
+  406 |                 style = MaterialTheme.typography.bodySmall,
+  407 |                 color = MaterialTheme.colorScheme.primary,
+  408 |                 modifier = Modifier.padding(top = 8.dp),
+  409 |             )
+  410 |             is ProbeUi.Unreachable -> Text(
+  411 |                 text = stringResource(
+  412 |                     R.string.settings_dictionary_site_unreachable,
+  413 |                     probe.host,
+  414 |                     probe.error,
+  415 |                 ),
+  416 |                 style = MaterialTheme.typography.bodySmall,
+  417 |                 color = MaterialTheme.colorScheme.error,
+  418 |                 modifier = Modifier.padding(top = 8.dp),
+  419 |             )","import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import com.chmouel.liseur.R
+import com.chmouel.liseur.data.settings.AppSettings
+import com.chmouel.liseur.data.settings.DefinitionTarget
+import com.chmouel.liseur.data.settings.EInkMode
+import com.chmouel.liseur.data.settings.PageTurnStyle
+import com.chmouel.liseur.data.settings.TapZones
+import com.chmouel.liseur.domain.DictionaryUrl
+import com.chmouel.liseur.domain.WiktionaryEditions
+import com.chmouel.liseur.reader.dictionary.WiktionaryClient
+import com.chmouel.liseur.ui.LocalEInk
+import com.chmouel.liseur.ui.contentWidthCap
+import com.chmouel.liseur.ui.reading.ReadingPageTurnStyleControl
+import com.chmouel.liseur.ui.windowWidth"
+pilot-0080,error_state_no_semantics,Darkrock-Studios__FastTrack,Darkrock-Studios__FastTrack/app/src/main/java/com/darkrockstudios/apps/fasttrack/screens/profile/ProfileScreen.kt,ProfileDataEntryCard,isError set without semantics { error(...) },"
+@Composable
+fun ProfileDataEntryCard(
+	isMetric: Boolean,
+	heightCm: String,
+	heightFeet: String,
+	heightInches: String,
+	weightKg: String,
+	weightLbs: String,
+	age: String,
+	gender: Gender,
+	heightCmError: String?,
+	heightFeetError: String?,
+	heightInchesError: String?,
+	weightKgError: String?,
+	weightLbsError: String?,",,,/Users/krunal/Documents/F1/PHD/2026PHDSpring/MyFirstPaper/ISEC/DataMining/mined_code/Darkrock-Studios__FastTrack/app/src/main/java/com/darkrockstudios/apps/fasttrack/screens/profile/ProfileScreen.kt,exact,True,191,ProfileDataEntryCard,1.0,235.0,\bisError\b,body,"isError = heightCmError != null,",True,"  223 | 				text = stringResource(id = R.string.profile_height_label),
+  224 | 				style = MaterialTheme.typography.headlineMedium,
+  225 | 				color = MaterialTheme.colorScheme.onSurface,
+  226 | 				modifier = Modifier.padding(top = 16.dp)
+  227 | 			)
+  228 | 
+  229 | 			if (isMetric) {
+  230 | 				// Metric Height Input
+  231 | 				OutlinedTextField(
+  232 | 					value = heightCm,
+  233 | 					onValueChange = onHeightCmChanged,
+  234 | 					label = { Text(stringResource(id = R.string.profile_height_metric_label)) },
+  235 | 					isError = heightCmError != null,
+  236 | 					keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+  237 | 					modifier = Modifier
+  238 | 						.padding(top = 8.dp)
+  239 | 						.width(120.dp)
+  240 | 				)
+  241 | 				if (heightCmError != null) {
+  242 | 					Text(
+  243 | 						text = heightCmError,
+  244 | 						color = MaterialTheme.colorScheme.error,
+  245 | 						style = MaterialTheme.typography.bodySmall,
+  246 | 						modifier = Modifier.padding(start = 16.dp)
+  247 | 					)
+  248 | 				}
+  249 | 			} else {
+  250 | 				// Imperial Height Input
+  251 | 				Row(
+  252 | 					modifier = Modifier.padding(top = 8.dp)
+  253 | 				) {
+  254 | 					OutlinedTextField(
+  255 | 						value = heightFeet,
+  256 | 						onValueChange = onHeightFeetChanged,
+  257 | 						label = { Text(stringResource(id = R.string.profile_height_imper_feet_label)) },
+  258 | 						isError = heightFeetError != null,
+  259 | 						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+  260 | 						modifier = Modifier.width(100.dp)
+  261 | 					)
+  262 | 
+  263 | 					Spacer(modifier = Modifier.width(8.dp))
+  264 | 
+  265 | 					OutlinedTextField(
+  266 | 						value = heightInches,
+  267 | 						onValueChange = onHeightInchesChanged,
+  268 | 						label = { Text(stringResource(id = R.string.profile_height_imper_inches_label)) },
+  269 | 						isError = heightInchesError != null,
+  270 | 						keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+  271 | 						modifier = Modifier.width(120.dp)
+  272 | 					)
+  273 | 				}
+  274 | 
+  275 | 				if (heightFeetError != null) {","import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import com.darkrockstudios.apps.fasttrack.R
+import com.darkrockstudios.apps.fasttrack.data.Gender
+import com.darkrockstudios.apps.fasttrack.utils.MAX_COLUMN_WIDTH
+import com.darkrockstudios.apps.fasttrack.utils.combinePadding
+import org.koin.compose.viewmodel.koinViewModel"

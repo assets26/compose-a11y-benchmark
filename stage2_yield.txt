@@ -1,0 +1,32 @@
+STAGE 2 - PRE-SCREEN YIELD  (no LLM involved)
+==============================================================
+Repos           : 175
+Files           : 3024
+Composables     : 7644
+Candidates      : 6053
+
+CATEGORY                          CANDS  REPOS  STATUS
+--------------------------------------------------------------
+missing_content_description        1425    128  OK
+missing_semantics_role              818    133  OK
+missing_interaction_semantics       875    135  OK
+touch_target_size                   250     77  OK
+missing_state_description           372     81  OK
+decorative_mislabeled               107     43  OK
+color_contrast                      127     36  OK
+--------------------------------------------------------------
+EXTENDED (study 2) -------------------------------------------
+pointerinput_no_semantics            52     28  OK
+textfield_no_label                   54     33  OK
+text_truncation_scaling             345     75  OK
+missing_heading_semantics           537     92  OK
+missing_merge_descendants           577    113  OK
+progress_no_semantics               299     94  OK
+error_state_no_semantics             97     39  OK
+clickable_icon_not_iconbutton       118     48  OK
+
+VERDICT
+--------------------------------------------------------------
+All six categories have natural candidates. Proceed to Stage 3
+(manual verification). NO SEEDING NEEDED -> the confound that
+weakened study 1 disappears.

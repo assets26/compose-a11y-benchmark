@@ -1,0 +1,7 @@
+model,n,changed_mind,toward_gold,away_from_gold,net
+claude-sonnet,129,13,8,5,3
+gemini-flash,129,8,7,1,6
+gemma3-1b,126,36,15,21,-6
+gpt-mini,129,13,8,5,3
+mistral,128,11,8,3,5
+qwen-coder,129,42,19,23,-4

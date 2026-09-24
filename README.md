@@ -28,9 +28,13 @@ model outputs and scoring scripts.
 
 **Benchmark and scoring** (`bench/`)
 - `run_benchmark.py`, `prompts.py`, `models.json` — Detect/Repair/Reflect runner
-- `score_benchmark.py` — detection, repair, and reflect tables
+- `score_benchmark.py` — first-pass scoring (anchor-level detection, repair, reflect)
+- `score_composable.py` — **reported detection and reflection results**: rescores
+  detection at the composable level and reflection with UNSURE excluded, and
+  writes `results/detect_composable_summary.csv` (Table 2) and
+  `results/reflect_decidable_summary.csv` (Figure 3 / RQ3)
 - `reparse.py` — robust JSON re-parse of raw model output
-- `score_repair_subset.py` — repair on the common 60-issue subset
+- `score_repair_subset.py` — repair on the common 60-issue subset (Table 3)
 - `cat_robustness.py` — category-accuracy robustness check
 - `sample_negatives.py` — matched-negative sampling
 - `verified_gold.csv`, `negatives_labeled.csv` — frozen ground truth + controls

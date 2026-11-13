@@ -1,0 +1,91 @@
+=== [A3] DETECTION, composable level, 95% bootstrap CI ===
+model              n  recall              specificity         balanced acc        category acc        
+claude-sonnet    285  0.98 [0.95, 1.00]   0.13 [0.08, 0.19]   0.56 [0.53, 0.59]   0.33 [0.25, 0.41]   
+gemini-flash     285  0.91 [0.86, 0.96]   0.42 [0.34, 0.49]   0.66 [0.62, 0.71]   0.45 [0.37, 0.53]   
+gemma3-1b        282  0.47 [0.38, 0.55]   0.66 [0.59, 0.74]   0.57 [0.51, 0.62]   0.04 [0.01, 0.08]   
+gpt-mini         285  0.98 [0.95, 1.00]   0.16 [0.10, 0.22]   0.57 [0.54, 0.60]   0.42 [0.34, 0.50]   
+mistral          285  0.99 [0.98, 1.00]   0.01 [0.00, 0.03]   0.50 [0.49, 0.52]   0.05 [0.02, 0.09]   
+phi3              77  0.98 [0.92, 1.00]   0.03 [0.00, 0.10]   0.50 [0.47, 0.54]   0.05 [0.00, 0.12]   
+qwen-coder       283  0.82 [0.75, 0.88]   0.26 [0.19, 0.33]   0.54 [0.49, 0.59]   0.04 [0.01, 0.08]   
+
+=== [A7] UNPARSED detect outputs (excluded from scoring, after one retry + tolerant parse) ===
+claude-sonnet   unparsed composables: 0
+gemini-flash    unparsed composables: 0
+gemma3-1b       unparsed composables: 3
+gpt-mini        unparsed composables: 0
+mistral         unparsed composables: 0
+phi3            unparsed composables: 0
+qwen-coder      unparsed composables: 2
+
+=== [A2] SPECIFICITY SPLIT: controls (not scanner-flagged) vs. screened negatives (scanner-flagged) ===
+model                        controls      screened negatives      of which HANDLED
+claude-sonnet            0.27 (10/37)           0.09 (10/112)           0.12 (7/57)
+gemini-flash             0.65 (24/37)           0.34 (38/112)          0.39 (22/57)
+gemma3-1b                0.70 (26/37)           0.65 (72/111)          0.65 (37/57)
+gpt-mini                 0.32 (12/37)           0.11 (12/112)           0.11 (6/57)
+mistral                   0.03 (1/37)            0.01 (1/112)           0.00 (0/57)
+phi3                              n/a             0.03 (1/34)           0.00 (0/13)
+qwen-coder               0.54 (20/37)           0.16 (18/112)          0.19 (11/57)
+
+=== [A3] DETECTION, exact McNemar on correct/incorrect (paired, same composables) ===
+claude-sonnet   vs gemini-flash    only-first-correct= 14 only-second-correct= 47  p=0.0000
+claude-sonnet   vs gemma3-1b       only-first-correct= 78 only-second-correct= 88  p=0.4850
+claude-sonnet   vs gpt-mini        only-first-correct= 11 only-second-correct= 15  p=0.5572
+claude-sonnet   vs mistral         only-first-correct= 20 only-second-correct=  4  p=0.0015
+claude-sonnet   vs qwen-coder      only-first-correct= 32 only-second-correct= 29  p=0.7982
+gemini-flash    vs gemma3-1b       only-first-correct= 83 only-second-correct= 60  p=0.0654
+gemini-flash    vs gpt-mini        only-first-correct= 44 only-second-correct= 15  p=0.0002
+gemini-flash    vs mistral         only-first-correct= 62 only-second-correct= 13  p=0.0000
+gemini-flash    vs qwen-coder      only-first-correct= 60 only-second-correct= 24  p=0.0001
+gemma3-1b       vs gpt-mini        only-first-correct= 82 only-second-correct= 76  p=0.6909
+gemma3-1b       vs mistral         only-first-correct= 98 only-second-correct= 71  p=0.0452
+gemma3-1b       vs qwen-coder      only-first-correct= 83 only-second-correct= 69  p=0.2917
+gpt-mini        vs mistral         only-first-correct= 24 only-second-correct=  4  p=0.0002
+gpt-mini        vs qwen-coder      only-first-correct= 34 only-second-correct= 27  p=0.4426
+mistral         vs qwen-coder      only-first-correct= 25 only-second-correct= 38  p=0.1299
+
+=== [A3] REFLECTION, exact McNemar on verdict changes (UNSURE excluded) ===
+claude-sonnet   n=129 toward= 8 away= 5 net=+3  p=0.581
+gemini-flash    n=129 toward= 7 away= 1 net=+6  p=0.070
+gemma3-1b       n=126 toward=15 away=21 net=-6  p=0.405
+gpt-mini        n=129 toward= 8 away= 5 net=+3  p=0.581
+mistral         n=128 toward= 8 away= 3 net=+5  p=0.227
+qwen-coder      n=129 toward=19 away=23 net=-4  p=0.644
+
+=== [A3] REPAIR on the common 60-issue subset, Pass with 95% bootstrap CI ===
+claude-sonnet   n= 56 Pass=0.62 [0.50, 0.75]
+gpt-mini        n= 60 Pass=0.67 [0.53, 0.78]
+gemini-flash    n= 60 Pass=0.68 [0.57, 0.80]
+qwen-coder      n= 59 Pass=0.34 [0.22, 0.46]
+mistral         n= 58 Pass=0.05 [0.00, 0.12]
+gemma3-1b       n= 56 Pass=0.00 [0.00, 0.00]
+
+Repair, exact McNemar on Pass (paired, same issues):
+claude-sonnet   vs gpt-mini        n=56 only-first= 4 only-second= 6  p=0.7539
+claude-sonnet   vs gemini-flash    n=56 only-first= 3 only-second= 6  p=0.5078
+claude-sonnet   vs qwen-coder      n=56 only-first=19 only-second= 4  p=0.0026
+claude-sonnet   vs mistral         n=55 only-first=32 only-second= 0  p=0.0000
+claude-sonnet   vs gemma3-1b       n=52 only-first=33 only-second= 0  p=0.0000
+gpt-mini        vs gemini-flash    n=60 only-first= 3 only-second= 4  p=1.0000
+gpt-mini        vs qwen-coder      n=59 only-first=21 only-second= 2  p=0.0001
+gpt-mini        vs mistral         n=58 only-first=37 only-second= 0  p=0.0000
+gpt-mini        vs gemma3-1b       n=56 only-first=36 only-second= 0  p=0.0000
+gemini-flash    vs qwen-coder      n=59 only-first=23 only-second= 3  p=0.0001
+gemini-flash    vs mistral         n=58 only-first=38 only-second= 0  p=0.0000
+gemini-flash    vs gemma3-1b       n=56 only-first=37 only-second= 0  p=0.0000
+qwen-coder      vs mistral         n=57 only-first=18 only-second= 1  p=0.0001
+qwen-coder      vs gemma3-1b       n=55 only-first=18 only-second= 0  p=0.0000
+mistral         vs gemma3-1b       n=54 only-first= 3 only-second= 0  p=0.2500
+
+[A4] hand-check sheet: 30 of 116 Pass repairs from the cloud tier
+
+[A4] hand-check sheet: 23 of 23 Pass repairs from the local tier
+-> wrote results/repair_handcheck_sheet.csv (judge this one) and results/repair_handcheck_key.csv (open only after judging)
+
+=== [A1] 40-item human check: Cohen's kappa on verdict, 95% bootstrap CI ===
+human vs rater_A_labels.csv   n=40 kappa=0.58 [0.35, 0.79]
+human vs rater_B_labels.csv   n=40 kappa=0.51 [0.26, 0.73]
+
+=== [A2] Unflagged composables sampled as control candidates (sample_negatives.py, seed 7) ===
+sampled=60  HANDLED=17  ISSUE=22  NO_ISSUE=20  UNSURE=1
+ISSUE rows are real defects the rule scanner did not flag; NO_ISSUE + HANDLED rows are the controls.

@@ -1,0 +1,54 @@
+check_id,category,fixes_defect (yes/no/unsure),breaks_something (yes/no),notes
+h01,decorative_mislabeled,yes,no,Decorative folder icon now has a null description; folder text remains available.
+h02,missing_content_description,yes,no,"Adds a spoken description for the previously unlabeled color swatch. Generic wording could be improved, but fixes the named omission."
+h03,missing_heading_semantics,unsure,no,"The heading() modifier addresses the defect, but the generated import list lacks semantics/heading; compilation in the actual file is unverified."
+h04,missing_semantics_role,no,yes,"Replaces multiple clickable modifiers with role-only semantics, removing theme, language, and external-link actions."
+h05,decorative_mislabeled,yes,no,Removes the redundant spoken label from the decorative folder icon.
+h06,touch_target_size,yes,no,"Increases the clickable color square to 48.dp. Visual size changes too, but no concrete functionality break is evident."
+h07,decorative_mislabeled,yes,no,"An empty contentDescription becomes null, correctly removing decorative icon semantics."
+h08,clickable_icon_not_iconbutton,yes,no,Converts clickable drawing icons to IconButtons and preserves callbacks; adds spoken action labels.
+h09,missing_content_description,yes,no,Adds an appropriate localized back-navigation description.
+h10,missing_semantics_role,unsure,no,"Adding role = Role.Button to clickable is the correct fix, but Role is absent from the shown generated imports; integration is unverified."
+h11,clickable_icon_not_iconbutton,unsure,yes,"Click handlers are moved into IconButtons, but shown imports omit IconButton. Also creates an unfocused-purpose MoreVert button with an empty click handler."
+h12,missing_heading_semantics,no,yes,Fully qualified semantics extension is called without a Modifier receiver; the added modifier expression is not valid Compose syntax.
+h13,color_contrast,unsure,no,"Theme primary/secondary may improve contrast, but forced white text is not guaranteed to contrast in all themes; clip imports also need checking."
+h14,textfield_no_label,yes,no,Adds a persistent localized label to the message input; surrounding lambda reformatting does not visibly alter behavior.
+h15,clickable_icon_not_iconbutton,unsure,yes,"IconButton wrappers preserve main click actions, but the displayed imports omit IconButton and a newly interactive MoreVert control has an empty action."
+h16,missing_state_description,no,yes,"The intended Checkbox role/state is appropriate, but .androidx.compose.foundation.selection.toggleable is an invalid modifier call."
+h17,pointerinput_no_semantics,no,yes,"onClick semantics calls currentTapToFocus(it), but onClick supplies no position argument and expects a Boolean result."
+h18,missing_heading_semantics,no,yes,Adds a fully qualified semantics function as a modifier without a receiver; invalid Compose expression.
+h19,missing_merge_descendants,no,yes,"mergeDescendants is a parameter of semantics(), not a writable property inside the semantics block."
+h20,missing_merge_descendants,yes,no,Row-level toggleable with Role.Switch exposes state/action while inner switches become noninteractive.
+h21,pointerinput_no_semantics,no,no,"Adds a single chart click using sentinel coordinates (-1,-1); accessible actions for actual data points are still absent."
+h22,clickable_icon_not_iconbutton,yes,no,"Replaces the clickable badge with IconButton, retaining its click action and circle styling."
+h23,pointerinput_no_semantics,no,yes,The fully qualified semantics extension is invoked without a receiver; role-only semantics also does not expose the drag action.
+h24,missing_heading_semantics,yes,no,Adds heading() to the title while retaining its original padding.
+h25,textfield_no_label,yes,no,Adds a localized accessible label to the search text field.
+h26,color_contrast,yes,no,"Darkens the disabled button background while retaining white text, improving contrast."
+h27,decorative_mislabeled,yes,no,Removes a generic description from an icon when adjacent text carries the meaning.
+h28,clickable_icon_not_iconbutton,yes,yes,"IconButton preserves the video-call action and supplies its description, but removes the prior background and end alignment."
+h29,missing_content_description,no,yes,The semantics call is malformed and contentDescription is assigned a List instead of a String.
+h30,decorative_mislabeled,yes,yes,Banner description is correctly removed; an unrelated 90.dp top padding addition visibly changes image layout.
+h31,clickable_icon_not_iconbutton,yes,no,"Replaces clickable search arrows with IconButtons, preserving enabled state, callbacks and accessible names."
+h32,missing_heading_semantics,yes,no,Adds heading() semantics directly to the title.
+h33,touch_target_size,yes,no,"Creates a 48.dp clickable target around the unchanged 20.dp visual swatch, preserving its action."
+h34,clickable_icon_not_iconbutton,yes,no,"Existing clickable icons become IconButtons with their callbacks intact. Icons still need meaningful descriptions, a separate issue."
+h35,textfield_no_label,no,yes,"The label is added, but the repair removes @Composable fun FieldRow() and leaves a top-level Row expression."
+h36,clickable_icon_not_iconbutton,yes,no,Wraps the styled badge in IconButton and retains the callback; inner icon remains visually styled.
+h37,decorative_mislabeled,yes,no,Movie image is treated as decorative when adjacent movie information is separately readable.
+h38,missing_content_description,no,yes,Output includes literal Markdown fences and an unsupported accessibilityElement modifier; original expand/collapse icon already had a description.
+h39,textfield_no_label,yes,no,Adds a TextField label using the existing localized search prompt.
+h40,touch_target_size,no,yes,"Although the target grows to 48.dp, the output contains literal Markdown fences and malformed modifier/block structure."
+h41,pointerinput_no_semantics,no,no,Only imports are inserted; the pointerInput drag gesture gains no accessibility semantics or alternative action.
+h42,missing_content_description,no,no,"No relevant composable change is shown, only imports; the claimed missing description is not addressed by this repair."
+h43,textfield_no_label,yes,no,Adds label = { Text(title) } to the editable text field; existing behavior is retained.
+h44,decorative_mislabeled,yes,no,Removes spoken description from a decorative product banner.
+h45,textfield_no_label,no,yes,"Output contains Markdown fences and tries to put a label on KeyboardOptions, where that parameter does not exist."
+h46,missing_content_description,yes,no,Adds a localized description to the back button image.
+h47,decorative_mislabeled,yes,no,Removes duplicated 92% speech from the decorative rating icon; nearby text still gives the value.
+h48,missing_heading_semantics,yes,no,Adds heading semantics to the dialog title without changing the dialog action.
+h49,pointerinput_no_semantics,no,no,A generic Radar chart description helps identify the chart but does not expose the pointer-only data-selection action.
+h50,color_contrast,no,yes,"Disabled text is changed to the same #979797 as its disabled background, making it unreadable."
+h51,missing_content_description,yes,no,Adds a localized back-button description.
+h52,textfield_no_label,yes,no,Adds a persistent Search city label to the OutlinedTextField.
+h53,color_contrast,yes,no,"Darkens the disabled button background while leaving white text, improving disabled-state contrast."

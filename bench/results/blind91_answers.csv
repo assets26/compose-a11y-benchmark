@@ -1,0 +1,92 @@
+blind_id,decl_name,anchor_line,verdict (ISSUE/NO_ISSUE/HANDLED/UNSURE),issue_category,notes
+b01,WhatsAppMessageTopBar,56,ISSUE,clickable_icon_not_iconbutton,Raw 26dp clickable back icon has no label or button role (R3/C2).
+b02,PostItem,64,NO_ISSUE,,Passive layout Column; child actions do not make the Column interactive.
+b03,LoadedPaywallComponents_Preview_CenteredBodyFooter,1225,NO_ISSUE,,Dark #272727 text on near-white #FDFDFD background has strong contrast.
+b04,TopBarSearch,34,ISSUE,textfield_no_label,Search placeholder is not a persistent text-field label.
+b05,WorkspaceStatusCard,824,UNSURE,,Theme primary foreground on a fixed dark card needs resolved theme colors.
+b06,RadarScrubber,841,ISSUE,pointerinput_no_semantics,Tap/drag scrubber changes selection without an accessible equivalent.
+b07,MovieHeader,122,ISSUE,missing_heading_semantics,Movie title is styled as a heading but lacks heading semantics.
+b08,SigningKeyRow,263,HANDLED,,RadioButton and selectable Row expose selection role/state natively (C1).
+b09,ListItem,224,ISSUE,missing_heading_semantics,Room section title has headline styling but no heading semantics.
+b10,GoToPositionDialog,271,ISSUE,textfield_no_label,"Position field provides only a numeric-range placeholder, not a label."
+b11,HistoryScreenLayout,168,NO_ISSUE,,Noninteractive spacing item has no touch-target requirement (C5).
+b12,ClientList,78,NO_ISSUE,,Spacer is decorative and noninteractive (C5).
+b13,TouchRegisteringDial,740,ISSUE,pointerinput_no_semantics,Time-dial tap selection uses pointer input without accessible activation.
+b14,ElasticPressContainer,51,NO_ISSUE,,onPress drives a visual scale effect only; no independent action is hidden.
+b15,ChapterDropdown,471,NO_ISSUE,,"Current chapter is in an expandable chapter list, an alternate access path (R4)."
+b16,NetworkingHeroCard,311,ISSUE,text_truncation_scaling,Unique connection URL may be clipped with no alternate full-value access shown (R4).
+b17,CustomSelectiveMenuItem,525,ISSUE,missing_semantics_role,Clickable selection Row lacks a role and selected semantics (R2).
+b18,HorizontalListItem,273,ISSUE,pointerinput_no_semantics,App item tap and long-press exist only as pointer gestures.
+b19,EmptyAnalysisView,350,NO_ISSUE,,Column only groups empty-state content; Button has its own semantics.
+b20,FavoriteDialog,130,HANDLED,,Material RadioButton plus selectable Row provide role and selected state (C1).
+b21,PasswordDetailScreen,268,NO_ISSUE,,"24dp Favorite icon is a non-clickable status indicator, not a touch target."
+b22,DoubleTapTestArea,208,ISSUE,pointerinput_no_semantics,Tap-test area lacks an equivalent keyboard or accessibility action.
+b23,EnginePickStep,295,NO_ISSUE,,Top-level Column is not clickable; its children supply their own actions.
+b24,RocketsErrorContent,29,ISSUE,missing_heading_semantics,Prominent error-screen title lacks heading semantics.
+b25,DynamicAsyncImage,57,ISSUE,error_state_no_semantics,Load failure changes image to placeholder without exposing error state.
+b26,TimeDialog,43,NO_ISSUE,,"Spacer is visual spacing only, not an interactive element (C5)."
+b27,PriorityChip,534,HANDLED,,Small decorative leading icon belongs to a Material FilterChip hit target.
+b28,MenuRow,167,HANDLED,,Named copy icon is inside a Material FilledIconButton with built-in button semantics.
+b29,BottomSheetsElementsHeader,118,ISSUE,clickable_icon_not_iconbutton,"24dp raw clickable close icon has no label, role or adequate target (R3)."
+b30,MainLayout,72,NO_ISSUE,,Noninteractive Spacer is not a 48dp touch target (C5).
+b31,CustomToolbar,47,ISSUE,clickable_icon_not_iconbutton,Back Image uses raw clickable without an accessible label or role (R3).
+b32,HomeScreen,98,NO_ISSUE,,Bottom-sheet Column is passive; its content is evaluated separately.
+b33,CreateTweetScreen,110,ISSUE,textfield_no_label,Tweet entry has a placeholder but no persistent accessible label.
+b34,RecipientPickerContent,207,NO_ISSUE,,Outer Column is passive; embedded Material Switch handles its own state (C1).
+b35,AppUpdateDialog,134,ISSUE,missing_heading_semantics,Update dialog title uses titleLarge without heading semantics.
+b36,CategoryItem,54,ISSUE,pointerinput_no_semantics,Long-press opens a menu without an accessibility custom action.
+b37,DifficultyBadge,396,ISSUE,color_contrast,White text on the EASY green #4CAF50 badge has insufficient contrast.
+b38,TaskCell,111,NO_ISSUE,,"Headline text style is used for editable task text, not a section heading."
+b39,BenchmarkSection,213,ISSUE,missing_semantics_role,Clickable ListItem lacks Role.Button for the benchmark navigation action (R2).
+b40,StoreConfigurationCard,1293,ISSUE,textfield_no_label,Custom expiration field has only a placeholder; isError is handled by C4.
+b41,RowScope.DialButton,251,ISSUE,pointerinput_no_semantics,Press gesture operates dial control without a semantic activation action.
+b42,InstallingStep,594,ISSUE,missing_heading_semantics,Installation status title has headline styling but no heading semantics.
+b43,MenuItemWithCheckbox,43,ISSUE,missing_semantics_role,Clickable checkbox Row lacks toggleable role/state at the container (R2/C1).
+b44,SquigglyProgressBar,117,ISSUE,pointerinput_no_semantics,"Seek bar supports tap/drag only, with no adjustable semantics."
+b45,ColorPickerDialog,115,NO_ISSUE,,"Dialog Card is a passive container, not an interactive control."
+b46,BookRow,209,ISSUE,text_truncation_scaling,Unique book title is limited to one line with no full-title path shown (R4).
+b47,SearchTextField,163,ISSUE,textfield_no_label,Search field has placeholder and test tag but no accessible label.
+b48,CloudBackupScreen,89,HANDLED,,Settings icon is labeled inside a standard Material IconButton (C2).
+b49,ProfileCard,145,ISSUE,text_truncation_scaling,Unique profile display name can be ellipsized without full-name access shown (R4).
+b50,InputSection,390,ISSUE,textfield_no_label,"Main text editor has only a placeholder, not a persistent label."
+b51,AppRoutingSheet,200,NO_ISSUE,,Spacer separates buttons and has no activation target (C5).
+b52,SettingsScreen,160,ISSUE,textfield_no_label,Server URL field lacks a label; URL placeholder is only an example.
+b53,MultiSongSelectionBar,215,ISSUE,textfield_no_label,Playlist-name input relies on placeholder rather than a label.
+b54,RadarChartMultiCanvas,413,ISSUE,pointerinput_no_semantics,Radar chart point selection uses touch coordinates without semantics.
+b55,AppDrawer,1073,ISSUE,pointerinput_no_semantics,Long-press drag reordering has no accessible move/reorder action.
+b56,ContributorsDialog,93,NO_ISSUE,,Contributors Column is a noninteractive layout container.
+b57,EditTextPreference,98,ISSUE,textfield_no_label,Preference text field has no label; dialog title is separate.
+b58,AboutScreen,101,HANDLED,,Labeled back icon is in a Material IconButton with built-in semantics (C2).
+b59,AppHeader,205,ISSUE,missing_heading_semantics,App header headline has no explicit heading semantics.
+b60,SearchBar,70,NO_ISSUE,,"18dp search glyph is decorative, not an independent touch target."
+b61,QuickReceivedFilesCard,819,ISSUE,text_truncation_scaling,Unique received file name may be truncated without a full-name path (R4).
+b62,ChatScreen,248,ISSUE,textfield_no_label,Chat composition field uses placeholder but no field label.
+b63,StreamButton,45,ISSUE,color_contrast,Disabled foreground and background palette both use #979797.
+b64,GenerateX25519,330,ISSUE,missing_heading_semantics,Generate-key screen title is visually a heading without heading semantics.
+b65,TopNavBar,56,ISSUE,clickable_icon_not_iconbutton,Clickable back Image has no label or control role (R3).
+b66,ColorPickerDialog,186,ISSUE,pointerinput_no_semantics,Color-wheel changes require touch-point gestures with no accessible alternative.
+b67,CloudNetworkingScreen,213,ISSUE,textfield_no_label,Local URL editor uses a hint but no persistent label.
+b68,GitHubUpdateCard,36,NO_ISSUE,,Update Card is passive; child Button and IconButton provide actions.
+b69,ResultItem,294,ISSUE,text_truncation_scaling,Unique result title is ellipsized without an alternate full-text path (R4).
+b70,FieldRow,629,ISSUE,textfield_no_label,Search city field has hint and icon but no accessible field label.
+b71,OutlineOverviewContent,133,NO_ISSUE,,"Backdrop tap is optional dismissal, not a named control at the anchor."
+b72,CurrentBalanceCard,103,NO_ISSUE,,Light-gray and white text contrast clearly against the dark gradient.
+b73,CryptoSafeApp,360,NO_ISSUE,,"Ellipsized chat-box name is an app-bar title, exempt under R4."
+b74,SurveyStatistics,749,ISSUE,missing_heading_semantics,Survey-statistics section header lacks heading semantics.
+b75,DialogHeader,120,ISSUE,missing_heading_semantics,DialogHeader supplies a visual headline without heading semantics.
+b76,LogoBlock,273,NO_ISSUE,,"App logo wordmark is branding, not necessarily a navigable section heading."
+b77,EncryptFlow,370,ISSUE,text_truncation_scaling,Selected source filename may be shortened without full-name access (R4).
+b78,SearchBar,165,ISSUE,textfield_no_label,Documentation search TextField has only placeholder text.
+b79,CategoryManagerScreen,71,HANDLED,,Category name input explicitly supplies label = Text(...).
+b80,SettingDialog,518,HANDLED,,Material AlertDialog conveys its title within the dialog context.
+b81,VersionTimelineEntry,124,NO_ISSUE,,Short version label uses intentional one-line layout; no unique long text shown (R4).
+b82,InputSection,180,ISSUE,textfield_no_label,Sibling Input heading and placeholder do not attach label to TextField.
+b83,SketchbookControlMenu,66,ISSUE,clickable_icon_not_iconbutton,Raw 40dp brush Icon is clickable with neither label nor role (R3).
+b84,HazardScreenSettingsSection,104,NO_ISSUE,,Outer gradient Column has no click modifier; child Row is separate.
+b85,ChatScreen,212,ISSUE,textfield_no_label,Message field supplies only a disappearing hint.
+b86,ApiKeyCard,434,ISSUE,text_truncation_scaling,User-provided service name may be ellipsized without full-text access (R4).
+b87,LineChartItem,403,ISSUE,pointerinput_no_semantics,Line chart tap/drag selection has no accessible selection action.
+b88,DateMetaRow,418,HANDLED,,18dp icon is decorative; adjacent text supplies the row label.
+b89,DailyFocusScreen,144,ISSUE,missing_heading_semantics,Edit-todo sheet title lacks heading() semantics.
+b90,VerticalListItem,200,ISSUE,pointerinput_no_semantics,App-list tap and long-press are exposed only through pointer input.
+b91,OnboardingScreen,340,ISSUE,missing_heading_semantics,Onboarding sheet section heading lacks heading semantics.

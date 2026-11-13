@@ -178,7 +178,7 @@ From the repository root:
 
 ```bash
 cd bench
-pip install pandas requests matplotlib
+pip install "pandas<3" requests matplotlib   # the legacy score_benchmark.py fails on pandas 3
 ```
 
 Re-parse the released raw model outputs:
@@ -230,6 +230,7 @@ Reproduce the camera-ready analyses:
 python reviewer_stats.py                 # CIs, McNemar tests, kappa -> results/reviewer_stats.txt
 python blind91.py score                  # second blind check -> results/blind91_result.txt
 python prompt_ablation.py                # prompt-definition test -> results/prompt_ablation_summary.csv
+python make_detection.py; python make_reflect.py   # Figures 2 and 3
 python score_repair_subset.py > results/repair_subset_summary.txt
 ```
 

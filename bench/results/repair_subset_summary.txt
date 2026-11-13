@@ -1,0 +1,13 @@
+subset items: 135
+model              n   Subst    Synt     API    Addr    Pass
+------------------------------------------------------------
+claude-sonnet     60     1.0     1.0   0.929   0.679   0.625
+gpt-mini          60     1.0     1.0    0.95   0.683   0.667
+gemini-flash      60     1.0     1.0    0.95   0.733   0.683
+qwen-coder        60   0.881   0.983   0.966   0.407   0.339
+mistral           59   0.241   0.879   0.948    0.31   0.052
+gemma3-1b         59     0.0    0.75     1.0   0.018     0.0
+
+Note: n above counts all subset repairs per model. Table 3 reports n as the repairs that
+returned parsable code (Claude 56, Qwen 59, Mistral 58, Gemma3-1B 56, Gemini and GPT-5-mini 60);
+every fraction above uses that n as its denominator.

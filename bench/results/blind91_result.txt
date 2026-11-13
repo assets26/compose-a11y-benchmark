@@ -1,0 +1,6 @@
+judged 91 of 91 items
+NEW 91-item check, human vs answer key:  agree 74/91 = 0.81  kappa = 0.63 [0.48, 0.76]
+category, where both say ISSUE: same category on 52/53
+disagreements (blind_id: yours vs key): b05: UNSURE vs NO_ISSUE, b08: HANDLED vs ISSUE, b15: NO_ISSUE vs ISSUE, b20: HANDLED vs ISSUE, b24: ISSUE vs NO_ISSUE, b25: ISSUE vs NO_ISSUE, b27: HANDLED vs NO_ISSUE, b28: HANDLED vs NO_ISSUE, b39: ISSUE vs NO_ISSUE, b48: HANDLED vs NO_ISSUE, b58: HANDLED vs NO_ISSUE, b73: NO_ISSUE vs ISSUE, b76: NO_ISSUE vs ISSUE, b79: HANDLED vs NO_ISSUE, b80: HANDLED vs ISSUE, b81: NO_ISSUE vs ISSUE, b88: HANDLED vs NO_ISSUE
+first check vs answer key (n=40):       agree 0.78  kappa = 0.65 [0.46, 0.83]   (note: you also adjudicated some of these)
+both checks pooled (n=131):              agree 0.80  kappa = 0.64 [0.52, 0.75]
